@@ -1,4 +1,8 @@
 #   System Y
+##  Terminology
+**Owner** = The node whose ID is equal to the hash value generated from the filename by the Nameserver
+**Local File Holder** = The person who controls a local copy of a file (and who isn't the owner of the file)
+
 ##  Responsibilities
 ### Nameserver
 -   Calculates hashes from filenames (`Math.abs(filename.hashCode() % 32768)`)
@@ -55,9 +59,20 @@
                                     +-----------------------------+
 ```
 
+### Node
+When a node leaves the network (either because of a failure or because it wants to) its files are made inaccessible over the network (they are not removed)
+
+### File Agent
+The file agent is a list of all file present on the network.
+It continuously circulates through the network by all nodes calling RMI methods on eachother
+`void update (List<String> fileList)`
+
 ## TO-DO
 - [ ] Implement UDP multicast
+- [ ]  Design protocol for non-RMI (TCP/UDP) communication
 
 ## Design Decisions
 - Security?
 - Will the nameserver limit the amount of requests a node can make over a specified period of time?
+- Can downloaded files be reshared?
+- What happens when a file is changed? In an owner? In a local file? In a downloaded file?
