@@ -35,19 +35,19 @@
   | ShutdownAgent shutdown          |
   +---------------------------------+
   | RMI server on port 1099         |
-  +---------------------------------+
+  +-------------+-------------------+
                 |
                 +-----------------------------------+-----------------------------------+
                 |                                   |                                   |
-  +-------------+---------------+   +---------------+-------------+   +---------------------------------+
+  +-------------+---------------+   +---------------+-------------+   +-----------------+---------------+
   | Resolver                    |   | DiscoveryAgent              |   | ShutdownAgent                   |
   +-----------------------------+   +-----------------------------+   +---------------------------------+
   | implements RMI              |   | implements Runnable         |   | implements RMI                  |
-  |                             |   | Listens on UDP Port 1997    |   |                                 |
-  +-----------------------------+   +-----------------------------+   +---------------------------------+
-  | IP lookup (String filename) |   | Continuously listens for    |   | void suspectedDead (IP nodeIp)  |
-  | IP lookup (int nodeId)      |   | incoming broadcasts or      |   | void shutdown (IP nodeIp)       |
-  +-----------------------------+   | multicasts                  |   +---------------------------------+
+  +-----------------------------+   | Listens on UDP Port 1997    |   +---------------------------------+
+  | IP lookup (int nodeId)      |   +-----------------------------+   | void suspectedDead (IP nodeIp)  |
+  | IP lookup (String filename) |   | Continuously listens for    |   | void shutdown (IP nodeIp)       |
+  +-----------------------------+   | incoming broadcasts or      |   +---------------------------------+
+                                    | multicasts                  |   
                                     +-----------------------------+
                                     | When a incoming connection  |
                                     | is received, the agent      |
