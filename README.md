@@ -34,6 +34,8 @@
   | DiscoveryAgent discovery        |
   | ShutdownAgent shutdown          |
   +---------------------------------+
+  | RMI server on port 1099         |
+  +---------------------------------+
                 |
                 +-----------------------------------+-----------------------------------+
                 |                                   |                                   |
@@ -41,6 +43,7 @@
   | Resolver                    |   | DiscoveryAgent              |   | ShutdownAgent                   |
   +-----------------------------+   +-----------------------------+   +---------------------------------+
   | implements RMI              |   | implements Runnable         |   | implements RMI                  |
+  |                             |   | Listens on UDP Port 1997    |   |                                 |
   +-----------------------------+   +-----------------------------+   +---------------------------------+
   | IP lookup (String filename) |   | Continuously listens for    |   | void suspectedDead (IP nodeIp)  |
   | IP lookup (int nodeId)      |   | incoming broadcasts or      |   | void shutdown (IP nodeIp)       |
@@ -51,3 +54,10 @@
                                     | responds appropriately      |
                                     +-----------------------------+
 ```
+
+## TO-DO
+[ ] Implement UDP multicast
+
+## Design Decisions
+- Security?
+- Will the nameserver limit the amount of requests a node can make over a specified period of time?
