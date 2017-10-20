@@ -23,3 +23,31 @@
 
 ##### Regular Operation (Thomas & Astrid)
 -   Any node can request the Nameserver to resolve a filename or a node-ID to an IP
+
+####  Nameserver Classes
+```
+  +---------------------------------+
+  | Nameserver                      |
+  +-------------+-------------------+
+  | TreeMap <int, InetAddress> map  |
+  | Resolver nodeResolver           |
+  | DiscoveryAgent discovery        |
+  | ShutdownAgent shutdown          |
+  +---------------------------------+
+                |
+                +-----------------------------------+-----------------------------------+
+                |                                   |                                   |
+  +-------------+---------------+   +---------------+-------------+   +---------------------------------+
+  | Resolver                    |   | DiscoveryAgent              |   | ShutdownAgent                   |
+  +-----------------------------+   +-----------------------------+   +---------------------------------+
+  | implements RMI              |   | implements Runnable         |   | implements RMI                  |
+  +-----------------------------+   +-----------------------------+   +---------------------------------+
+  | IP lookup (String filename) |   | Continuously listens for    |   | void suspectedDead (IP nodeIp)  |
+  | IP lookup (int nodeId)      |   | incoming broadcasts or      |   | void shutdown (IP nodeIp)       |
+  +-----------------------------+   | multicasts                  |   +---------------------------------+
+                                    +-----------------------------+
+                                    | When a incoming connection  |
+                                    | is received, the agent      |
+                                    | responds appropriately      |
+                                    +-----------------------------+
+```
