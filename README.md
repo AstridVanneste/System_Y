@@ -28,7 +28,7 @@
 ```
   +---------------------------------+
   | Nameserver                      |
-  +-------------+-------------------+
+  +---------------------------------+
   | TreeMap <int, InetAddress> map  |
   | Resolver nodeResolver           |
   | DiscoveryAgent discovery        |
