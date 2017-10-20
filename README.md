@@ -56,7 +56,7 @@
 ```
 
 ## TO-DO
-[ ] Implement UDP multicast
+- [ ] Implement UDP multicast
 
 ## Design Decisions
 - Security?
