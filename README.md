@@ -1,6 +1,6 @@
 #   System Y
 ##  Terminology
-**Owner** = The node whose ID is equal to the hash value generated from the filename by the Nameserver
+**Owner** = The node whose ID is lower and the closest to the hash value generated from the filename by the Nameserver
 
 **Local File Holder** = The person who controls a local copy of a file (and who isn't the owner of the file)
 
