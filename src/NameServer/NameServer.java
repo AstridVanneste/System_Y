@@ -1,3 +1,5 @@
+package NameServer;
+
 /**
  * Created by Astrid on 20-Oct-17.
  */
