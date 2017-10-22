@@ -5,5 +5,5 @@ package NameServer;
  */
 public class NameServer
 {
-    //test
+
 }
