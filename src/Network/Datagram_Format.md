@@ -1,4 +1,4 @@
-# Discovery Protocol for System Y
+# Network Protocol for System Y
 ## Overview
 The discovery-service for System Y will consist of 2 messages, the initial being a broadcast, intended to go from the client to the Nameserver.
 
