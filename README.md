@@ -79,7 +79,9 @@ It continuously circulates through the network by all nodes calling RMI methods 
 
 ## TO-DO
 - [ ] Implement UDP multicast
-- [ ]  Design protocol for non-RMI (TCP/UDP) communication
+- [ ] Design protocol for non-RMI (TCP/UDP) communication
+- [ ] Add file package and classes to repo
+- [ ] Add file methods to network system
 
 ## Design Decisions
 - Security?
