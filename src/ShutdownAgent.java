@@ -1,5 +1,6 @@
-import Network.UDP.Unicast.Client;
+import Network.UDP.Unicast.*;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -22,15 +23,18 @@ import java.rmi.server.UnicastRemoteObject;
 public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentInterface {
 
 
-    InetAddress deadNodeIP;
+    String deadNodeIP;
     boolean statusNode;
 
     protected ShutdownAgent() throws RemoteException {
+    }
+
+    public void failureListener(){
 
     }
 
-    @Override
-    public void requestDeadNode(InetAddress nodeIP) throws RemoteException {
+
+    public void requestDeadNode(String nodeIP) throws RemoteException {
 
         deadNodeIP = nodeIP;
         statusNode = pingNode(deadNodeIP);
@@ -38,31 +42,38 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
         if (!statusNode)
             deleteNodeFromMap(deadNodeIP);
-
-
+            //send to neighbours
     }
 
     // Return true if node replies, false if not
     //      Not necessary in interface
-    public boolean pingNode (InetAddress nodeIP) {
-
-        // Send a pingRequest makes me client or server???
-        new Client();
-
-        return true;
+    public boolean pingNode (String nodeIP) {
+        try {
+            //ping the client
+            if(InetAddress.getByName(nodeIP).isReachable(3000)){
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     // NS can delete a node from his Map
     //      Not necessary in interface
-    public void deleteNodeFromMap (InetAddress nodeIP){
+    public void deleteNodeFromMap (String deadNodeIP){
 
     }
 
     // Send new IP-addresses to neighbours of dead node
     // NS knows just one IP of the neighbours??
     //      Not necessary in interface
-    public void sendNeighboursIP (InetAddress deadNodeIP){
-
+    public void sendNeighboursIP (InetAddress deadNodeIP, Server server){
+        //Node neighbour1 = node.getLeftNeighbour();
+        //Node neighbour2 = node.getRightNeighbour();
+        //server.send(ipaddr neighbour 2) <= neigbour needs to be updated, left neighbour from deleted node has new right neigbhour = right neighbour dleted node
+        server.send("",2000,"new left neighbour"); //ip's of neighbour??
+        server.send("",2000,"new left neighbour");
     }
 
     // Sends a broadcast about the dead node. This allows all nodes
