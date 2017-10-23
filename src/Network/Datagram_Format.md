@@ -65,9 +65,14 @@ The reply code tells the receiver the result of their request. It also tells the
 ## Request Codes
 
 - 0x00000001  Request to be added to network
+- 0x00000002  Request Cluster Health Report
+- 0x00000003  Ping request
 
 ## Reply Codes
 
 - 0x00000000  Succesfully added to network, reply to 0x00000001
 - 0x00000001  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x00000001.
 - 0x00000002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x00000001.
+- 0x00000003  Cluster Node is UP. (See data for more info)
+- 0x00000004  Cluster Node is DOWN. (See data for more info)
+- 0x00000005  Ping reply
