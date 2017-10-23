@@ -40,7 +40,7 @@
 |  | Implements Resolver and         |                                                                          |
 |  | ShutdownAgentinterfaces         |                                                                          |
 |  +---------------------------------+                                                                          |
-|  | TreeMap <int, String> map  |                                                                          |
+|  | TreeMap <int, String> map       |                                                                          |
 |  | Resolver nodeResolver           |                                                                          |
 |  | DiscoveryAgent discovery        |                                                                          |
 |  | ShutdownAgent shutdown          |                                                                          |
