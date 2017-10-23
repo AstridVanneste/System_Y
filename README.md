@@ -37,6 +37,9 @@
 |  +---------------------------------+                                                                          |
 |  | Nameserver                      |                                                                          |
 |  +---------------------------------+                                                                          |
+|  | Implements Resolver and         |                                                                          |
+|  | ShutdownAgentinterfaces         |                                                                          |
+|  +---------------------------------+                                                                          |
 |  | TreeMap <int, InetAddress> map  |                                                                          |
 |  | Resolver nodeResolver           |                                                                          |
 |  | DiscoveryAgent discovery        |                                                                          |
