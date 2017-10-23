@@ -1,3 +1,5 @@
+package NameServer;
+
 /**
  * Created by Axel on 20/10/2017.
  */
@@ -11,7 +13,7 @@ import java.rmi.RemoteException;
 public interface ShutdownAgentInterface extends Remote {
 
     // The node calls this method to do a request to the NS
-    public void requestDeadNode (String nodeIP) throws RemoteException;
+    public void requestDeadNode (String deadNodeIP) throws RemoteException;
         // call pingNode
 
 

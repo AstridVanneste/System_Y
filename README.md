@@ -43,7 +43,7 @@
 |  | TreeMap <int, String> map       |                                                                          |
 |  | Resolver nodeResolver           |                                                                          |
 |  | DiscoveryAgent discovery        |                                                                          |
-|  | ShutdownAgent shutdown          |                                                                          |
+|  | NameServer.ShutdownAgent shutdown          |                                                                          |
 |  +---------------------------------+                                                                          |
 |  | RMI server on port 1099         |                                                                          |
 |  +-------------+-------------------+                                                                          |
@@ -51,7 +51,7 @@
 |                +-----------------------------------+-----------------------------------+                      |
 |                |                                   |                                   |                      |
 |  +-------------+---------------+   +---------------+-------------+   +-----------------+---------------+      |
-|  | Resolver                    |   | DiscoveryAgent              |   | ShutdownAgent                   |      |
+|  | Resolver                    |   | DiscoveryAgent              |   | NameServer.ShutdownAgent                   |      |
 |  +-----------------------------+   +-----------------------------+   +---------------------------------+      |
 |  | implements RMI              |   | implements Runnable         |   | implements RMI                  |      |
 |  +-----------------------------+   | Listens on UDP Port 1997    |   +---------------------------------+      |
