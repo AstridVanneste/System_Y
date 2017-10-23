@@ -56,7 +56,7 @@
 |  | implements RMI              |   | implements Runnable         |   | implements RMI                  |      |
 |  +-----------------------------+   | Listens on UDP Port 1997    |   +---------------------------------+      |
 |  | IP lookup (int nodeId)      |   +-----------------------------+   | void suspectedDead (IP nodeIp)  |      |
-|  | IP lookup (String filename) |   | Continuously listens for    |   | void shutdown (IP nodeIp)       |      |
+|  | IP lookup (String filename)  |   | Continuously listens for    |   | void shutdown (IP nodeIp)       |      |
 |  +-----------------------------+   | incoming broadcasts or      |   +---------------------------------+      |
 |                                    | multicasts                  |                                            |
 |                                    +-----------------------------+                                            |
