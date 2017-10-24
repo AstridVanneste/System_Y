@@ -50,13 +50,13 @@ public class Server implements TCPServer
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("Networking.TCP.Server.send()\tAn Exception was thrown while trying to send data");
+				System.err.println("Networking.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
 				ioe.printStackTrace();
 			}
 		}
 		else
 		{
-			System.err.println("Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
@@ -80,13 +80,13 @@ public class Server implements TCPServer
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("Network.TCP.Server.send()\tAn Exception was thrown while trying to send data");
+				System.err.println("Network.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
 				ioe.printStackTrace();
 			}
 		}
 		else
 		{
-			System.err.println("Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
@@ -99,7 +99,7 @@ public class Server implements TCPServer
 		}
 		else
 		{
-			System.err.println("Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 			return new byte[0];
 		}
 	}
@@ -113,7 +113,7 @@ public class Server implements TCPServer
 		}
 		else
 		{
-			System.err.println("Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 			return new byte[0];
 		}
 	}
@@ -140,7 +140,7 @@ public class Server implements TCPServer
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("Network.TCP.Server.run()\tException was thrown in call to accept() or close()");
+			System.err.println("Network.TCP.Publisher.run()\tException was thrown in call to accept() or close()");
 			ioe.printStackTrace();
 		}
 	}
@@ -158,7 +158,7 @@ public class Server implements TCPServer
 	public String toString()
 	{
 		StringBuilder resBuilder = new StringBuilder();
-		resBuilder.append("Server listening on port ");
+		resBuilder.append("Publisher listening on port ");
 		resBuilder.append(this.portNum);
 		resBuilder.append(" (TCP)");
 		resBuilder.append('\n');

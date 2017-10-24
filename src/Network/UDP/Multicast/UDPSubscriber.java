@@ -3,7 +3,7 @@ package Network.UDP.Multicast;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
-public interface UDPClient
+public interface UDPSubscriber
 {
 	/**
 	 * Starts the UDP server.

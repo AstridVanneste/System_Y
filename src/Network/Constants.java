@@ -14,7 +14,7 @@ public class Constants
 	public final static int UDP_PORT_SERVER = 2001;
 
 	/**
-	 * Server IP for testing purposes.<br>
+	 * Publisher IP for testing purposes.<br>
 	 * Update at the beginning of every lab session.<br>
 	 * If you don't:<br>
 	 * <img src="http://godlessmom.com/wp-content/uploads/2015/03/youre-going-to-have-a-bad-time.png" alt="You're going to have a bad time.">

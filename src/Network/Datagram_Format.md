@@ -20,29 +20,23 @@ Version is the version number of the party that sent the datagram, this can chan
 
 ```
                 SEPARATE FIELDS                                         COMPLETE PACKAGE
-        1 Byte                                                      8 Bytes
+        1 Byte          3 Bytes                                     4 Bytes
     |<--------->|<--------------------------------->|       |<--------------------------------------------->|
     +-----------+-----------------------------------+       +-----------+-----------------------------------+--
     |   Version |   Data Length                     |       |   Version |   Data Length                     | ^
     +-----------+-----------------------------------+       +-----------+-----------------------------------+ |
                                                             |   Transaction ID                              | |
-        8 Bytes                                             +-----------------------------------------------+ |
-    |<--------------------------------------------->|       |   Request Code                                | | 5 Octets
-    +-----------------------------------------------+       +-----------------------------------------------+ |
-    |   Transaction ID                              |       |   Reply Code                                  | |
-    +-----------------------------------------------+       +-----------------------------------------------+ |
-                                                            |   Data                                        | v
-        8 Bytes                                             +-----------------------------------------------+--
-    |<--------------------------------------------->|
-    +-----------------------------------------------+       Total: 40 Bytes without data
-    |   Request Code                                |
-    +-----------------------------------------------+
-    
-        8 Bytes
-    |<--------------------------------------------->|
-    +-----------------------------------------------+
-    |   Reply Code                                  |
-    +-----------------------------------------------+
+        4 Bytes                                             +----------------------+------------------------+ |
+    |<--------------------------------------------->|       |   Request Code       | Reply Code             | V 5 Quads
+    +-----------------------------------------------+       +----------------------+------------------------+--
+    |   Transaction ID                              |       |   Data                                        |
+    +-----------------------------------------------+       +-----------------------------------------------+
+
+        2 Bytes                     2 Bytes
+    |<--------------------->|<--------------------->|
+    +-----------------------+-----------------------+       Total: 20 Bytes without data
+    |   Request Code        | Reply Code            |
+    +-----------------------+-----------------------+
     
         ??? Bytes
     |<--------------------------------------------->|
@@ -71,18 +65,18 @@ The reply code tells the receiver the result of their request. It also tells the
 
 ## Request Codes
 
-- 0x00000001  Request to be added to network
-- 0x00000002  Request Cluster Health Report
-- 0x00000003  Ping request
+- 0x0001  Request to be added to network
+- 0x0002  Request Cluster Health Report
+- 0x0003  Ping request
 
 ## Reply Codes
 
-- 0x00000000  Succesfully added to network, reply to 0x00000001
-- 0x00000001  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x00000001.
-- 0x00000002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x00000001.
-- 0x00000003  Cluster Node is UP. (See data for more info), reply to 0x00000002.
-- 0x00000004  Cluster Node is DOWN. (See data for more info), reply to 0x00000002.
-- 0x00000005  Ping reply, reply to 0x00000003.
+- 0x0000  Succesfully added to network, reply to 0x0001
+- 0x0001  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x0001.
+- 0x0002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
+- 0x0003  Cluster Node is UP. (See data for more info), reply to 0x0002.
+- 0x0004  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
+- 0x0005  Ping reply, reply to 0x0003.
 
 
 ### Discovery Service
