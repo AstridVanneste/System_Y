@@ -37,19 +37,6 @@ public class Client implements UDPClient, Runnable
 		}
 	}
 
-	public static void printByteArray (byte[] data)
-	{
-		for (int i = 0; i < data.length; i++)
-		{
-			System.out.print(data[i] + " ");
-
-			if ((i % 8) == 0)
-			{
-				System.out.print('\n');
-			}
-		}
-	}
-
 	@Override
 	public void send(String remoteHost,
 	                 int port,
@@ -109,7 +96,7 @@ public class Client implements UDPClient, Runnable
 		if(!this.packetBuffer.isEmpty())
 		{
 			DatagramPacket packet = this.packetBuffer.get(0);
-			//Client.printByteArray(this.packetBuffer.get(0).getData());
+			//Publisher.printByteArray(this.packetBuffer.get(0).getData());
 			this.packetBuffer.remove(0);
 			return packet;
 		}

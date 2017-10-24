@@ -75,7 +75,7 @@ public class Server implements UDPServer, Runnable
 			System.err.println("Error when sending packet");
 			e.printStackTrace();
 		}
-		//Client.printByteArray(data);
+		//Publisher.printByteArray(data);
 		//System.out.println("");
 	}
 
