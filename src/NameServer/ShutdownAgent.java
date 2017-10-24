@@ -2,6 +2,7 @@ package NameServer;
 
 import Network.UDP.Unicast.*;
 
+import javax.lang.model.element.Name;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -31,8 +32,8 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
     private boolean statusNode;
     private NameServer nameServer;
 
-    protected ShutdownAgent(NameServer nameServer) throws RemoteException {
-        this.nameServer=nameServer;
+    protected ShutdownAgent() throws RemoteException {
+        this.nameServer= NameServer.getNameServer();
     }
 
     public void failureListener(){
