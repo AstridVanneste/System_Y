@@ -11,10 +11,13 @@ public class NameServer
 
 	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
 
+	private Resolver resolver;
+
 
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
+		//this.resolver = new Resolver();
 	}
 
 	public static NameServer getNameServer()
@@ -25,5 +28,22 @@ public class NameServer
 		}
 		return nameServer;
 	}
+
+	/**
+	 * Initializes RMI
+	 */
+	public void init()
+	{
+
+	}
+
+	/**
+	 * Binds new RMI service to registry
+	 */
+	public void bind(String name)
+	{
+
+	}
+
 
 }
