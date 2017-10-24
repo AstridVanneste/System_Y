@@ -17,19 +17,19 @@ public class Resolver implements ResolverInterface
 
 	public void init()
 	{
-		this.nameServer.bind("RESOLVER");
+		//this.nameServer.bind("RESOLVER");
 	}
 
 	@Override
 	public String lookup(int nodeId) throws RemoteException
 	{
-		return nameServer.lookup();
+		return null;
 	}
 
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-		int hash = filename.hashCode()%32768; //todo: CHECK IF FORMULA CORRECT!!!
+		//int hash = abs(filename.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
 
 		return null;
 	}
