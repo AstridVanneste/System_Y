@@ -20,7 +20,7 @@ Version is the version number of the party that sent the datagram, this can chan
 
 ```
                 SEPARATE FIELDS                                         COMPLETE PACKAGE
-        1 Byte                                                      8 Bytes
+        1 Byte            7 Bytes                                          8 Bytes
     |<--------->|<--------------------------------->|       |<--------------------------------------------->|
     +-----------+-----------------------------------+       +-----------+-----------------------------------+--
     |   Version |   Data Length                     |       |   Version |   Data Length                     | ^
