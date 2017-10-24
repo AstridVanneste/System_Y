@@ -1,0 +1,66 @@
+package NameServer;
+
+import java.rmi.RemoteException;
+import java.security.InvalidParameterException;
+
+/**
+ * Created by Astrid on 22-10-2017.
+ */
+public class Resolver implements ResolverInterface
+{
+	private NameServer nameServer;
+
+	public Resolver()
+	{
+		this.nameServer = NameServer.getNameServer();
+	}
+
+	public void init()
+	{
+		this.nameServer.bind("RESOLVER");
+	}
+
+	@Override
+	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
+	{
+		if(this.nameServer.map.containsKey(nodeId))
+		{
+			return this.nameServer.map.get(nodeId);
+		}
+		else
+		{
+			throw new InvalidParameterException("No node with that ID");
+		}
+	}
+
+	@Override
+	public String lookup(String filename) throws RemoteException
+	{
+		int hash = Math.abs(filename.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+
+		System.out.println("HASH = " + hash);
+
+		int ID = getOwnerID(hash);
+
+
+		return this.nameServer.map.get(ID);
+	}
+
+	public int getOwnerID(int hash)
+	{
+		int ID;
+		boolean lower = true;
+
+		ID = nameServer.map.lowerKey(hash);
+
+
+
+		return ID;
+	}
+
+	@Deprecated
+	public void addToTree(int ID, String IP)
+	{
+		this.nameServer.map.put(ID,IP);
+	}
+}
