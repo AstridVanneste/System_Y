@@ -92,7 +92,7 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
        4 Bytes          4 Bytes                 4 Bytes
     |<--------->|<--------------------->|<------------------------->|
     +-----------+-----------------------+---------------------------+
-    |   Node ID |   Next Neighbour IP   |   Previous Neighbour IP   |
+    |   Node ID |    Next Neighbour IP  |   Previous Neighbour IP   |
     +-----------+-----------------------+---------------------------+
 
     Total: 12 bytes

@@ -1,24 +1,21 @@
 package NameServer;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.security.InvalidParameterException;
 
 /**
  * Created by Astrid on 22-10-2017.
  */
-public class Resolver implements ResolverInterface
+public class Resolver extends UnicastRemoteObject implements ResolverInterface
 {
 	private NameServer nameServer;
 
-	public Resolver()
+	protected Resolver() throws RemoteException
 	{
 		this.nameServer = NameServer.getNameServer();
 	}
 
-	public void init()
-	{
-		this.nameServer.bind("RESOLVER");
-	}
 
 	@Override
 	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
