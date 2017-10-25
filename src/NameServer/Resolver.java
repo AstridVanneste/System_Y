@@ -51,7 +51,7 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Deprecated
-	public void addToTree(int ID, String IP)
+	public void addToTree(int ID, String IP) throws RemoteException
 	{
 		NameServer.getInstance().map.put(ID,IP);
 	}

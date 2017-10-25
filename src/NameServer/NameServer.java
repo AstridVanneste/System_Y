@@ -12,13 +12,13 @@ import java.util.TreeMap;
  */
 public class NameServer
 {
-	private static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_INTERFACE";
-	private static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
+	public static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_INTERFACE";
+	public static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
 	private static NameServer nameServer;	//singleton instance of nameserver
 
 	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
 	private ShutdownAgentInterface shutdownAgentStub;
-	private ResolverInterface resolverStub;
+	public ResolverInterface resolverStub;  // todo: temporary, move back to private when RMI testing is complete
 	private DiscoveryAgent discoveryAgent;
 
 	private NameServer()
