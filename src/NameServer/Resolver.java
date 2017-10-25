@@ -13,9 +13,8 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 
 	protected Resolver() throws RemoteException
 	{
-		this.nameServer = NameServer.getNameServer();
+		this.nameServer = NameServer.getInstance();
 	}
-
 
 	@Override
 	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
@@ -33,7 +32,9 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-		int hash = Math.abs(filename.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+
+		int hash = NameServer.getHash(filename);
+
 
 		System.out.println("HASH = " + hash);
 
@@ -49,8 +50,6 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 		boolean lower = true;
 
 		ID = nameServer.map.lowerKey(hash);
-
-
 
 		return ID;
 	}

@@ -18,16 +18,16 @@ public class NameServer
 	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
 	private Remote shutdownAgent;
 	private Remote resolver;
-
+	private DiscoveryAgent discoveryAgent;
 
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
 		init();
-
+		this.discoveryAgent = new DiscoveryAgent();
     }
 
-	public static NameServer getNameServer()
+	public static NameServer getInstance()
 	{
 		if(nameServer == null)
 		{
@@ -41,11 +41,15 @@ public class NameServer
 	 */
 	public void init()
 	{
-	    try {
-           // shutdownAgent = new ShutdownAgent();
-            resolver = new Resolver();
-            bind();
-        } catch (Exception e) {
+	    
+	    try
+	    {
+            this.shutdownAgent = new ShutdownAgent();
+            this.resolver = new Resolver();
+            this.bind();
+        }
+        catch (Exception e)
+	    {
             System.out.println(e.getMessage());
         }
 	}
@@ -55,16 +59,24 @@ public class NameServer
 	 */
 	public void bind()
 	{
-	    try {
-
+	    try
+	    {
             Registry registry = LocateRegistry.getRegistry();
             //registry.rebind("SHUTDOWNAGENT", shutdownAgent);
 			registry.rebind("RESOLVER", resolver);
-
-	    } catch (Exception e) {
-
+	    }
+	    catch (Exception e)
+	    {
             System.out.println(e.getMessage());
+       }
 
-        }
 	}
+
+	public static int getHash(String name)
+	{
+
+		return Math.abs(name.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+	}
+
+
 }
