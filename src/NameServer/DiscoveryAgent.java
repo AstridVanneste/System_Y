@@ -1,5 +1,7 @@
 package NameServer;
 
+import Network.Datagrams.Datagram;
+import Network.Datagrams.ProtocolHeader;
 import Network.UDP.Multicast.Subscriber;
 
 import java.net.DatagramPacket;
@@ -33,8 +35,23 @@ public class DiscoveryAgent implements Runnable
 			if (this.multicastSub.hasData())
 			{
 				DatagramPacket packet = this.multicastSub.receivePacket();
-				String remoteHost = packet.getAddress().toString();
+				Datagram request = new Datagram(packet.getData());
 
+				if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
+				{
+					ProtocolHeader header = request.getHeader();
+					byte[] data = request.getData();
+					byte[] length = new byte [4];
+
+					for (int i = 0; i < 4; i++)
+					{
+						length[i] = data[i];
+					}
+
+					int lengthInt = Datagram.byteArrayToInt(length);
+
+					//int hash = NameServer.getHash();
+				}
 			}
 		}
 	}

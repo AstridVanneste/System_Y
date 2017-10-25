@@ -79,4 +79,9 @@ public class Datagram
 
 		return serial;
 	}
+
+	public static int byteArrayToInt (byte[] data)
+	{
+		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
+	}
 }
