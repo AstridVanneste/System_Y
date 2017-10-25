@@ -67,7 +67,6 @@ The reply code tells the receiver the result of their request. It also tells the
 
 - 0x0001  Request to be added to network
 - 0x0002  Request Cluster Health Report
-- 0x0003  Ping request
 
 ## Reply Codes
 
@@ -76,8 +75,6 @@ The reply code tells the receiver the result of their request. It also tells the
 - 0x0002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
 - 0x0003  Cluster Node is UP. (See data for more info), reply to 0x0002.
 - 0x0004  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
-- 0x0005  Ping reply, reply to 0x0003.
-
 
 ### Discovery Service
 The Discovery Service in System Y will consist of a client sending a broadcast/multicast message onto the network and the Nameserver replying with a unicast message to the new client.
