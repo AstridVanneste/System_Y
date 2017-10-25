@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 public class ProtocolHeader
 {
-	private static final int HEADER_LENGTH = 20;
+	public static final int HEADER_LENGTH = 12;
 	private static final int VERSION_LENGTH = 1;
 	private static final int DATA_LENGTH_LENGTH = 3;
 	private static final int TRANSACTION_ID_LENGTH = 4;
@@ -124,11 +124,11 @@ public class ProtocolHeader
 	{
 		byte[] subarray = new byte[length];
 
-		System.out.println("LENGTH " + length + " START " + start + " ARRAY SIZE " + array.length);
+		//System.out.println("LENGTH " + length + " START " + start + " ARRAY SIZE " + array.length);
 
-		for(int i = 0; i< start + length - 1; i++)
+		for(int i = 0; i< length - 1; i++)
 		{
-			System.out.println("START " + start + " I " + i + " INDEX " + (i + start));
+			//System.out.println("START " + start + " I " + i + " INDEX " + (i + start));
 			subarray[i] = array[start + i];
 		}
 
@@ -202,11 +202,14 @@ public class ProtocolHeader
 
 	public byte[] intToByteArray(int value)
 	{
-		return new byte[] {
-				(byte)((value >>> 24)& 0x000000FF),
-				(byte)((value >>> 16) & 0x000000FF),
-				(byte)((value >>> 8)& 0x000000FF),
-				(byte)(value & 0x000000FF)};
+		byte[] result = new byte[4];
+
+		result[0] = (byte)(value & 0x000000FF);
+		result[1] = (byte)((value >>> 8)& 0x000000FF);
+		result[2] = (byte)((value >>> 16) & 0x000000FF);
+		result[3] = (byte)((value >>> 24)& 0x000000FF);
+
+		return result;
 	}
 
 }
