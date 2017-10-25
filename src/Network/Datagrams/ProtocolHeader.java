@@ -31,7 +31,7 @@ public class ProtocolHeader
 
 	private byte version;
 	private int dataLength;
-	private int transactionID; 
+	private int transactionID;
 	private int requestCode;
 	private int replyCode;
 
@@ -207,8 +207,7 @@ public class ProtocolHeader
 
 	}
 
-
-	public byte[] intToByteArray(int value)
+	public static byte[] intToByteArray(int value)
 	{
 		return new byte[] {
 				(byte)((value >>> 24)& 0x000000FF),
