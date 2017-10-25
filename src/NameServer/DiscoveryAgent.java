@@ -53,7 +53,6 @@ public class DiscoveryAgent implements Runnable
 
 					int lengthInt = Datagram.byteArrayToInt(length);
 					byte[] nameArray = new byte [lengthInt];
-
 					for (int i = 0; i < lengthInt; i++)
 					{
 						nameArray[i] = data[i + 4];
