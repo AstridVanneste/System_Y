@@ -1,5 +1,6 @@
 package NameServer;
 
+import Network.Datagrams.Datagram;
 import Network.UDP.Multicast.Subscriber;
 
 import java.net.DatagramPacket;
@@ -34,7 +35,7 @@ public class DiscoveryAgent implements Runnable
 			{
 				DatagramPacket packet = this.multicastSub.receivePacket();
 				String remoteHost = packet.getAddress().toString();
-
+				Datagram reply = new Datagram(packet.getData());
 			}
 		}
 	}
