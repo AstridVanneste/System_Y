@@ -187,6 +187,7 @@ public class ProtocolHeader
 
 		offset += DATA_LENGTH_LENGTH;
 
+
 		bytes = intToByteArray(this.transactionID);
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
