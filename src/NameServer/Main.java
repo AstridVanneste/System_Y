@@ -11,7 +11,6 @@ public class Main
     {
     	/*
         NameServer nameServer = NameServer.getNameServer();
-
         try
         {
             Registry registry = LocateRegistry.getRegistry(null);

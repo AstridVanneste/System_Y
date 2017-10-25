@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 public class ProtocolHeader
 {
-	static final int HEADER_LENGTH = 20;
+	static final int HEADER_LENGTH = 12;
 	private static final int VERSION_LENGTH = 1;
 	private static final int DATA_LENGTH_LENGTH = 3;
 	private static final int TRANSACTION_ID_LENGTH = 4;
@@ -112,32 +112,42 @@ public class ProtocolHeader
 
 		offset += VERSION_LENGTH;
 
-		this.dataLength = new BigInteger(this.getSubArray(header, offset, DATA_LENGTH_LENGTH)).intValue();
+		byte[] bytes = new byte[4];
+		int i = 0;
+
+		for(byte b: this.getSubArray(header,offset, DATA_LENGTH_LENGTH))
+		{
+			bytes[i] = b;
+			i++;
+		}
+
+		this.dataLength = byteArrayToInt(bytes);
 
 		offset += DATA_LENGTH_LENGTH;
 
-		this.transactionID = new BigInteger(this.getSubArray(header,offset, TRANSACTION_ID_LENGTH)).intValue();
+		this.transactionID = byteArrayToInt(this.getSubArray(header, offset, TRANSACTION_ID_LENGTH));
 
 		offset += TRANSACTION_ID_LENGTH;
 
-		this.requestCode = new BigInteger(this.getSubArray(header, offset, REQUEST_CODE_LENGTH)).shortValue();
+		this.requestCode = byteArrayToShort(this.getSubArray(header, offset, REQUEST_CODE_LENGTH));
 
 		offset += REQUEST_CODE_LENGTH;
 
-		this.replyCode = new BigInteger(this.getSubArray(header,offset,REPLY_CODE_LENGTH)).shortValue();
+		this.replyCode = byteArrayToShort(this.getSubArray(header,offset,REPLY_CODE_LENGTH));
 
 	}
 
-	public byte[] getSubArray(byte[] array , int start, int length)
+	public byte[] getSubArray(byte[] array , int offset, int length)
 	{
 		byte[] subarray = new byte[length];
 
-		System.out.println("LENGTH " + length + " START " + start + " ARRAY SIZE " + array.length);
+		//System.out.println("LENGTH " + length + " START " + start + " ARRAY SIZE " + array.length);
 
-		for(int i = 0; i< start + length - 1; i++)
+		for(int i = 0; i< length; i++)
 		{
-			System.out.println("START " + start + " I " + i + " INDEX " + (i + start));
-			subarray[i] = array[start + i];
+			//System.out.println("OFFSET " + offset + " I " + i + " INDEX " + (i + offset) + " VALUE " + array[offset + i]);
+			subarray[i] = array[offset + i];
+
 		}
 
 		return subarray;
@@ -177,11 +187,12 @@ public class ProtocolHeader
 
 		offset += DATA_LENGTH_LENGTH;
 
+
 		bytes = intToByteArray(this.transactionID);
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[i];
+			serial[offset + i] = bytes[3-i];
 		}
 
 		offset += TRANSACTION_ID_LENGTH;
@@ -190,16 +201,16 @@ public class ProtocolHeader
 
 		for(int i = 0; i < REQUEST_CODE_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[i];
+			serial[offset + i] = bytes[1-i];
 		}
 
 		offset += REQUEST_CODE_LENGTH;
 
 		bytes = intToByteArray(this.replyCode);
 
-		for(int i = 0; i<REPLY_CODE_LENGTH; i++)
+		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
 		{
-			serial[offset + i ] = bytes[i];
+			serial[offset + i ] = bytes[1-i];
 		}
 
 		return serial;
@@ -209,11 +220,32 @@ public class ProtocolHeader
 
 	public static byte[] intToByteArray(int value)
 	{
-		return new byte[] {
-				(byte)((value >>> 24)& 0x000000FF),
-				(byte)((value >>> 16) & 0x000000FF),
-				(byte)((value >>> 8)& 0x000000FF),
-				(byte)(value & 0x000000FF)};
+		byte[] result = new byte[4];
+
+		result[0] = (byte)(value & 0x000000FF);
+		result[1] = (byte)((value >>> 8)& 0x000000FF);
+		result[2] = (byte)((value >>> 16) & 0x000000FF);
+		result[3] = (byte)((value >>> 24)& 0x000000FF);
+
+		return result;
+	}
+
+	public static int byteArrayToInt (byte[] data)
+	{
+		for(int i = 0; i< data.length; i++)
+		{
+			//System.out.println("BYTE " + i + " VALUE " + data[i]);
+		}
+		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
+	}
+
+	public static short byteArrayToShort(byte[] data)
+	{
+		for(int i = 0; i< data.length; i++)
+		{
+			//System.out.println("BYTE " + i + " VALUE " + data[i]);
+		}
+		return (short) ((data[1]) | (data[0] << 8));
 	}
 
 }

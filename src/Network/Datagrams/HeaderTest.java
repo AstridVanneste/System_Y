@@ -1,11 +1,31 @@
 package Network.Datagrams;
 
+/**
+ * Created by Astrid on 25-Oct-17.
+ */
 public class HeaderTest
 {
-	public static void main (String[] args)
+	public static void main(String args[])
 	{
-		byte[] num = new byte[] {0,1,0,0};
-		 int res = Datagram.byteArrayToInt(num);
-		 System.out.println("Num: " + res);
+		ProtocolHeader header = new ProtocolHeader();
+		header.setVersion((byte)1);
+		header.setDataLength(0);
+		header.setTransactionID(2);
+		header.setRequestCode(1);
+		header.setReplyCode(2);
+
+		System.out.println(header.toString());
+
+		byte[] serial = header.serialize();
+
+		for(byte b: serial)
+		{
+			System.out.print(b);
+		}
+		System.out.println();
+
+		header.setHeader(serial);
+
+		System.out.println(header.toString());
 	}
 }
