@@ -58,6 +58,7 @@ public class Datagram
 
 	public byte[] serialize()
 	{
+
 		byte[] serial = new byte[data.length + ProtocolHeader.HEADER_LENGTH];
 
 		byte[] header = this.header.serialize();
