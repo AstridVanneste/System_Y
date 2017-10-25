@@ -56,7 +56,7 @@ public class ProtocolHeader
 		this.version = version;
 	}
 
-	public long getDataLength()
+	public int getDataLength()
 	{
 		return this.dataLength;
 	}
@@ -66,7 +66,7 @@ public class ProtocolHeader
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
 	}
 
-	public long getTransactionID()
+	public int getTransactionID()
 	{
 		return this.transactionID;
 	}
@@ -76,22 +76,22 @@ public class ProtocolHeader
 		this.transactionID = transactionID;
 	}
 
-	public long getRequestCode()
+	public int getRequestCode()
 	{
 		return this.requestCode;
 	}
 
-	public void setRequestCode(short requestCode)
+	public void setRequestCode(int requestCode)
 	{
 		this.requestCode = requestCode & REQUEST_CODE_MASK;
 	}
 
-	public long getReplyCode()
+	public int getReplyCode()
 	{
 		return this.replyCode;
 	}
 
-	public void setReplyCode(short replyCode)
+	public void setReplyCode(int replyCode)
 	{
 		this.replyCode = replyCode & REPLY_CODE_MASK;
 	}
@@ -124,8 +124,11 @@ public class ProtocolHeader
 	{
 		byte[] subarray = new byte[length];
 
-		for(int i = 0; i<start+length; i++)
+		System.out.println("LENGTH " + length + " START " + start + " ARRAY SIZE " + array.length);
+
+		for(int i = 0; i< start + length - 1; i++)
 		{
+			System.out.println("START " + start + " I " + i + " INDEX " + (i + start));
 			subarray[i] = array[start + i];
 		}
 
@@ -136,11 +139,11 @@ public class ProtocolHeader
 	{
 		String string = "HEADER\n";
 
-		string += "VERSION:	" + this.version;
-		string += "DATALENGTH:	" + this.dataLength;
-		string += "TRANSACTION ID:	" + this.transactionID;
-		string += "REQUEST CODE:	" + this.requestCode;
-		string += "REPLY CODE:	"	+ this.replyCode;
+		string += "VERSION:		" + this.version + "\n";
+		string += "DATALENGTH:		" + this.dataLength + "\n";
+		string += "TRANSACTION ID:	" + this.transactionID + "\n";
+		string += "REQUEST CODE:	" + this.requestCode + "\n";
+		string += "REPLY CODE:		"	+ this.replyCode + "\n";
 
 		return string;
 	}
@@ -156,31 +159,54 @@ public class ProtocolHeader
 		offset += VERSION_LENGTH;
 
 
-		//byte[] bytes = this.dataLength.toByteArray();
+		byte[] bytes = intToByteArray(this.dataLength);
 
 
 		for(int i = 0; i < DATA_LENGTH_LENGTH; i++ )
 		{
-			//serial[ offset + i] = bytes[i];
+			serial[offset + i] = bytes[i];
 		}
 
-		//bytes = this.transactionID.toByteArray();
+		offset += DATA_LENGTH_LENGTH;
+
+		bytes = intToByteArray(this.transactionID);
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
 		{
-			//serial[offset + i] = bytes[i];
+			serial[offset + i] = bytes[i];
 		}
 
-		//bytes = this.requestCode.toByteArray();
+		offset += TRANSACTION_ID_LENGTH;
 
-		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
+		bytes = intToByteArray(this.requestCode);
+
+		for(int i = 0; i < REQUEST_CODE_LENGTH; i++)
 		{
-			//serial[offset + i] = bytes[i];
+			serial[offset + i] = bytes[i];
+		}
+
+		offset += REQUEST_CODE_LENGTH;
+
+		bytes = intToByteArray(this.replyCode);
+
+		for(int i = 0; i<REPLY_CODE_LENGTH; i++)
+		{
+			serial[offset + i ] = bytes[i];
 		}
 
 		return serial;
 
 
+	}
+
+
+	public byte[] intToByteArray(int value)
+	{
+		return new byte[] {
+				(byte)((value >>> 24)& 0x000000FF),
+				(byte)((value >>> 16) & 0x000000FF),
+				(byte)((value >>> 8)& 0x000000FF),
+				(byte)(value & 0x000000FF)};
 	}
 
 }
