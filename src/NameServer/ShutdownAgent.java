@@ -2,7 +2,6 @@ package NameServer;
 
 import Network.UDP.Unicast.*;
 
-import javax.lang.model.element.Name;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
@@ -27,7 +26,6 @@ import java.util.*;
 public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentInterface {
 
 
-    private String deadNodeIP;
     private boolean statusNode;
     private NameServer nameServer;
 
@@ -39,23 +37,28 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
     }
 
-    @Override
-    public void requestDeadNode(String deadNodeIP) throws RemoteException {
 
-        deadNodeIP = deadNodeIP;
-        statusNode = pingNode(deadNodeIP);
+    @Override
+    public void requestDeadNode(int id) throws RemoteException {
+
+        statusNode = pingNode(id);
 
         if (!statusNode)
-            deleteNodeFromMap(deadNodeIP);
+            deleteNodeFromMap(id);
             //send to neighbours
+    }
+
+    @Override
+    public void requestShutdown(int id) throws RemoteException{
+        deleteNodeFromMap(id);
     }
 
     // Return true if node replies, false if not
     //      Not necessary in interface
-    public boolean pingNode (String deadNodeIP) {
+    public boolean pingNode (int id) {
         try {
             //ping the client
-            if(InetAddress.getByName(deadNodeIP).isReachable(3000)){
+            if(InetAddress.getByName(nameServer.map.get(id)).isReachable(1000)){
                 return true;
             }
         } catch (IOException e) {
@@ -66,19 +69,18 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
     // NS can delete a node from his Map
     //      Not necessary in interface
-    public void deleteNodeFromMap (String deadNodeIP){
-
+    public void deleteNodeFromMap (int id){
+        nameServer.map.remove(id);
     }
 
     // Send new IP-addresses to neighbours of dead node
     // NS knows just one IP of the neighbours??
     //      Not necessary in interface
-    public void sendNeighboursIP (String deadNodeIP, Server server){
+    public void sendNeighboursIP (int id, Server server){
 
         int ID;
         int IDRight;
         int IDLeft;
-        int searchID = Integer.parseInt(deadNodeIP);
         boolean found = false;
 
         Set set = nameServer.map.keySet();
@@ -95,7 +97,7 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
                 ID = (int) listIterator.next();
 
-                if (ID == searchID) {
+                if (ID == id) {
                     found = true;
 
                     if (listIterator.nextIndex() == size)
@@ -111,19 +113,13 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
             }
         }
-
-        //Node neighbour1 = node.getLeftNeighbour();
-        //Node neighbour2 = node.getRightNeighbour();
-        // server.send(ipaddr neighbour 2) <= neigbour needs to be updated, left neighbour from deleted node has new right neigbhour = right neighbour dleted node
-        server.send("", 2000, "new left neighbour"); //ip's of neighbour??
-        server.send("", 2000, "new left neighbour");
-
+        //needs to be send to packagging (datagram pakket)
     }
 
     // Sends a broadcast about the dead node. This allows all nodes
     //  to remove all links with the files of the dead node
     //      Not necessary in interface
-    public void sendBroadCast (InetAddress deadNodeIP){
+    public void sendBroadCast (int id){
 
     }
     

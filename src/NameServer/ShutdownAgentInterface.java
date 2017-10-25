@@ -13,8 +13,9 @@ import java.rmi.RemoteException;
 public interface ShutdownAgentInterface extends Remote {
 
     // The node calls this method to do a request to the NS
-    public void requestDeadNode (String deadNodeIP) throws RemoteException;
+    public void requestDeadNode (int id) throws RemoteException;
         // call pingNode
+    public void requestShutdown(int id) throws RemoteException;
 
 
 }
