@@ -16,6 +16,12 @@ public class Datagram
 		this.data = data;
 	}
 
+	public Datagram (ProtocolHeader header)
+	{
+		this.header = header;
+		this.data = new byte [0];
+	}
+
 	public Datagram(byte[] datagram)
 	{
 		byte[] header = new byte[ProtocolHeader.HEADER_LENGTH];
