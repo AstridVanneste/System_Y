@@ -112,19 +112,33 @@ public class ProtocolHeader
 
 		offset += VERSION_LENGTH;
 
-		this.dataLength = new BigInteger(this.getSubArray(header, offset, DATA_LENGTH_LENGTH)).intValue();
+		byte[] bytes = new byte[4];
+		int i = 0;
+
+		for(byte b: this.getSubArray(header,offset, TRANSACTION_ID_LENGTH))
+		{
+			bytes[i] = b;
+			i++;
+		}
+
+		this.transactionID = byteArrayToInt(bytes);
 
 		offset += DATA_LENGTH_LENGTH;
 
-		this.transactionID = new BigInteger(this.getSubArray(header,offset, TRANSACTION_ID_LENGTH)).intValue();
+
+
+
+		this.transactionID = byteArrayToInt(this.getSubArray(header, offset, TRANSACTION_ID_LENGTH));
+
+
 
 		offset += TRANSACTION_ID_LENGTH;
 
-		this.requestCode = new BigInteger(this.getSubArray(header, offset, REQUEST_CODE_LENGTH)).shortValue();
+		this.requestCode = byteArrayToShort(this.getSubArray(header, offset, REQUEST_CODE_LENGTH));
 
 		offset += REQUEST_CODE_LENGTH;
 
-		this.replyCode = new BigInteger(this.getSubArray(header,offset,REPLY_CODE_LENGTH)).shortValue();
+		this.replyCode = byteArrayToShort(this.getSubArray(header,offset,REPLY_CODE_LENGTH));
 
 	}
 
@@ -208,7 +222,7 @@ public class ProtocolHeader
 	}
 
 
-	public byte[] intToByteArray(int value)
+	public static byte[] intToByteArray(int value)
 	{
 		byte[] result = new byte[4];
 
@@ -218,6 +232,16 @@ public class ProtocolHeader
 		result[3] = (byte)((value >>> 24)& 0x000000FF);
 
 		return result;
+	}
+
+	public static int byteArrayToInt (byte[] data)
+	{
+		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
+	}
+
+	public static short byteArrayToShort(byte[] data)
+	{
+		return (short) ((data[1]) | (data[0] << 8));
 	}
 
 }

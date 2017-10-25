@@ -7,7 +7,7 @@ import java.rmi.registry.Registry;
 
 public class Main {
     public static void main(String[] args) {
-        NameServer nameServer = NameServer.getNameServer();
+        NameServer nameServer = NameServer.getInstance();
 
         try {
             Registry registry = LocateRegistry.getRegistry(null);
