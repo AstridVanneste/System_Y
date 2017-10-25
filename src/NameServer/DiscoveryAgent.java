@@ -48,7 +48,7 @@ public class DiscoveryAgent implements Runnable
 						length[i] = data[i];
 					}
 
-					int lengthInt = Datagram.byteArrayToInt(length);
+					int lengthInt = ProtocolHeader.byteArrayToInt(length);
 
 					//int hash = NameServer.getHash();
 				}

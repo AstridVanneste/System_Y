@@ -16,8 +16,6 @@ public class HeaderTest
 
 		System.out.println(header.toString());
 
-		header.setHeader(header.serialize());
-
 		byte[] serial = header.serialize();
 
 		for(byte b: serial)
@@ -25,6 +23,8 @@ public class HeaderTest
 			System.out.print(b);
 		}
 		System.out.println();
+
+		header.setHeader(serial);
 
 		System.out.println(header.toString());
 	}
