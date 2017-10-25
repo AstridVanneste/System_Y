@@ -1,6 +1,7 @@
 package NameServer;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.security.InvalidParameterException;
 
 /**
@@ -12,12 +13,7 @@ public class Resolver implements ResolverInterface
 
 	public Resolver()
 	{
-		this.nameServer = NameServer.getNameServer();
-	}
-
-	public void init()
-	{
-		this.nameServer.bind("RESOLVER");
+		this.nameServer = NameServer.getInstance();
 	}
 
 	@Override
@@ -36,7 +32,7 @@ public class Resolver implements ResolverInterface
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-		int hash = Math.abs(filename.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+		int hash = Math.abs(filename.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
 
 		System.out.println("HASH = " + hash);
 
@@ -52,8 +48,6 @@ public class Resolver implements ResolverInterface
 		boolean lower = true;
 
 		ID = nameServer.map.lowerKey(hash);
-
-
 
 		return ID;
 	}

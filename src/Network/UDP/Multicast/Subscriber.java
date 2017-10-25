@@ -104,9 +104,9 @@ public class Subscriber implements UDPSubscriber, Runnable
 		}
 	}
 
-	public boolean bufferEmpty()
+	public boolean hasData()
 	{
-		return packetBuffer.isEmpty();
+		return !packetBuffer.isEmpty();
 	}
 
 	public int getBufferLength()

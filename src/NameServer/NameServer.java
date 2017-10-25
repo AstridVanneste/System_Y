@@ -16,19 +16,17 @@ public class NameServer
 	private static NameServer nameServer;	//singleton instance of nameserver
 
 	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
-
-	private Resolver resolver;
 	private Remote shutdownAgent;
-
+	private Remote resolver;
+	private DiscoveryAgent discoveryAgent;
 
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
-        //this.resolver = new Resolver();
-
+		this.discoveryAgent = new DiscoveryAgent();
     }
 
-	public static NameServer getNameServer()
+	public static NameServer getInstance()
 	{
 		if(nameServer == null)
 		{
@@ -42,9 +40,14 @@ public class NameServer
 	 */
 	public void init()
 	{
-	    try {
-            Remote shutdownAgent = new ShutdownAgent();
-        } catch (Exception e) {
+	    try
+	    {
+            this.shutdownAgent = new ShutdownAgent();
+            this.resolver = new Resolver();
+            this.bind();
+        }
+        catch (Exception e)
+	    {
             System.out.println(e.getMessage());
         }
 	}
@@ -52,20 +55,17 @@ public class NameServer
 	/**
 	 * Binds new RMI service to registry
 	 */
-	public void bind(String name)
+	public void bind()
 	{
-	    try {
-
+	    try
+	    {
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind("shutdownAgent", shutdownAgent);
-
-	    } catch (Exception e) {
-
+			registry.rebind("RESOLVER", resolver);
+	    }
+	    catch (Exception e)
+	    {
             System.out.println(e.getMessage());
-
         }
-
 	}
-
-
 }

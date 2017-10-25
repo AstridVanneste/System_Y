@@ -38,9 +38,7 @@ public class Client implements UDPClient, Runnable
 	}
 
 	@Override
-	public void send(String remoteHost,
-	                 int port,
-	                 byte[] data)
+	public void send(String remoteHost, int port, byte[] data)
 	{
 		try
 		{
@@ -59,17 +57,13 @@ public class Client implements UDPClient, Runnable
 	}
 
 	@Override
-	public void send(String remoteHost,
-	                 int port,
-	                 String data)
+	public void send(String remoteHost, int port, String data)
 	{
 		this.send(remoteHost,port,data.getBytes());
 	}
 
 	@Override
-	public void send(String remoteHost,
-	                 int port,
-	                 List<Byte> data)
+	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
 		int i=0;
