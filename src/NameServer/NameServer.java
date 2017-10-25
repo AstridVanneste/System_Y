@@ -54,17 +54,25 @@ public class NameServer
 	 */
 	public void bind(String name)
 	{
-	    try {
+	    try
+		{
 
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind("shutdownAgent", shutdownAgent);
 
-	    } catch (Exception e) {
+	    } catch (Exception e)
+		{
 
             System.out.println(e.getMessage());
 
         }
 
+	}
+
+	public static int getHash(String name)
+	{
+
+		return Math.abs(name.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
 	}
 
 

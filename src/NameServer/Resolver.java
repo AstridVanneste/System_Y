@@ -36,7 +36,7 @@ public class Resolver implements ResolverInterface
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-		int hash = Math.abs(filename.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+
 
 		System.out.println("HASH = " + hash);
 

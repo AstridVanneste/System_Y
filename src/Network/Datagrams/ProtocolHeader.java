@@ -5,6 +5,8 @@ import java.math.BigInteger;
 /**
  * Created by Astrid on 24-10-2017.
  */
+
+
 public class ProtocolHeader
 {
 	public static final int HEADER_LENGTH = 20;
@@ -15,7 +17,9 @@ public class ProtocolHeader
 	public static final int REPLY_CODE_LENGTH = 2;
 
 
-	public static final int DATA_LENGTH_MASK = 0x0111;
+	public static final int DATA_LENGTH_MASK = 0x00FFFFFF;
+	public static final int REQUEST_CODE_MASK = 0x0000FFFF;
+	public static final int REPLY_CODE_MASK = 0x0000FFFF;
 
 	private byte version;
 	private int dataLength;
@@ -33,8 +37,8 @@ public class ProtocolHeader
 		this.version = version;
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
 		this.transactionID = transactionID;
-		this.requestCode = requestCode;
-		this.replyCode = replyCode;
+		this.requestCode = requestCode & REQUEST_CODE_MASK;
+		this.replyCode = replyCode & REPLY_CODE_MASK;
 	}
 
 	public ProtocolHeader(byte[] header)
@@ -79,7 +83,7 @@ public class ProtocolHeader
 
 	public void setRequestCode(short requestCode)
 	{
-		this.requestCode = requestCode;
+		this.requestCode = requestCode & REQUEST_CODE_MASK;
 	}
 
 	public long getReplyCode()
@@ -89,17 +93,14 @@ public class ProtocolHeader
 
 	public void setReplyCode(short replyCode)
 	{
-		this.replyCode = replyCode;
+		this.replyCode = replyCode & REPLY_CODE_MASK;
 	}
 
 	public void setHeader(byte[] header)
 	{
 		int offset = 0;
 
-		for(int i = 0;i<offset + VERSION_LENGTH; i++)
-		{
-			this.version = header[offset+i];
-		}
+		this.version = header[0];
 
 		offset += VERSION_LENGTH;
 
@@ -143,4 +144,41 @@ public class ProtocolHeader
 
 		return string;
 	}
+
+	public byte[] serialize()
+	{
+		byte[] serial = new byte[HEADER_LENGTH];
+
+		int offset = 0;
+
+		serial[0] = this.version;
+
+		offset += VERSION_LENGTH;
+
+
+		byte[] bytes = this.dataLength.toByteArray();
+
+
+		for(int i = 0; i < DATA_LENGTH_LENGTH; i++ )
+		{
+			serial[ offset + i] = bytes[i];
+		}
+
+		bytes = this.transactionID.toByteArray();
+
+		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
+		{
+			serial[offset + i] = bytes[i];
+		}
+
+		bytes = this.requestCode.toByteArray();
+
+		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
+		{
+			serial[offset + i] = bytes[i];
+		}
+
+
+	}
+
 }

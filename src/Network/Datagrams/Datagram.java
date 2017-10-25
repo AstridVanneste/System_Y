@@ -55,4 +55,27 @@ public class Datagram
 	{
 		this.data = data;
 	}
+
+	public byte[] serialize()
+	{
+		byte[] serial = new byte[data.length + ProtocolHeader.HEADER_LENGTH];
+
+		byte[] header = this.header.serialize();
+
+		int i = 0;
+
+		for(byte b: header)
+		{
+			serial[i] = b;
+			i++;
+		}
+
+		for(byte b: this.data)
+		{
+			serial[i] = b;
+			i++;
+		}
+
+		return serial;
+	}
 }
