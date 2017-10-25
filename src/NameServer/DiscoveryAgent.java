@@ -68,7 +68,7 @@ public class DiscoveryAgent implements Runnable
 					{
 						header.setReplyCode(ProtocolHeader.REPLY_DUPLICATE_ID);
 
-						reply = new Datagram(header));
+						reply = new Datagram(header);
 					}
 					else if (NameServer.getInstance().map.containsValue(packet.getAddress().toString()))
 					{

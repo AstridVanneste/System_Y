@@ -1,29 +1,29 @@
 package NameServer;
 
-import Network.UDP.Unicast.Server;
-
-import java.rmi.Remote;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Astrid on 20-Oct-17.
  */
 public class NameServer
 {
+	private static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_INTERFACE";
+	private static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
 	private static NameServer nameServer;	//singleton instance of nameserver
 
 	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
-	private Remote shutdownAgent;
-	private Remote resolver;
+	private ShutdownAgentInterface shutdownAgentStub;
+	private ResolverInterface resolverStub;
 	private DiscoveryAgent discoveryAgent;
 
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
-		init();
 		this.discoveryAgent = new DiscoveryAgent();
     }
 
@@ -41,16 +41,21 @@ public class NameServer
 	 */
 	public void init()
 	{
-	    
+		if(System.getSecurityManager()==null)
+		{
+			System.setSecurityManager(new SecurityManager());
+		}
+
 	    try
 	    {
-            this.shutdownAgent = new ShutdownAgent();
-            this.resolver = new Resolver();
+	    	this.shutdownAgentStub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(new ShutdownAgent(), 0);
+		    this.resolverStub = (ResolverInterface) UnicastRemoteObject.exportObject(new Resolver(), 0);
             this.bind();
         }
-        catch (Exception e)
+        catch (RemoteException re)
 	    {
-            System.out.println(e.getMessage());
+	    	System.out.println("Exception in init()");
+	    	re.printStackTrace();
         }
 	}
 
@@ -61,13 +66,19 @@ public class NameServer
 	{
 	    try
 	    {
-            Registry registry = LocateRegistry.getRegistry();
-            //registry.rebind("SHUTDOWNAGENT", shutdownAgent);
-			registry.rebind("RESOLVER", resolver);
+            Registry registry = LocateRegistry.createRegistry(1099);
+		    registry.bind(SHUTDOWN_AGENT_NAME, this.shutdownAgentStub);
+			registry.bind(RESOLVER_NAME, this.resolverStub);
 	    }
-	    catch (Exception e)
+	    catch (AlreadyBoundException abe)
 	    {
-            System.out.println(e.getMessage());
+	    	System.out.println("AlreadyBoundException in bind()");
+	    	abe.printStackTrace();
+	    }
+	    catch (RemoteException re)
+	    {
+	    	System.out.println("RemoteException in  bind()");
+            re.printStackTrace();
        }
 
 	}
@@ -75,7 +86,7 @@ public class NameServer
 	public static int getHash(String name)
 	{
 
-		return Math.abs(name.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+		return Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
 	}
 
 

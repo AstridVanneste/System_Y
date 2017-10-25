@@ -9,7 +9,7 @@ import java.math.BigInteger;
 
 public class ProtocolHeader
 {
-	private static final int HEADER_LENGTH = 20;
+	static final int HEADER_LENGTH = 20;
 	private static final int VERSION_LENGTH = 1;
 	private static final int DATA_LENGTH_LENGTH = 3;
 	private static final int TRANSACTION_ID_LENGTH = 4;
