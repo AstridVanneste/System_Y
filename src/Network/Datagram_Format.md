@@ -87,7 +87,19 @@ After a new node joins the network, the new node's neighbours are informed that 
 Ownership of some files is also rechecked to make sure the new node also contains all files it's hash maps to.
 Replies 1 and 2 contain no data, they do however tell the client why joining the network failed and allow the client to be reconfigured before trying again.
 
-#### Data format for Discovery Service
+
+#### Data format for Discovery Request (Multicast)
+```
+       4 Bytes        Name Length Bytes
+    |<------------->|<----------------->|
+    +---------------+-------------------+
+    |   Name Length | Node Name         |
+    +---------------+-------------------+
+
+    Total length: unknown (Name Length + 4)
+```
+
+#### Data format for Discovery Reply
 ```
        4 Bytes          4 Bytes                 4 Bytes
     |<--------->|<--------------------->|<------------------------->|
