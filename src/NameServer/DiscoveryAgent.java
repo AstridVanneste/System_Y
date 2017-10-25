@@ -9,10 +9,12 @@ public class DiscoveryAgent implements Runnable
 	public static String discoveryMulticast = "224.0.0.1";
 	public static int discoveryPort = 1997;
 
+	private boolean quit;
 	private Subscriber multicastSub;
 
 	public DiscoveryAgent ()
 	{
+		this.quit = false;
 		this.multicastSub = new Subscriber(discoveryMulticast, discoveryPort);
 	}
 
@@ -26,7 +28,7 @@ public class DiscoveryAgent implements Runnable
 	@Override
 	public void run()
 	{
-		while (true)
+		while (!this.quit)
 		{
 			if (this.multicastSub.hasData())
 			{
@@ -39,6 +41,7 @@ public class DiscoveryAgent implements Runnable
 
 	public void stop ()
 	{
-
+		this.quit = true;
+		this.multicastSub.stop();
 	}
 }
