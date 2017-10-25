@@ -66,6 +66,15 @@ public class NameServer
 	    catch (Exception e)
 	    {
             System.out.println(e.getMessage());
-        }
+       }
+
 	}
+
+	public static int getHash(String name)
+	{
+
+		return Math.abs(name.hashCode()%32768); //todo: CHECK IF FORMULA CORRECT!!!
+	}
+
+
 }
