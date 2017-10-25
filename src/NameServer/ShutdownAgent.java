@@ -4,7 +4,6 @@ import Network.UDP.Unicast.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InterfaceAddress;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -31,7 +30,7 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
     private NameServer nameServer;
 
     protected ShutdownAgent() throws RemoteException {
-        this.nameServer=NameServer.getNameServer();
+        this.nameServer=NameServer.getInstance();
     }
 
     public void failureListener(){
