@@ -7,18 +7,17 @@ import java.rmi.registry.Registry;
 
 public class Main {
     public static void main(String[] args) {
-        NameServer nameServer = NameServer.getNameServer();
 
+        ShutdownAgent nameServer = null;
         try {
-            Registry registry = LocateRegistry.getRegistry(null);
-            ShutdownAgentInterface shutDown = (ShutdownAgentInterface) registry.lookup("SHUTDOWNAGENT");
-            ResolverInterface resolver = (ResolverInterface) registry.lookup("RESOLVER");
-            resolver.lookup(2);
+            nameServer = new ShutdownAgent();
+            nameServer.init();
+
+            System.out.println("Server ready");
         } catch (RemoteException e) {
             e.printStackTrace();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
         }
+
 
     }
 }

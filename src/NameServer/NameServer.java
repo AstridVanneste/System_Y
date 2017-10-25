@@ -1,12 +1,10 @@
 package NameServer;
 
-import Network.UDP.Unicast.Server;
-
 import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Astrid on 20-Oct-17.
@@ -23,7 +21,6 @@ public class NameServer
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
-		init();
 		this.discoveryAgent = new DiscoveryAgent();
     }
 
@@ -41,12 +38,15 @@ public class NameServer
 	 */
 	public void init()
 	{
-	    
-	    try
-	    {
-            this.shutdownAgent = new ShutdownAgent();
-            this.resolver = new Resolver();
-            this.bind();
+	    /*if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}*/
+	    try {
+            shutdownAgent = new ShutdownAgent();
+            resolver = new Resolver();
+			Registry registry = LocateRegistry.createRegistry(1098);
+			registry.bind("SHUTDOWNAGENT", shutdownAgent);
+			registry.bind("RESOLVER", resolver);
         }
         catch (Exception e)
 	    {
@@ -57,13 +57,12 @@ public class NameServer
 	/**
 	 * Binds new RMI service to registry
 	 */
+/*
 	public void bind()
 	{
 	    try
 	    {
-            Registry registry = LocateRegistry.getRegistry();
-            //registry.rebind("SHUTDOWNAGENT", shutdownAgent);
-			registry.rebind("RESOLVER", resolver);
+
 	    }
 	    catch (Exception e)
 	    {
@@ -71,7 +70,7 @@ public class NameServer
        }
 
 	}
-
+*/
 	public static int getHash(String name)
 	{
 

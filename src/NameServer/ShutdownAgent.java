@@ -1,10 +1,10 @@
 package NameServer;
 
-import Network.UDP.Unicast.*;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -28,10 +28,28 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
     private boolean statusNode;
     private NameServer nameServer;
+    private ShutdownAgent shutdownAgent;
 
     protected ShutdownAgent() throws RemoteException {
         this.nameServer=NameServer.getInstance();
     }
+    public void init()
+    {
+	    /*if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}*/
+        try {
+            shutdownAgent = this;
+            ShutdownAgentInterface stub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(shutdownAgent,0);
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.rebind("NamingServer", stub);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+    }
+
 
     public void failureListener(){
 
@@ -71,12 +89,13 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
     //      Not necessary in interface
     public void deleteNodeFromMap (int id){
         nameServer.map.remove(id);
+        sendNeighboursIP(id);
     }
 
     // Send new IP-addresses to neighbours of dead node
     // NS knows just one IP of the neighbours??
     //      Not necessary in interface
-    public void sendNeighboursIP (int id, Server server){
+    public void sendNeighboursIP (int id){
 
         int ID;
         int IDRight;
