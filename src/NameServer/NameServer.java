@@ -23,6 +23,7 @@ public class NameServer
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
+		init();
 
     }
 
@@ -41,8 +42,9 @@ public class NameServer
 	public void init()
 	{
 	    try {
-            shutdownAgent = new ShutdownAgent();
+           // shutdownAgent = new ShutdownAgent();
             resolver = new Resolver();
+            bind();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -51,12 +53,12 @@ public class NameServer
 	/**
 	 * Binds new RMI service to registry
 	 */
-	public void bind(String name)
+	public void bind()
 	{
 	    try {
 
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("shutdownAgent", shutdownAgent);
+            //registry.rebind("SHUTDOWNAGENT", shutdownAgent);
 			registry.rebind("RESOLVER", resolver);
 
 	    } catch (Exception e) {
