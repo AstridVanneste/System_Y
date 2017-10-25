@@ -113,6 +113,7 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
 
             }
         }
+        System.out.println("new neighbours");
         //needs to be send to packagging (datagram pakket)
     }
 

@@ -27,14 +27,14 @@ Version is the version number of the party that sent the datagram, this can chan
     +-----------+-----------------------------------+       +-----------+-----------------------------------+ |
                                                             |   Transaction ID                              | |
         4 Bytes                                             +----------------------+------------------------+ |
-    |<--------------------------------------------->|       |   Request Code       | Reply Code             | V 5 Quads
+    |<--------------------------------------------->|       |   Request Code       | Reply Code             | V 3 Quads
     +-----------------------------------------------+       +----------------------+------------------------+--
     |   Transaction ID                              |       |   Data                                        |
     +-----------------------------------------------+       +-----------------------------------------------+
-
+                                                            Total: 12 Bytes without data
         2 Bytes                     2 Bytes
     |<--------------------->|<--------------------->|
-    +-----------------------+-----------------------+       Total: 20 Bytes without data
+    +-----------------------+-----------------------+
     |   Request Code        | Reply Code            |
     +-----------------------+-----------------------+
     
@@ -65,9 +65,8 @@ The reply code tells the receiver the result of their request. It also tells the
 
 ## Request Codes
 
-- 0x0001  Request to be added to network
-- 0x0002  Request Cluster Health Report
-- 0x0003  Ping request
+- 0x0000  Request to be added to network
+- 0x0001  Request Cluster Health Report
 
 ## Reply Codes
 
@@ -76,8 +75,6 @@ The reply code tells the receiver the result of their request. It also tells the
 - 0x0002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
 - 0x0003  Cluster Node is UP. (See data for more info), reply to 0x0002.
 - 0x0004  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
-- 0x0005  Ping reply, reply to 0x0003.
-
 
 ### Discovery Service
 The Discovery Service in System Y will consist of a client sending a broadcast/multicast message onto the network and the Nameserver replying with a unicast message to the new client.
@@ -87,12 +84,24 @@ After a new node joins the network, the new node's neighbours are informed that 
 Ownership of some files is also rechecked to make sure the new node also contains all files it's hash maps to.
 Replies 1 and 2 contain no data, they do however tell the client why joining the network failed and allow the client to be reconfigured before trying again.
 
-#### Data format for Discovery Service
+
+#### Data format for Discovery Request (Multicast)
+```
+       4 Bytes        Name Length Bytes
+    |<------------->|<----------------->|
+    +---------------+-------------------+
+    |   Name Length | Node Name         |
+    +---------------+-------------------+
+
+    Total length: unknown (Name Length + 4)
+```
+
+#### Data format for Discovery Reply
 ```
        4 Bytes          4 Bytes                 4 Bytes
     |<--------->|<--------------------->|<------------------------->|
     +-----------+-----------------------+---------------------------+
-    |   Node ID |    Next Neighbour IP  |   Previous Neighbour IP   |
+    |   Node ID |    Next Neighbour ID  |   Previous Neighbour ID   |
     +-----------+-----------------------+---------------------------+
 
     Total: 12 bytes

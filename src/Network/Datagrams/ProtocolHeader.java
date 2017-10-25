@@ -21,9 +21,17 @@ public class ProtocolHeader
 	private static final int REQUEST_CODE_MASK = 0x0000FFFF;
 	private static final int REPLY_CODE_MASK = 0x0000FFFF;
 
+	public static final int REQUEST_DISCOVERY_CODE = 0x00000000;
+	public static final int REQUEST_CLUSTER_HEALTH_REPORT = 0x00000001;
+	public static final int REPLY_SUCCESSFULLY_ADDED = 0x00000000;
+	public static final int REPLY_DUPLICATE_ID = 0x00000001;
+	public static final int REPLY_DUPLICATE_IP = 0x00000002;
+	public static final int REPLY_NODE_UP = 0x00000003;
+	public static final int REPLY_NODE_DOWN = 0x00000004;
+
 	private byte version;
 	private int dataLength;
-	private int transactionID;
+	private int transactionID; 
 	private int requestCode;
 	private int replyCode;
 

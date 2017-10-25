@@ -23,6 +23,7 @@ public class NameServer
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
+		init();
 		this.discoveryAgent = new DiscoveryAgent();
     }
 
@@ -40,6 +41,7 @@ public class NameServer
 	 */
 	public void init()
 	{
+	    
 	    try
 	    {
             this.shutdownAgent = new ShutdownAgent();
@@ -60,7 +62,7 @@ public class NameServer
 	    try
 	    {
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("shutdownAgent", shutdownAgent);
+            //registry.rebind("SHUTDOWNAGENT", shutdownAgent);
 			registry.rebind("RESOLVER", resolver);
 	    }
 	    catch (Exception e)
