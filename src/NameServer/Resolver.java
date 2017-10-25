@@ -33,7 +33,7 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-
+		int hash = NameServer.getHash(filename);
 
 		System.out.println("HASH = " + hash);
 

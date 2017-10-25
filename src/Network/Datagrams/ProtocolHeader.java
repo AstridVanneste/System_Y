@@ -24,8 +24,8 @@ public class ProtocolHeader
 	private byte version;
 	private int dataLength;
 	private int transactionID;
-	private short requestCode;
-	private short replyCode;
+	private int requestCode;
+	private int replyCode;
 
 	public ProtocolHeader()
 	{
@@ -156,27 +156,29 @@ public class ProtocolHeader
 		offset += VERSION_LENGTH;
 
 
-		byte[] bytes = this.dataLength.toByteArray();
+		//byte[] bytes = this.dataLength.toByteArray();
 
 
 		for(int i = 0; i < DATA_LENGTH_LENGTH; i++ )
 		{
-			serial[ offset + i] = bytes[i];
+			//serial[ offset + i] = bytes[i];
 		}
 
-		bytes = this.transactionID.toByteArray();
+		//bytes = this.transactionID.toByteArray();
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[i];
+			//serial[offset + i] = bytes[i];
 		}
 
-		bytes = this.requestCode.toByteArray();
+		//bytes = this.requestCode.toByteArray();
 
 		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[i];
+			//serial[offset + i] = bytes[i];
 		}
+
+		return serial;
 
 
 	}
