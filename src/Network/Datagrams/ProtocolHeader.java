@@ -9,17 +9,17 @@ import java.math.BigInteger;
 
 public class ProtocolHeader
 {
-	public static final int HEADER_LENGTH = 20;
-	public static final int VERSION_LENGTH = 1;
-	public static final int DATA_LENGTH_LENGTH = 3;
-	public static final int TRANSACTION_ID_LENGTH = 4;
-	public static final int REQUEST_CODE_LENGTH = 2;
-	public static final int REPLY_CODE_LENGTH = 2;
+	private static final int HEADER_LENGTH = 20;
+	private static final int VERSION_LENGTH = 1;
+	private static final int DATA_LENGTH_LENGTH = 3;
+	private static final int TRANSACTION_ID_LENGTH = 4;
+	private static final int REQUEST_CODE_LENGTH = 2;
+	private static final int REPLY_CODE_LENGTH = 2;
 
 
-	public static final int DATA_LENGTH_MASK = 0x00FFFFFF;
-	public static final int REQUEST_CODE_MASK = 0x0000FFFF;
-	public static final int REPLY_CODE_MASK = 0x0000FFFF;
+	private static final int DATA_LENGTH_MASK = 0x00FFFFFF;
+	private static final int REQUEST_CODE_MASK = 0x0000FFFF;
+	private static final int REPLY_CODE_MASK = 0x0000FFFF;
 
 	private byte version;
 	private int dataLength;
