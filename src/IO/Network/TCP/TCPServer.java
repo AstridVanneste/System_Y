@@ -1,4 +1,4 @@
-package Network.TCP;
+package IO.Network.TCP;
 
 import java.io.IOException;
 import java.util.List;
