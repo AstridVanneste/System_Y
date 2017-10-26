@@ -16,6 +16,18 @@ public interface ResolverInterface extends Remote
 	 * @throws RemoteException
 	 */
 	public String lookup(int nodeId) throws RemoteException;
+	/**
+	 * Print out the existing TreeMap
+	 * @throws RemoteException
+	 */
+	public void writeMap() throws RemoteException;
+	/**
+	 * Removes entry from TreeMap
+	 * @param nodeId
+	 * @return
+	 * @throws RemoteException
+	 */
+	public void removeFromTree(int nodeId) throws RemoteException;
 
 	/**
 	 * For a given filename it returns the IP address from the owner of the file
