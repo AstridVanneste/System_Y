@@ -4,9 +4,6 @@ package NameServer;
  * Created by Axel on 20/10/2017.
  */
 
-import Network.UDP.Unicast.Server;
-
-import java.net.InetAddress;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

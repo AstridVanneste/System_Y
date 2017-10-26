@@ -1,4 +1,4 @@
-package Network.Datagrams;
+package IO.Network.Datagrams;
 
 /**
  * Created by Astrid on 25-Oct-17.

@@ -1,10 +1,10 @@
 package NameServer;
 
-import Network.Constants;
-import Network.Datagrams.Datagram;
-import Network.Datagrams.ProtocolHeader;
-import Network.UDP.Multicast.Subscriber;
-import Network.UDP.Unicast.Client;
+import IO.Network.Constants;
+import IO.Network.Datagrams.Datagram;
+import IO.Network.Datagrams.ProtocolHeader;
+import IO.Network.UDP.Multicast.Subscriber;
+import IO.Network.UDP.Unicast.Client;
 
 import java.net.DatagramPacket;
 

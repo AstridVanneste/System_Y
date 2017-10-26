@@ -1,6 +1,4 @@
-package Network.Datagrams;
-
-import java.math.BigInteger;
+package IO.Network.Datagrams;
 
 /**
  * Created by Astrid on 24-10-2017.
