@@ -51,7 +51,7 @@ public class DiscoveryAgent implements Runnable
 						length[i] = data[i];
 					}
 
-					int lengthInt = Datagram.byteArrayToInt(length);
+					/*int lengthInt = Datagram.byteArrayToInt(length);
 					byte[] nameArray = new byte [lengthInt];
 					for (int i = 0; i < lengthInt; i++)
 					{
@@ -95,7 +95,7 @@ public class DiscoveryAgent implements Runnable
 					Client cl = new Client();
 					cl.start();
 					cl.send(packet.getAddress().toString(), discoveryPort, reply.serialize());
-					cl.stop();
+					cl.stop();*/
 				}
 			}
 		}
