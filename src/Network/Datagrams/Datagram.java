@@ -9,10 +9,17 @@ public class Datagram
 	private byte[] data;
 
 
+
 	public Datagram (ProtocolHeader header, byte[] data)
 	{
 		this.header = header;
 		this.data = data;
+	}
+
+	public Datagram (ProtocolHeader header)
+	{
+		this.header = header;
+		this.data = new byte [0];
 	}
 
 	public Datagram(byte[] datagram)
@@ -79,4 +86,6 @@ public class Datagram
 
 		return serial;
 	}
+
+
 }

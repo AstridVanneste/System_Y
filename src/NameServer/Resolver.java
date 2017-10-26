@@ -1,27 +1,23 @@
 package NameServer;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.security.InvalidParameterException;
 
 /**
  * Created by Astrid on 22-10-2017.
  */
-public class Resolver extends UnicastRemoteObject implements ResolverInterface
+public class Resolver implements ResolverInterface
 {
-	private NameServer nameServer;
-
-	protected Resolver() throws RemoteException
+	public Resolver()
 	{
-		this.nameServer = NameServer.getInstance();
 	}
 
 	@Override
 	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
 	{
-		if(this.nameServer.map.containsKey(nodeId))
+		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
-			return this.nameServer.map.get(nodeId);
+			return NameServer.getInstance().map.get(nodeId);
 		}
 		else
 		{
@@ -41,7 +37,7 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 		int ID = getOwnerID(hash);
 
 
-		return this.nameServer.map.get(ID);
+		return NameServer.getInstance().map.get(ID);
 	}
 
 	public int getOwnerID(int hash)
@@ -49,14 +45,14 @@ public class Resolver extends UnicastRemoteObject implements ResolverInterface
 		int ID;
 		boolean lower = true;
 
-		ID = nameServer.map.lowerKey(hash);
+		ID = NameServer.getInstance().map.lowerKey(hash);
 
 		return ID;
 	}
 
 	@Deprecated
-	public void addToTree(int ID, String IP)
+	public void addToTree(int ID, String IP) throws RemoteException
 	{
-		this.nameServer.map.put(ID,IP);
+		NameServer.getInstance().map.put(ID,IP);
 	}
 }

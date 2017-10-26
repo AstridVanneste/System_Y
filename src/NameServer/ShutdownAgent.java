@@ -1,10 +1,10 @@
 package NameServer;
 
+import Network.UDP.Unicast.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -23,38 +23,20 @@ import java.util.*;
  * 6) NS sends broadcast to erase all links with local documents of dead node
  */
 
-public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentInterface {
+public class ShutdownAgent implements ShutdownAgentInterface {
 
 
     private boolean statusNode;
-    private NameServer nameServer;
-    private ShutdownAgent shutdownAgent;
 
-    protected ShutdownAgent() throws RemoteException {
-        this.nameServer=NameServer.getInstance();
-    }
-    public void init()
+    public ShutdownAgent()
     {
-	    /*if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new SecurityManager());
-		}*/
-        try {
-            shutdownAgent = this;
-            ShutdownAgentInterface stub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(shutdownAgent,0);
-            Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("NamingServer", stub);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
+    	this.statusNode = false;
     }
 
-
-    public void failureListener(){
+    public void failureListener()
+    {
 
     }
-
 
     @Override
     public void requestDeadNode(int id) throws RemoteException {
@@ -76,7 +58,7 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
     public boolean pingNode (int id) {
         try {
             //ping the client
-            if(InetAddress.getByName(nameServer.map.get(id)).isReachable(1000)){
+            if(InetAddress.getByName(NameServer.getInstance().map.get(id)).isReachable(1000)){
                 return true;
             }
         } catch (IOException e) {
@@ -88,21 +70,20 @@ public class ShutdownAgent extends UnicastRemoteObject implements ShutdownAgentI
     // NS can delete a node from his Map
     //      Not necessary in interface
     public void deleteNodeFromMap (int id){
-        nameServer.map.remove(id);
-        sendNeighboursIP(id);
+        NameServer.getInstance().map.remove(id);
     }
 
     // Send new IP-addresses to neighbours of dead node
     // NS knows just one IP of the neighbours??
     //      Not necessary in interface
-    public void sendNeighboursIP (int id){
+    public void sendNeighboursIP (int id, Server server){
 
         int ID;
         int IDRight;
         int IDLeft;
         boolean found = false;
 
-        Set set = nameServer.map.keySet();
+        Set set =  NameServer.getInstance().map.keySet();
         int size = set.size();
         ArrayList<Integer> list = new ArrayList<>(size);
 
