@@ -1,11 +1,10 @@
 package NameServer;
 
-import Network.UDP.Unicast.*;
+import IO.Network.UDP.Unicast.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 /**

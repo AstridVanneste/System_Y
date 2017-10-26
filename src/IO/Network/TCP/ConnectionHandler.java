@@ -1,12 +1,11 @@
-package Network.TCP;
+package IO.Network.TCP;
 
-import Network.Constants;
+import IO.Network.Constants;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ConnectionHandler implements Runnable
@@ -39,7 +38,7 @@ public class ConnectionHandler implements Runnable
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("Network.TCP.ConnetionHandler.start()\tAn IOException was thrown while creating the Streams for the socket");
+			System.err.println("IO.Network.TCP.ConnetionHandler.start()\tAn IOException was thrown while creating the Streams for the socket");
 		}
 	}
 
