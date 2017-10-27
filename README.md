@@ -92,6 +92,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Make node listen and respond for/to join-network-multicasts (Fergan & Axel)
 - [ ] Make new node listen for reply to multicast (Fergan & Axel)
 - [ ] Update discovery frame format to take into account multicast IP's (Thomas)
+- [ ] Make sure Map rolls-over when calculating an ID lower than the lowest ID
 
 ## Design Decisions
 - Security?
