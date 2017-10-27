@@ -84,14 +84,14 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Add file methods to network system
 
 ### Opdracht 4
-- [ ] Write method/class to convert TreeMap to CSV-formatted String
-- [ ] Write method/class to convert CSV-formatted String to TreeMap
-- [ ] Discovery Agent needs to be updated to match new specs
-- [ ] Create Node Class
-- [ ] Set up Node startup
-- [ ] Make node listen and respond for/to join-network-multicasts
-- [ ] Make new node listen for reply to multicast
-- [ ] Update discovery frame format to take into account multicast IP's
+- [ ] Write method/class to convert TreeMap to CSV-formatted String (Astrid)
+- [ ] Write method/class to convert CSV-formatted String to TreeMap (Astrid)
+- [ ] Discovery Agent needs to be updated to match new specs (Thomas)
+- [ ] Create Node Class (Fergan & Axel)
+- [ ] Set up Node startup (Fergan & Axel)
+- [ ] Make node listen and respond for/to join-network-multicasts (Fergan & Axel)
+- [ ] Make new node listen for reply to multicast (Fergan & Axel)
+- [ ] Update discovery frame format to take into account multicast IP's (Thomas)
 
 ## Design Decisions
 - Security?
