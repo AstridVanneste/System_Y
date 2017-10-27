@@ -98,11 +98,11 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
 
 #### Data format for Discovery Reply
 ```
-       4 Bytes          4 Bytes                 4 Bytes
-    |<--------->|<--------------------->|<------------------------->|
-    +-----------+-----------------------+---------------------------+
-    |   Node ID |    Next Neighbour ID  |   Previous Neighbour ID   |
-    +-----------+-----------------------+---------------------------+
+            4 Bytes          4 Bytes                 4 Bytes
+    |<----------------->|<--------------------->|<------------------------->|
+    +-------------------+-----------------------+---------------------------+
+    |   Number of Nodes |    Next Neighbour ID  |   Previous Neighbour ID   |
+    +-------------------+-----------------------+---------------------------+
 
     Total: 12 bytes
 ```
