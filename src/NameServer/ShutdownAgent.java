@@ -77,43 +77,13 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     //      Not necessary in interface
     public void sendNeighboursIP (int id, Server server){
 
-        int ID;
-        int IDRight;
-        int IDLeft;
-        boolean found = false;
+        int IDPrevious = NameServer.getInstance().map.lowerKey(id);
+        int IDNext = NameServer.getInstance().map.higherKey(id);
 
-        Set set =  NameServer.getInstance().map.keySet();
-        int size = set.size();
-        ArrayList<Integer> list = new ArrayList<>(size);
-
-        for (Object setElement : set)
-            list.add((int)setElement);
-
-        ListIterator listIterator = list.listIterator();
-
-        while (!found) {
-            if (listIterator.hasNext()) {
-
-                ID = (int) listIterator.next();
-
-                if (ID == id) {
-                    found = true;
-
-                    if (listIterator.nextIndex() == size)
-                        IDRight = list.get(0);
-                    else
-                        IDRight = list.get(listIterator.nextIndex());
-
-                    if (listIterator.previousIndex() == -1)
-                        IDLeft = list.get(size-1);
-                    else
-                        IDLeft = list.get(listIterator.previousIndex());
-                }
-
-            }
-        }
         System.out.println("new neighbours");
+
         //needs to be send to packagging (datagram pakket)
+
     }
 
     // Sends a broadcast about the dead node. This allows all nodes
