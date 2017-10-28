@@ -85,7 +85,6 @@ public class NameServer
 
 	public static int getHash(String name)
 	{
-
 		return Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
 	}
 
