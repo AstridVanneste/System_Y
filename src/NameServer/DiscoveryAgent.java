@@ -98,6 +98,10 @@ public class DiscoveryAgent implements Runnable
 					cl.send(packet.getAddress().toString(), discoveryPort, reply.serialize());
 					cl.stop();
 				}
+
+
+
+				NameServer.getInstance().writeMapToFile();
 			}
 		}
 	}
