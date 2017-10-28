@@ -70,6 +70,8 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     //      Not necessary in interface
     public void deleteNodeFromMap (int id){
         NameServer.getInstance().map.remove(id);
+
+        NameServer.getInstance().writeMapToFile();
     }
 
     // Send new IP-addresses to neighbours of dead node
