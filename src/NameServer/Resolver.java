@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class Resolver implements ResolverInterface
 {
-	public Resolver()
-	{
+	public Resolver(){
+
 	}
 
 	@Override
