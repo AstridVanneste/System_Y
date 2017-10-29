@@ -8,6 +8,7 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -18,7 +19,6 @@ public class Node{
 	private String name;
 	private String previousNeighbour;
 	private String nextNeighbour;
-	private Subscriber sub;
 	private String multicastIP = "224.0.0.1";
 	private int multicastPort = 1997;
 	private int id;
@@ -26,8 +26,9 @@ public class Node{
 	private ResolverInterface resolverInterface;
 	private ShutdownAgentInterface shutdownAgentInterface;
 	//private DiscoveryAgentInterface discoveryAgentInterface;
+	private Client udpClient;
 
-	public Node(String name){
+	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface){
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
 
@@ -41,18 +42,15 @@ public class Node{
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-
 		this.name = name;
-		//this.ip = giveIp;
-		sub = new Subscriber(ip, 5000);
-
+		udpClient = new Client();
 	}
 
 	public void accessRequest () {
 
 		ProtocolHeader header = new ProtocolHeader();
 		header.setVersion((byte)1);
-		header.setDataLength(0);
+		header.setDataLength(ip.length() + name.length());
 		header.setTransactionID(1);         //is this 'unique' enough?
 		header.setRequestCode(0);
 
@@ -62,7 +60,7 @@ public class Node{
 
 		System.out.println(header.toString());
 
-		UDPClient udpClient = new Client();
+
 		udpClient.start();
 
 		// Send header with access request
@@ -73,6 +71,8 @@ public class Node{
 		System.arraycopy(name, 0 , data,0,name.length());
 		System.arraycopy(ip,0,data,name.length(),ip.length());
 		udpClient.send(multicastIP, multicastPort, data );
+
+
 
 	}
 
@@ -93,33 +93,70 @@ public class Node{
 
 	}
 
-	public void setNeighbours(int amountNeighbours){
-		if(amountNeighbours == 0){
-			previousNeighbour = this.ip;
-			nextNeighbour = this.ip;
-		}
-
-
-		if(amountNeighbours == 1){
-			//getIP
-			//previousNeighbour = nextNeighbour;
-		}
-
-
-
-		if(amountNeighbours == 2){
-			//previousNeighbour =;
-			//nextNeighbour=;
-		}
+	public void setNeighbours(){
+		previousNeighbour = this.ip;
+		nextNeighbour = this.ip;
 	}
 
-	public String getData(){
+	public void setNeighbours(String neighbourIp){
+		previousNeighbour = neighbourIp;
+		nextNeighbour = neighbourIp;
 
-
-
-
-		return null;
 	}
+
+	public void setNeighbours(String previousNeighbour, String nextNeighbour){
+		this.previousNeighbour = previousNeighbour;
+		this.nextNeighbour = nextNeighbour;
+	}
+
+	public void getData(){
+		udpClient.run();
+		byte[] receivedData = udpClient.receiveData();
+
+		if(receivedData[4] == 0){
+			setNeighbours();
+		}
+		if(receivedData[4] == 1){
+			try
+			{
+				String ip1= new String(new byte[]{receivedData[5]}, "UTF-8");
+				String ip2= new String(new byte[]{receivedData[6]}, "UTF-8");
+				String ip3= new String(new byte[]{receivedData[7]}, "UTF-8");
+				String ip4= new String(new byte[]{receivedData[8]}, "UTF-8");
+				setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4));
+			} catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+
+		}
+		if(receivedData[4] >= 2){
+			try
+			{
+				String ip1= new String(new byte[]{receivedData[5]}, "UTF-8");
+				String ip2= new String(new byte[]{receivedData[6]}, "UTF-8");
+				String ip3= new String(new byte[]{receivedData[7]}, "UTF-8");
+				String ip4= new String(new byte[]{receivedData[8]}, "UTF-8");
+
+				String ip5= new String(new byte[]{receivedData[9]}, "UTF-8");
+				String ip6= new String(new byte[]{receivedData[10]}, "UTF-8");
+				String ip7= new String(new byte[]{receivedData[11]}, "UTF-8");
+				String ip8= new String(new byte[]{receivedData[12]}, "UTF-8");
+
+				setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4),ip5.concat(".").concat(ip6).concat(".").concat(ip7).concat(".").concat(ip8));
+			} catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+
+		}
+
+
+		udpClient.stop();
+
+	}
+
+
 
 	public int getID(){
 		return Math.abs(name.hashCode() % 32768);
