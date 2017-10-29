@@ -4,6 +4,10 @@ import Network.UDP.Multicast.*;
 import Network.Datagrams.ProtocolHeader;
 import Network.UDP.Unicast.Client;
 import Network.UDP.Unicast.UDPClient;
+import IO.Network.Datagrams.ProtocolHeader;
+import IO.Network.UDP.Multicast.*;
+import IO.Network.UDP.Unicast.Client;
+import IO.Network.UDP.Unicast.UDPClient;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
@@ -11,7 +15,6 @@ import NameServer.ShutdownAgentInterface;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-
 
 public class Node{
 	private String ip;

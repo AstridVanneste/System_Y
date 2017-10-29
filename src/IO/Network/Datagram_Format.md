@@ -1,4 +1,4 @@
-# Network Protocol for System Y
+# IO.Network Protocol for System Y
 ## Overview
 System Y will use UDP datagrams for various purposes.
 
@@ -87,22 +87,22 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
 
 #### Data format for Discovery Request (Multicast)
 ```
-       4 Bytes        Name Length Bytes
-    |<------------->|<----------------->|
-    +---------------+-------------------+
-    |   Name Length | Node Name         |
-    +---------------+-------------------+
+       4 Bytes        Name Length Bytes       4 Bytes
+    |<------------->|<----------------->|<--------------->|
+    +---------------+-------------------+-----------------+
+    |   Name Length | Node Name         | Node Unicast IP |
+    +---------------+-------------------+-----------------+
 
-    Total length: unknown (Name Length + 4)
+    Total length: unknown (Name Length + 8)
 ```
 
 #### Data format for Discovery Reply
 ```
-       4 Bytes          4 Bytes                 4 Bytes
-    |<--------->|<--------------------->|<------------------------->|
-    +-----------+-----------------------+---------------------------+
-    |   Node ID |    Next Neighbour ID  |   Previous Neighbour ID   |
-    +-----------+-----------------------+---------------------------+
+            4 Bytes          4 Bytes                 4 Bytes
+    |<----------------->|<--------------------->|<------------------------->|
+    +-------------------+-----------------------+---------------------------+
+    |   Number of Nodes |    Next Neighbour ID  |   Previous Neighbour ID   |
+    +-------------------+-----------------------+---------------------------+
 
     Total: 12 bytes
 ```

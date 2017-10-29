@@ -1,4 +1,4 @@
-package Network.UDP.Unicast;
+package IO.Network.UDP.Unicast;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

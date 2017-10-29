@@ -78,10 +78,21 @@ It continuously circulates through the network by all nodes calling RMI methods 
 `void update (List<String> fileList)`
 
 ## TO-DO
-- [ ] Implement UDP multicast
-- [ ] Design protocol for non-RMI (TCP/UDP) communication
-- [ ] Add file package and classes to repo
+- [x] Implement UDP multicast
+- [x] Design protocol for non-RMI (TCP/UDP) communication
+- [x] Add file package and classes to repo
 - [ ] Add file methods to network system
+
+### Opdracht 4
+- [x] Write method/class to convert TreeMap to CSV-formatted String (Astrid)
+- [x] Write method/class to convert CSV-formatted String to TreeMap (Astrid)
+- [ ] Discovery Agent needs to be updated to match new specs (Thomas)
+- [ ] Create Node Class (Fergan & Axel)
+- [ ] Set up Node startup (Fergan & Axel)
+- [ ] Make node listen and respond for/to join-network-multicasts (Fergan & Axel)
+- [ ] Make new node listen for reply to multicast (Fergan & Axel)
+- [ ] Update discovery frame format to take into account multicast IP's (Thomas)
+- [ ] Make sure Map rolls-over when calculating an ID lower than the lowest ID (Astrid)
 
 ## Design Decisions
 - Security?

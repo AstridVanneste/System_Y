@@ -1,4 +1,4 @@
-package Network.TCP;
+package IO.Network.TCP;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -56,7 +56,7 @@ public class Server implements TCPServer
 		}
 		else
 		{
-			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
@@ -80,13 +80,13 @@ public class Server implements TCPServer
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("Network.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
+				System.err.println("IO.Network.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
 				ioe.printStackTrace();
 			}
 		}
 		else
 		{
-			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
@@ -99,7 +99,7 @@ public class Server implements TCPServer
 		}
 		else
 		{
-			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 			return new byte[0];
 		}
 	}
@@ -113,7 +113,7 @@ public class Server implements TCPServer
 		}
 		else
 		{
-			System.err.println("Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 			return new byte[0];
 		}
 	}
@@ -140,7 +140,7 @@ public class Server implements TCPServer
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("Network.TCP.Publisher.run()\tException was thrown in call to accept() or close()");
+			System.err.println("IO.Network.TCP.Publisher.run()\tException was thrown in call to accept() or close()");
 			ioe.printStackTrace();
 		}
 	}
