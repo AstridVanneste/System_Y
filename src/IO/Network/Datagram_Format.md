@@ -67,6 +67,7 @@ The reply code tells the receiver the result of their request. It also tells the
 
 - 0x0000  Request to be added to network
 - 0x0001  Request Cluster Health Report
+- 0x0002  Request to change neighbour
 
 ## Reply Codes
 
