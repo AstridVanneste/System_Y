@@ -1,9 +1,5 @@
 package Node;
 
-import Network.UDP.Multicast.*;
-import Network.Datagrams.ProtocolHeader;
-import Network.UDP.Unicast.Client;
-import Network.UDP.Unicast.UDPClient;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Multicast.*;
 import IO.Network.UDP.Unicast.Client;
@@ -117,10 +113,6 @@ public class Node{
 	}
 
 	public String getData(){
-
-
-
-
 		return null;
 	}
 

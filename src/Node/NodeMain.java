@@ -28,7 +28,7 @@ public class NodeMain {
             ResolverInterface resolverInterface = (ResolverInterface) resolver;
             ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
 
-            Node node = new Node (resolverInterface,shutdownAgentInterface);
+            //Node node = new Node (resolverInterface,shutdownAgentInterface);
 
 
         }
