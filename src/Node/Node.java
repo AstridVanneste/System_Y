@@ -11,6 +11,7 @@ import NameServer.ShutdownAgentInterface;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 
@@ -50,7 +51,7 @@ public class Node{
 
 		ProtocolHeader header = new ProtocolHeader();
 		header.setVersion((byte)1);
-		header.setDataLength(ip.length() + name.length());
+		header.setDataLength(name.length() + 8);
 		header.setTransactionID(1);         //is this 'unique' enough?
 		header.setRequestCode(0);
 
@@ -67,9 +68,13 @@ public class Node{
 		udpClient.send(multicastIP, multicastPort, serial );
 
 		// Send name + ip as data
-		byte [] data = new byte[ip.length() + name.length()];
-		System.arraycopy(name, 0 , data,0,name.length());
-		System.arraycopy(ip,0,data,name.length(),ip.length());
+		byte [] data = new byte[name.length() + 8];
+		byte [] nameLengthInByte = ByteBuffer.allocate(4).putInt(name.length()).array();
+		byte [] nameInByte = name.getBytes();
+		byte [] ipInByte = ByteBuffer.allocate(4).put(ip.getBytes()).array();
+		System.arraycopy(nameLengthInByte , 0 ,  data,0											 ,	nameLengthInByte.length);
+		System.arraycopy(nameInByte       ,	0 ,	data,		 nameLengthInByte.length					 ,	nameInByte.length);
+		System.arraycopy(ipInByte         ,	0 ,	data,nameLengthInByte.length + nameInByte.length ,	ipInByte.length);
 		udpClient.send(multicastIP, multicastPort, data );
 
 
