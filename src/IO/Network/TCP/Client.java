@@ -1,6 +1,6 @@
-package Network.TCP;
+package IO.Network.TCP;
 
-import Network.Constants;
+import IO.Network.Constants;
 
 import java.net.*;
 import java.io.*;

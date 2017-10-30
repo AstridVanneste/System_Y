@@ -1,4 +1,4 @@
-package Network;
+package IO.Network;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

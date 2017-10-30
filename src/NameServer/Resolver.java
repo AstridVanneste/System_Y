@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class Resolver implements ResolverInterface
 {
-	public Resolver()
-	{
+	public Resolver(){
+
 	}
 
 	@Override
@@ -29,6 +29,7 @@ public class Resolver implements ResolverInterface
 		}
 	}
 
+	@Deprecated
 	public void removeFromTree(int nodeId) throws RemoteException{
 		if(NameServer.getInstance().map.containsKey(nodeId)){
 			NameServer.getInstance().map.remove(nodeId);
@@ -65,9 +66,15 @@ public class Resolver implements ResolverInterface
 	public int getOwnerID(int hash)
 	{
 		int ID;
-		boolean lower = true;
 
-		ID = NameServer.getInstance().map.lowerKey(hash);
+		if(hash < NameServer.getInstance().map.firstKey())
+		{
+			ID = NameServer.getInstance().map.lastKey();
+		}
+		else
+		{
+			ID = NameServer.getInstance().map.lowerKey(hash);
+		}
 
 		return ID;
 	}
