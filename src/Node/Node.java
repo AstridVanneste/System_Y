@@ -1,5 +1,6 @@
 package Node;
 
+import IO.Network.Datagrams.Datagram;
 import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Unicast.Client;
@@ -8,6 +9,9 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -110,51 +114,92 @@ public class Node{
 
 	}
 
+	public void sendNeighbours(){
+		byte version = (byte)0;
+		short replyCode = (short)0;
+		short requestCode = (short)2;
+		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
+		byte[] idToSend = new byte[4];
+
+
+		byte[] ipToSend = new byte[4];
+		String[] ipInParts = ip.split(".");
+		ipToSend[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipToSend[1]=(byte)Integer.parseInt(ipInParts[0]);
+		ipToSend[2]=(byte)Integer.parseInt(ipInParts[0]);
+		ipToSend[3]=(byte)Integer.parseInt(ipInParts[0]);
+
+
+		Datagram datagram = new Datagram(header, ipToSend);//needs to be replaced by ip + id
+
+		udpClient.send(nextNeighbour,5000,datagram.serialize());
+		udpClient.send(previousNeighbour,5000,datagram.serialize());
+
+	}
+
+
+
+	public void changeNeighbours(int id, String ip){
+		if(getID()< id){
+			nextNeighbour = ip;
+
+		}
+		if(getID()> id){
+			previousNeighbour = ip;
+
+		}
+	}
+
 	public void setNeighbours(String previousNeighbour, String nextNeighbour){
 		this.previousNeighbour = previousNeighbour;
 		this.nextNeighbour = nextNeighbour;
 	}
 
-	public void getData(){
+	public void getData()
+	{
 		udpClient.run();
 		byte[] receivedData = udpClient.receiveData();
-
-		if(receivedData[4] == 0){
-			setNeighbours();
-		}
-		if(receivedData[4] == 1){
-			try
+		if(receivedData[10] == 0x0000){
+			if (receivedData[16] == 0)
 			{
-				String ip1= new String(new byte[]{receivedData[5]}, "UTF-8");
-				String ip2= new String(new byte[]{receivedData[6]}, "UTF-8");
-				String ip3= new String(new byte[]{receivedData[7]}, "UTF-8");
-				String ip4= new String(new byte[]{receivedData[8]}, "UTF-8");
-				setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4));
-			} catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
+				setNeighbours();
 			}
-
-		}
-		if(receivedData[4] >= 2){
-			try
+			if (receivedData[16] == 1)
 			{
-				String ip1= new String(new byte[]{receivedData[5]}, "UTF-8");
-				String ip2= new String(new byte[]{receivedData[6]}, "UTF-8");
-				String ip3= new String(new byte[]{receivedData[7]}, "UTF-8");
-				String ip4= new String(new byte[]{receivedData[8]}, "UTF-8");
+				try
+				{
+					String ip1 = new String(new byte[]{receivedData[5]}, "UTF-8");
+					String ip2 = new String(new byte[]{receivedData[6]}, "UTF-8");
+					String ip3 = new String(new byte[]{receivedData[7]}, "UTF-8");
+					String ip4 = new String(new byte[]{receivedData[8]}, "UTF-8");
+					setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4));
+				} catch (UnsupportedEncodingException e)
+				{
+					e.printStackTrace();
+				}
 
-				String ip5= new String(new byte[]{receivedData[9]}, "UTF-8");
-				String ip6= new String(new byte[]{receivedData[10]}, "UTF-8");
-				String ip7= new String(new byte[]{receivedData[11]}, "UTF-8");
-				String ip8= new String(new byte[]{receivedData[12]}, "UTF-8");
-
-				setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4),ip5.concat(".").concat(ip6).concat(".").concat(ip7).concat(".").concat(ip8));
-			} catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
 			}
+			if (receivedData[16] >= 2)
+			{
+				try
+				{
+					String ip1 = new String(new byte[]{receivedData[5]}, "UTF-8");
+					String ip2 = new String(new byte[]{receivedData[6]}, "UTF-8");
+					String ip3 = new String(new byte[]{receivedData[7]}, "UTF-8");
+					String ip4 = new String(new byte[]{receivedData[8]}, "UTF-8");
 
+					String ip5 = new String(new byte[]{receivedData[9]}, "UTF-8");
+					String ip6 = new String(new byte[]{receivedData[10]}, "UTF-8");
+					String ip7 = new String(new byte[]{receivedData[11]}, "UTF-8");
+					String ip8 = new String(new byte[]{receivedData[12]}, "UTF-8");
+
+					setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4), ip5.concat(".").concat(ip6).concat(".").concat(ip7).concat(".").concat(ip8));
+				} catch (UnsupportedEncodingException e)
+				{
+					e.printStackTrace();
+				}
+
+			}
 		}
 
 
