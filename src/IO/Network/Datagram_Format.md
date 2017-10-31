@@ -105,7 +105,7 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
     |   Node ID |    Number of Nodes   |    Next Neighbour ID  |   Previous Neighbour ID   |
     +-----------+----------------------+-----------------------+---------------------------+
 
-    Total: 13 bytes
+    Total: 8 bytes
 ```
 
 ### Ping Service
