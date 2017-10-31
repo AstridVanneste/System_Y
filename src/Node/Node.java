@@ -9,12 +9,10 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 
@@ -113,8 +111,11 @@ public class Node{
 		short replyCode = (short)0;
 		short requestCode = (short)2;
 		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
-		byte[] idToSend = new byte[4];
+		//put id in a byte buffer
+		ByteBuffer b = ByteBuffer.allocate(4);
+		b.putInt(id);
 
+		byte[] result = b.array();
 
 		byte[] ipToSend = new byte[4];
 		String[] ipInParts = ip.split(".");
@@ -195,7 +196,6 @@ public class Node{
 
 			}
 		}
-
 
 		udpClient.stop();
 

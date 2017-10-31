@@ -146,4 +146,9 @@ public class Client implements UDPClient, Runnable
 	{
 		return packetBuffer.size();
 	}
+
+	public DatagramSocket getSocket()
+	{
+		return socket;
+	}
 }
