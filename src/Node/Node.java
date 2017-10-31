@@ -9,10 +9,7 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -36,10 +33,6 @@ public class Node{
 	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface){
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
-
-		/*System.out.print("Enter the hostName : ");
-		Scanner input = new Scanner(System.in);
-		name = input.nextLine();*/
 
 		try {
 			this.ip = InetAddress.getLocalHost().getHostAddress();
@@ -114,20 +107,26 @@ public class Node{
 
 	}
 
+	public void setNeighbours(String previousNeighbour, String nextNeighbour){
+		this.previousNeighbour = previousNeighbour;
+		this.nextNeighbour = nextNeighbour;
+	}
+
+
 	public void sendNeighbours(){
 		byte version = (byte)0;
 		short replyCode = (short)0;
 		short requestCode = (short)2;
 		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
-		byte[] idToSend = new byte[4];
-
+		//put id in a byte buffer
+		byte[] id = ByteBuffer.allocate(4).putInt(getID()).array();
 
 		byte[] ipToSend = new byte[4];
 		String[] ipInParts = ip.split(".");
 		ipToSend[0]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[1]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[2]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[3]=(byte)Integer.parseInt(ipInParts[0]);
+		ipToSend[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipToSend[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipToSend[3]=(byte)Integer.parseInt(ipInParts[3]);
 
 
 		Datagram datagram = new Datagram(header, ipToSend);//needs to be replaced by ip + id
@@ -150,10 +149,6 @@ public class Node{
 		}
 	}
 
-	public void setNeighbours(String previousNeighbour, String nextNeighbour){
-		this.previousNeighbour = previousNeighbour;
-		this.nextNeighbour = nextNeighbour;
-	}
 
 	public void getData()
 	{
@@ -201,7 +196,6 @@ public class Node{
 
 			}
 		}
-
 
 		udpClient.stop();
 
