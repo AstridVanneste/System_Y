@@ -34,10 +34,6 @@ public class Node{
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
 
-		/*System.out.print("Enter the hostName : ");
-		Scanner input = new Scanner(System.in);
-		name = input.nextLine();*/
-
 		try {
 			this.ip = InetAddress.getLocalHost().getHostAddress();
 			this.id = getHash(ip);
@@ -106,23 +102,26 @@ public class Node{
 
 	}
 
+	public void setNeighbours(String previousNeighbour, String nextNeighbour){
+		this.previousNeighbour = previousNeighbour;
+		this.nextNeighbour = nextNeighbour;
+	}
+
+
 	public void sendNeighbours(){
 		byte version = (byte)0;
 		short replyCode = (short)0;
 		short requestCode = (short)2;
 		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
 		//put id in a byte buffer
-		ByteBuffer b = ByteBuffer.allocate(4);
-		b.putInt(id);
-
-		byte[] result = b.array();
+		byte[] id = ByteBuffer.allocate(4).putInt(getID()).array();
 
 		byte[] ipToSend = new byte[4];
 		String[] ipInParts = ip.split(".");
 		ipToSend[0]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[1]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[2]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[3]=(byte)Integer.parseInt(ipInParts[0]);
+		ipToSend[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipToSend[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipToSend[3]=(byte)Integer.parseInt(ipInParts[3]);
 
 
 		Datagram datagram = new Datagram(header, ipToSend);//needs to be replaced by ip + id
@@ -145,10 +144,6 @@ public class Node{
 		}
 	}
 
-	public void setNeighbours(String previousNeighbour, String nextNeighbour){
-		this.previousNeighbour = previousNeighbour;
-		this.nextNeighbour = nextNeighbour;
-	}
 
 	public void getData()
 	{
