@@ -26,8 +26,7 @@ public class Client implements TCPClient, Runnable
 		this.buffer = new LinkedList<Byte>();
 	}
 
-	public Client(String IP,
-	              int port)
+	public Client(String IP, int port)
 	{
 		this.stop = false;
 		this.portNum = port;

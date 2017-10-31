@@ -5,21 +5,19 @@ import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Multicast.Subscriber;
 import IO.Network.UDP.Unicast.Client;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
 import java.net.DatagramPacket;
 
 public class DiscoveryAgent implements Runnable
 {
-	public static String discoveryMulticast = "224.0.0.1";
-	public static int discoveryPort = 1997;
-
 	private boolean quit;
 	private Subscriber multicastSub;
 
 	public DiscoveryAgent ()
 	{
 		this.quit = false;
-		this.multicastSub = new Subscriber(discoveryMulticast, discoveryPort);
+		this.multicastSub = new Subscriber(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT);
 	}
 
 	public void init ()
@@ -41,6 +39,24 @@ public class DiscoveryAgent implements Runnable
 
 				if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 				{
+					byte[] data = request.getData();
+					byte[] nameLenBytes = new byte [4];
+					System.arraycopy(data, 0, nameLenBytes, 0, 4);
+
+					int nameLen = ProtocolHeader.byteArrayToInt(nameLenBytes);
+					byte[] nameBytes = new byte [nameLen];
+					System.arraycopy(data, 4, nameLenBytes, 0, nameLen);
+					String nodeName = new String (nameBytes, Constants.ENCODING);
+
+					if (NameServer.getInstance().map.containsKey(NameServer.getHash(nodeName)))
+					{
+						// Return failure
+						continue;
+					}
+
+
+
+					/*
 					ProtocolHeader header = request.getHeader();
 					Datagram reply;
 					byte[] data = request.getData();
@@ -96,6 +112,7 @@ public class DiscoveryAgent implements Runnable
 					cl.start();
 					cl.send(packet.getAddress().toString(), discoveryPort, reply.serialize());
 					cl.stop();
+					*/
 				}
 			}
 		}
