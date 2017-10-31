@@ -1,4 +1,4 @@
-# IO.Network Protocol for System Y
+# Network Protocol for System Y
 ## Overview
 System Y will use UDP datagrams for various purposes.
 
