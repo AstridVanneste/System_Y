@@ -86,12 +86,12 @@ It continuously circulates through the network by all nodes calling RMI methods 
 ### Opdracht 4
 - [x] Write method/class to convert TreeMap to CSV-formatted String (Astrid)
 - [x] Write method/class to convert CSV-formatted String to TreeMap (Astrid)
-- [ ] Discovery Agent needs to be updated to match new specs (Thomas)
+- [x] Discovery Agent needs to be updated to match new specs (Thomas)
 - [ ] Create Node Class (Fergan & Axel)
 - [ ] Set up Node startup (Fergan & Axel)
 - [ ] Make node listen and respond for/to join-network-multicasts (Fergan & Axel)
 - [ ] Make new node listen for reply to multicast (Fergan & Axel)
-- [ ] Update discovery frame format to take into account multicast IP's (Thomas)
+- [x] Update discovery frame format to take into account multicast IP's (Thomas)
 - [x] Make sure Map rolls-over when calculating an ID lower than the lowest ID (Astrid)
 
 ## Design Decisions
