@@ -60,7 +60,7 @@ public class DiscoveryAgent implements Runnable
 					}
 
 					String name = new String (nameArray, Constants.ENCODING);
-					int hash = NameServer.getHash(name);
+					short hash = NameServer.getHash(name);
 
 					byte[] replyData = new byte [12];   // 3  ID's = 12 bytes
 

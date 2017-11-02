@@ -23,7 +23,7 @@ public class NameServer
 
 	private static NameServer nameServer;	//singleton instance of nameserver
 
-	TreeMap<Integer,String> map;			//can be accessed throughout entire NameServer package
+	TreeMap<Short,String> map;			//can be accessed throughout entire NameServer package
 	private ShutdownAgentInterface shutdownAgentStub;
 	public ResolverInterface resolverStub;  // todo: temporary, move back to private when RMI testing is complete
 	private DiscoveryAgent discoveryAgent;
@@ -90,9 +90,9 @@ public class NameServer
 
 	}
 
-	public static int getHash(String name)
+	public static short getHash(String name)
 	{
-		return Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
+		return (short) Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
 	}
 
 	public void writeMapToFile()
@@ -139,7 +139,7 @@ public class NameServer
 	}
 
 	@Deprecated
-	public void addToTree(int ID, String IP)
+	public void addToTree(short ID, String IP)
 	{
 		this.map.put(ID,IP);
 	}

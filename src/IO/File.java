@@ -211,13 +211,13 @@ public class File
 		}
 	}
 
-	public static String mapToCSV(Map<Integer, String> map)
+	public static String mapToCSV(Map<Short, String> map)
 	{
 		String CSV = "";
 
-		Set<Integer> keySet = map.keySet();
+		Set<Short> keySet = map.keySet();
 
-		for(int ID: keySet)
+		for(short ID: keySet)
 		{
 			CSV += ID + ";";
 			CSV += map.get(ID) + "\n";
@@ -225,14 +225,14 @@ public class File
 		return CSV;
 	}
 
-	public static TreeMap<Integer,String> CSVToMap(String CSV)
+	public static TreeMap<Short,String> CSVToMap(String CSV)
 	{
-		TreeMap<Integer, String> map = new TreeMap<>();
+		TreeMap<Short, String> map = new TreeMap<>();
 
 		for(String s: CSV.split("\n"))
 		{
 			String[] KV = s.split(";");
-			map.put(Integer.parseInt(KV[0]),KV[1]);
+			map.put(Short.parseShort(KV[0]),KV[1]);
 		}
 
 

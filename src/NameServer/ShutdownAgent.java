@@ -77,7 +77,7 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     // Send new IP-addresses to neighbours of dead node
     // NS knows just one IP of the neighbours??
     //      Not necessary in interface
-    public void sendNeighboursIP (int id, Server server){
+    public void sendNeighboursIP (short id, Server server){
 
         int IDPrevious = NameServer.getInstance().map.lowerKey(id);
         int IDNext = NameServer.getInstance().map.higherKey(id);

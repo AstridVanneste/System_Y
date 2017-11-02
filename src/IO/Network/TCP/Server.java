@@ -1,5 +1,7 @@
 package IO.Network.TCP;
 
+import IO.File;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -182,5 +184,11 @@ public class Server implements TCPServer
 		}
 
 		return resBuilder.toString();
+	}
+
+	@Override
+	public void sendFile(File file)
+	{
+
 	}
 }
