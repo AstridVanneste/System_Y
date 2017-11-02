@@ -1,5 +1,7 @@
 package IO.Network;
 
+import IO.Network.Datagrams.ProtocolHeader;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -8,20 +10,14 @@ import java.nio.charset.StandardCharsets;
  */
 public class Constants
 {
-
-	public final static int TCP_PORT = 1997;
-	//public final static int UDP_PORT_CLIENT = 2000;
-	public final static int UDP_PORT_SERVER = 2001;
-
 	/**
-	 * Publisher IP for testing purposes.<br>
-	 * Update at the beginning of every lab session.<br>
-	 * If you don't:<br>
-	 * <img src="http://godlessmom.com/wp-content/uploads/2015/03/youre-going-to-have-a-bad-time.png" alt="You're going to have a bad time.">
+	 * The Multicast IP that's going to be used for discovery
 	 */
-	public final static String TCP_SERVER_IP = "localhost";
-	public final static String UDP_SERVER_IP = "localhost";
+	public static final String DISCOVERY_MULTICAST_IP = "224.0.0.1";
 
+	public static final int DISCOVERY_NAMESERVER_PORT = 2000;
+
+	public static final int DISCOVERY_CLIENT_PORT = 2001;
 
 	/**
 	 * Default Encoding
@@ -29,4 +25,11 @@ public class Constants
 	 * Please use this.
 	 */
 	public static final Charset ENCODING = StandardCharsets.UTF_8;
+
+
+	/**
+	 * Segment size for sending a TCP segment
+	 */
+	public static final int MAX_TCP_SEGMENT_SIZE = 1460;
+	public static final int MAX_TCP_FILE_SEGMENT_SIZE = MAX_TCP_SEGMENT_SIZE - ProtocolHeader.HEADER_LENGTH;
 }
