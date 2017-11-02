@@ -51,19 +51,6 @@ public class Resolver implements ResolverInterface
 		}
 	}
 
-	//@Override
-	/*public String getOwnerIP(String filename) throws RemoteException	{
-
-		int hash = NameServer.getHash(filename);
-
-		System.out.println("HASH = " + hash);
-
-		int ID = getOwnerID(hash);
-
-		return NameServer.getInstance().map.get(NameServer.getInstance().map.floorKey(new Integer(ID)));
-	}
-	*/
-
 	@Override
 	public String getOwnerIP(String filename)
 	{
