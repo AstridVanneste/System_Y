@@ -17,7 +17,7 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Override
-	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
+	public String getOwnerIP(int nodeId) throws RemoteException, InvalidParameterException
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
@@ -43,7 +43,7 @@ public class Resolver implements ResolverInterface
 		String eol = System.getProperty("line.separator");
 
 		try (Writer writer = new FileWriter("somefile.csv")) {
-			for (Map.Entry<Integer, String> entry : NameServer.getInstance().map.entrySet()) {
+			for (Map.Entry<Short, String> entry : NameServer.getInstance().map.entrySet()) {
 				writer.append((entry.getKey().toString())).append(',').append(entry.getValue()).append(eol);
 			}
 		} catch (IOException ex) {
@@ -51,8 +51,8 @@ public class Resolver implements ResolverInterface
 		}
 	}
 
-	@Override
-	public String lookup(String filename) throws RemoteException	{
+	//@Override
+	/*public String getOwnerIP(String filename) throws RemoteException	{
 
 		int hash = NameServer.getHash(filename);
 
@@ -62,25 +62,26 @@ public class Resolver implements ResolverInterface
 
 		return NameServer.getInstance().map.get(NameServer.getInstance().map.floorKey(new Integer(ID)));
 	}
+	*/
 
-	public int getOwnerID(int hash)
+	@Override
+	public String getOwnerIP(String filename)
 	{
-		int ID;
+		short hash = NameServer.getHash(filename);
 
 		if(hash < NameServer.getInstance().map.firstKey())
 		{
-			ID = NameServer.getInstance().map.lastKey();
+			return NameServer.getInstance().map.get(NameServer.getInstance().map.lastKey());
 		}
 		else
 		{
-			ID = NameServer.getInstance().map.lowerKey(hash);
+			return NameServer.getInstance().map.get(NameServer.getInstance().map.lowerKey(hash));
 		}
-
-		return ID;
 	}
 
+
 	@Deprecated
-	public void addToTree(int ID, String IP) throws RemoteException
+	public void addToTree(short ID, String IP) throws RemoteException
 	{
 		NameServer.getInstance().map.put(ID,IP);
 	}

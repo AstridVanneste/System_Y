@@ -15,7 +15,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-	public String lookup(int nodeId) throws RemoteException;
+	public String getOwnerIP(int nodeId) throws RemoteException;
 	/**
 	 * Print out the existing TreeMap
 	 * @throws RemoteException
@@ -36,7 +36,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException, InvalidParameterException
 	 */
-	public String lookup(String filename) throws RemoteException, InvalidParameterException;
+	public String getOwnerIP(String filename) throws RemoteException, InvalidParameterException;
 
-	public void addToTree(int ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
+	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
 }
