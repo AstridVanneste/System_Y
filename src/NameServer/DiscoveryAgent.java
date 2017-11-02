@@ -5,7 +5,7 @@ import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Multicast.Subscriber;
 import IO.Network.UDP.Unicast.Client;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+import Util.Serializer;
 
 import java.net.DatagramPacket;
 
@@ -18,11 +18,13 @@ public class DiscoveryAgent implements Runnable
 	{
 		this.quit = false;
 		this.multicastSub = new Subscriber(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT);
+		System.out.println("Set up multicast sub to listen on " + Constants.DISCOVERY_MULTICAST_IP + ":" + Integer.toString(Constants.DISCOVERY_NAMESERVER_PORT));
 	}
 
 	public void init ()
 	{
 		multicastSub.start();
+		System.out.println("Started listening");
 		Thread t = new Thread (this);
 		t.start();
 	}
@@ -32,8 +34,10 @@ public class DiscoveryAgent implements Runnable
 	{
 		while (!this.quit)
 		{
-			if (this.multicastSub.hasData())
+			if (this.multicastSub.getBufferLength() > 0)
 			{
+				System.out.println("Multicast sub received data");
+
 				DatagramPacket packet = this.multicastSub.receivePacket();
 				Datagram request = new Datagram(packet.getData());
 
@@ -42,8 +46,15 @@ public class DiscoveryAgent implements Runnable
 					byte[] data = request.getData();
 					byte[] nameLenBytes = new byte [4];
 					System.arraycopy(data, 0, nameLenBytes, 0, 4);
+					int nameLen = Util.Serializer.bytesToInt(nameLenBytes);
 
-					int nameLen = ProtocolHeader.byteArrayToInt(nameLenBytes);
+					if (data.length != 8 + nameLen)
+					{
+						System.err.println("Packet data had length of " + Integer.toString(data.length) + ", was supposed to be " + Integer.toString(8 + nameLen));
+						continue;
+					}
+
+
 					byte[] nameBytes = new byte [nameLen];
 					System.arraycopy(data, 4, nameLenBytes, 0, nameLen);
 					String nodeName = new String (nameBytes, Constants.ENCODING);
@@ -51,68 +62,65 @@ public class DiscoveryAgent implements Runnable
 					if (NameServer.getInstance().map.containsKey(NameServer.getHash(nodeName)))
 					{
 						// Return failure
+						System.err.println("Nameserver already has record for hash " + Integer.toString(NameServer.getHash(nodeName)));
+						ProtocolHeader replyHeader = new ProtocolHeader(request.getHeader());
+						replyHeader.setReplyCode(0x0002);
+						Datagram replyDatagram = new Datagram(replyHeader);
+
+						Client replyClient = new Client();
+						replyClient.start();
+						replyClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, replyDatagram.serialize());
+						replyClient.stop();
 						continue;
 					}
 
+					byte[] unicastIPBytes = new byte [4];
+					System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
+					String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
 
-
-					/*
-					ProtocolHeader header = request.getHeader();
-					Datagram reply;
-					byte[] data = request.getData();
-					byte[] length = new byte [4];
-
-					for (int i = 0; i < 4; i++)
+					if (NameServer.getInstance().map.containsValue(unicastIp))
 					{
-						length[i] = data[i];
+						// Return failure
+						System.err.println("Nameserver already has a record for IP " + unicastIp);
+						ProtocolHeader replyHeader = new ProtocolHeader(request.getHeader());
+						replyHeader.setReplyCode(0x0003);
+						Datagram replyDatagram = new Datagram(replyHeader);
+
+						Client replyClient = new Client();
+						replyClient.start();
+						replyClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, replyDatagram.serialize());
+						replyClient.stop();
+						continue;
 					}
 
-					int lengthInt = ProtocolHeader.byteArrayToInt(length);
-					byte[] nameArray = new byte [lengthInt];
-					for (int i = 0; i < lengthInt; i++)
-					{
-						nameArray[i] = data[i + 4];
-					}
+					// Return succes
+					short nodeId = (short) NameServer.getHash(nodeName);
+					short nextId = NameServer.getInstance().map.higherKey(nodeId);
+					short prevId = NameServer.getInstance().map.lowerKey(nodeId);
+					short numNodes = (short) NameServer.getInstance().map.size();
 
-					String name = new String (nameArray, Constants.ENCODING);
-					int hash = NameServer.getHash(name);
+					byte[] replyData = new byte [8];
+					replyData[7] = (byte) ((nodeId >>> 8) & 0x00FF);
+					replyData[6] = (byte) (nodeId & 0x00FF);
 
-					byte[] replyData = new byte [12];   // 3  ID's = 12 bytes
+					replyData[5] = (byte) ((numNodes >>> 8) & 0x00FF);
+					replyData[4] = (byte) (numNodes & 0x00FF);
 
-					if (NameServer.getInstance().map.containsKey(hash))
-					{
-						header.setReplyCode(ProtocolHeader.REPLY_DUPLICATE_ID);
+					replyData[3] = (byte) ((nextId >>> 8) & 0x00FF);
+					replyData[2] = (byte) (nextId & 0x00FF);
 
-						reply = new Datagram(header);
-					}
-					else if (NameServer.getInstance().map.containsValue(packet.getAddress().toString()))
-					{
-						header.setReplyCode(ProtocolHeader.REPLY_DUPLICATE_IP);
+					replyData[1] = (byte) ((prevId >>> 8) & 0x00FF);
+					replyData[0] = (byte) (prevId & 0x00FF);
 
-						reply = new Datagram(header);
-					}
-					else
-					{
-						header.setReplyCode(ProtocolHeader.REPLY_SUCCESSFULLY_ADDED);
-						byte[] nodeId = ProtocolHeader.intToByteArray(hash);
-						byte[] prevNodeId = ProtocolHeader.intToByteArray(NameServer.getInstance().map.lowerKey(hash));
-						byte[] nextNodeId = ProtocolHeader.intToByteArray(NameServer.getInstance().map.higherKey(hash));
+					ProtocolHeader replyHeader = new ProtocolHeader(request.getHeader());
+					replyHeader.setReplyCode(0x0001);
+					Datagram replyDatagram = new Datagram(replyHeader);
+					replyDatagram.setData(replyData);
 
-						for (int i = 0; i < 4; i++)
-						{
-							replyData[i] = nodeId[i];
-							replyData[i + 4] = prevNodeId[i];
-							replyData[i + 8] = nextNodeId[i];
-						}
-
-						reply = new Datagram(header, replyData);
-					}
-
-					Client cl = new Client();
-					cl.start();
-					cl.send(packet.getAddress().toString(), discoveryPort, reply.serialize());
-					cl.stop();
-					*/
+					Client replyClient = new Client();
+					replyClient.start();
+					replyClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, replyDatagram.serialize());
+					replyClient.stop();
 				}
 			}
 		}

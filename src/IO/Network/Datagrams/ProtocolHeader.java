@@ -33,18 +33,29 @@ public class ProtocolHeader
 	private int requestCode;
 	private int replyCode;
 
+	/*
 	public ProtocolHeader()
 	{
 
 	}
+	*/
 
-	public ProtocolHeader(byte version, int dataLength,int transactionID, short requestCode, short replyCode)
+	public ProtocolHeader(byte version, int dataLength, int transactionID, short requestCode, short replyCode)
 	{
 		this.version = version;
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
 		this.transactionID = transactionID;
 		this.requestCode = requestCode & REQUEST_CODE_MASK;
 		this.replyCode = replyCode & REPLY_CODE_MASK;
+	}
+
+	public ProtocolHeader(ProtocolHeader other)
+	{
+		this.version = other.version;
+		this.dataLength = other.dataLength;
+		this.transactionID = other.transactionID;
+		this.requestCode = other.requestCode;
+		this.replyCode = other.replyCode;
 	}
 
 	public ProtocolHeader(byte[] header)
@@ -57,9 +68,10 @@ public class ProtocolHeader
 		return this.version;
 	}
 
-	public void setVersion(byte version)
+	public ProtocolHeader setVersion(byte version)
 	{
 		this.version = version;
+		return this;
 	}
 
 	public int getDataLength()
@@ -67,9 +79,10 @@ public class ProtocolHeader
 		return this.dataLength;
 	}
 
-	public void setDataLength(int dataLength)
+	public ProtocolHeader setDataLength(int dataLength)
 	{
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
+		return this;
 	}
 
 	public int getTransactionID()
@@ -77,9 +90,10 @@ public class ProtocolHeader
 		return this.transactionID;
 	}
 
-	public void setTransactionID(int transactionID)
+	public ProtocolHeader setTransactionID(int transactionID)
 	{
 		this.transactionID = transactionID;
+		return this;
 	}
 
 	public int getRequestCode()
@@ -87,9 +101,10 @@ public class ProtocolHeader
 		return this.requestCode;
 	}
 
-	public void setRequestCode(int requestCode)
+	public ProtocolHeader setRequestCode(int requestCode)
 	{
 		this.requestCode = requestCode & REQUEST_CODE_MASK;
+		return this;
 	}
 
 	public int getReplyCode()
@@ -97,9 +112,10 @@ public class ProtocolHeader
 		return this.replyCode;
 	}
 
-	public void setReplyCode(int replyCode)
+	public ProtocolHeader setReplyCode(int replyCode)
 	{
 		this.replyCode = replyCode & REPLY_CODE_MASK;
+		return this;
 	}
 
 	public void setHeader(byte[] header)
@@ -119,19 +135,19 @@ public class ProtocolHeader
 			i++;
 		}
 
-		this.dataLength = byteArrayToInt(bytes);
+		this.dataLength = Util.Serializer.bytesToInt(bytes);
 
 		offset += DATA_LENGTH_LENGTH;
 
-		this.transactionID = byteArrayToInt(this.getSubArray(header, offset, TRANSACTION_ID_LENGTH));
+		this.transactionID = Util.Serializer.bytesToInt(this.getSubArray(header, offset, TRANSACTION_ID_LENGTH));
 
 		offset += TRANSACTION_ID_LENGTH;
 
-		this.requestCode = byteArrayToShort(this.getSubArray(header, offset, REQUEST_CODE_LENGTH));
+		this.requestCode = Util.Serializer.bytesToShort(this.getSubArray(header, offset, REQUEST_CODE_LENGTH));
 
 		offset += REQUEST_CODE_LENGTH;
 
-		this.replyCode = byteArrayToShort(this.getSubArray(header,offset,REPLY_CODE_LENGTH));
+		this.replyCode = Util.Serializer.bytesToShort(this.getSubArray(header,offset,REPLY_CODE_LENGTH));
 
 	}
 
@@ -175,7 +191,7 @@ public class ProtocolHeader
 		offset += VERSION_LENGTH;
 
 
-		byte[] bytes = intToByteArray(this.dataLength);
+		byte[] bytes = Util.Serializer.intToBytes(this.dataLength);
 
 
 		for(int i = 0; i < DATA_LENGTH_LENGTH; i++ )
@@ -186,7 +202,7 @@ public class ProtocolHeader
 		offset += DATA_LENGTH_LENGTH;
 
 
-		bytes = intToByteArray(this.transactionID);
+		bytes = Util.Serializer.intToBytes(this.transactionID);
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
 		{
@@ -195,7 +211,7 @@ public class ProtocolHeader
 
 		offset += TRANSACTION_ID_LENGTH;
 
-		bytes = intToByteArray(this.requestCode);
+		bytes = Util.Serializer.intToBytes(this.requestCode);
 
 		for(int i = 0; i < REQUEST_CODE_LENGTH; i++)
 		{
@@ -204,7 +220,7 @@ public class ProtocolHeader
 
 		offset += REQUEST_CODE_LENGTH;
 
-		bytes = intToByteArray(this.replyCode);
+		bytes = Util.Serializer.intToBytes(this.replyCode);
 
 		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
 		{
@@ -212,38 +228,5 @@ public class ProtocolHeader
 		}
 
 		return serial;
-
-
 	}
-
-	public static byte[] intToByteArray(int value)
-	{
-		byte[] result = new byte[4];
-
-		result[0] = (byte)(value & 0x000000FF);
-		result[1] = (byte)((value >>> 8)& 0x000000FF);
-		result[2] = (byte)((value >>> 16) & 0x000000FF);
-		result[3] = (byte)((value >>> 24)& 0x000000FF);
-
-		return result;
-	}
-
-	public static int byteArrayToInt (byte[] data)
-	{
-		for(int i = 0; i< data.length; i++)
-		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
-		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
-	}
-
-	public static short byteArrayToShort(byte[] data)
-	{
-		for(int i = 0; i< data.length; i++)
-		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
-		return (short) ((data[1]) | (data[0] << 8));
-	}
-
 }

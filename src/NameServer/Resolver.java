@@ -13,7 +13,7 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Override
-	public String lookup(int nodeId) throws RemoteException, InvalidParameterException
+	public String lookup(short nodeId) throws RemoteException, InvalidParameterException
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
@@ -28,30 +28,18 @@ public class Resolver implements ResolverInterface
 	@Override
 	public String lookup(String filename) throws RemoteException
 	{
-
-		int hash = NameServer.getHash(filename);
-
+		/*
+		short hash = ;
 
 		System.out.println("HASH = " + hash);
 
-		int ID = getOwnerID(hash);
-
-
-		return NameServer.getInstance().map.get(ID);
-	}
-
-	public int getOwnerID(int hash)
-	{
-		int ID;
-		boolean lower = true;
-
-		ID = NameServer.getInstance().map.lowerKey(hash);
-
-		return ID;
+		short ID = ;
+		*/
+		return NameServer.getInstance().map.get(NameServer.getInstance().map.lowerKey(NameServer.getHash(filename)));
 	}
 
 	@Deprecated
-	public void addToTree(int ID, String IP) throws RemoteException
+	public void addToTree(short ID, String IP) throws RemoteException
 	{
 		NameServer.getInstance().map.put(ID,IP);
 	}
