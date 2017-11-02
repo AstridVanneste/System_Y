@@ -34,6 +34,7 @@ public class DiscoveryAgent implements Runnable
 	{
 		while (!this.quit)
 		{
+			System.out.println("Multicast sub buffer length: " + Integer.toString(this.multicastSub.getBufferLength()));
 			if (this.multicastSub.getBufferLength() > 0)
 			{
 				System.out.println("Multicast sub received data");
