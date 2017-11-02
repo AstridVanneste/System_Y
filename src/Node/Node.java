@@ -57,6 +57,7 @@ public class Node{
 		byte[] serial = header.serialize();		// necessary??
 		header.setHeader(serial);				// necessary??
 
+
 		// Send name + ip as data
 		byte [] data = new byte[name.length() + 8];
 		byte [] nameLengthInByte = ProtocolHeader.intToByteArray(name.length());
