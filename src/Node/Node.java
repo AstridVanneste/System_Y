@@ -1,5 +1,6 @@
 package Node;
 
+import IO.Network.Constants;
 import IO.Network.Datagrams.Datagram;
 import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
@@ -13,6 +14,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -49,33 +51,30 @@ public class Node{
 		ProtocolHeader header = new ProtocolHeader();
 		header.setVersion((byte)1);
 		header.setDataLength(name.length() + 8);
-		header.setTransactionID(1);         //is this 'unique' enough?
+		header.setTransactionID(1);
 		header.setRequestCode(0);
 
-		byte[] serial = header.serialize();
-
-		header.setHeader(serial);
-
-		System.out.println(header.toString());
-
-
-		udpClient.start();
-
-		// Send header with access request
-		udpClient.send(multicastIP, multicastPort, serial );
+		byte[] serial = header.serialize();		// necessary??
+		header.setHeader(serial);				// necessary??
 
 		// Send name + ip as data
 		byte [] data = new byte[name.length() + 8];
-		byte [] nameLengthInByte = ByteBuffer.allocate(4).putInt(name.length()).array();
+		byte [] nameLengthInByte = ProtocolHeader.intToByteArray(name.length());
 		byte [] nameInByte = name.getBytes();
-		byte [] ipInByte = ByteBuffer.allocate(4).put(ip.getBytes()).array();
-		System.arraycopy(nameLengthInByte , 0 ,  data,0											 ,	nameLengthInByte.length);
-		System.arraycopy(nameInByte       ,	0 ,	data,		 nameLengthInByte.length					 ,	nameInByte.length);
-		System.arraycopy(ipInByte         ,	0 ,	data,nameLengthInByte.length + nameInByte.length ,	ipInByte.length);
-		udpClient.send(multicastIP, multicastPort, data );
 
+		byte[] ipInByte = new byte[4];
+		String[] ipInParts = ip.split("\\.");
+		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
 
+		System.arraycopy(nameLengthInByte , 0 ,  data,0 ,	nameLengthInByte.length);
+		System.arraycopy(nameInByte       ,	0 ,	data,4 ,	nameInByte.length);
+		System.arraycopy(ipInByte         ,	0 ,	data,nameInByte.length,	ipInByte.length);
 
+		Datagram datagram = new Datagram(header, data);
+		udpClient.send(multicastIP, multicastPort, datagram.serialize() );
 
 	}
 
@@ -119,17 +118,20 @@ public class Node{
 		short requestCode = (short)2;
 		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
 		//put id in a byte buffer
-		byte[] id = ByteBuffer.allocate(4).putInt(getID()).array();
+		byte[] idInBytes = ProtocolHeader.intToByteArray(getID());
 
 		byte[] ipToSend = new byte[4];
-		String[] ipInParts = ip.split(".");
+		String[] ipInParts = ip.split("\\.");					//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
 		ipToSend[0]=(byte)Integer.parseInt(ipInParts[0]);
 		ipToSend[1]=(byte)Integer.parseInt(ipInParts[1]);
 		ipToSend[2]=(byte)Integer.parseInt(ipInParts[2]);
 		ipToSend[3]=(byte)Integer.parseInt(ipInParts[3]);
 
+		byte [] data = new byte[8];
+		System.arraycopy(idInBytes,0,data,0,idInBytes.length);
+		System.arraycopy(ipToSend,0,data,4,ipToSend.length);
 
-		Datagram datagram = new Datagram(header, ipToSend);//needs to be replaced by ip + id
+		Datagram datagram = new Datagram(header, data);
 
 		udpClient.send(nextNeighbour,5000,datagram.serialize());
 		udpClient.send(previousNeighbour,5000,datagram.serialize());
@@ -195,8 +197,29 @@ public class Node{
 				}
 
 			}
-		}
+		} else if(receivedData[10] == 0x00000002) {
 
+			byte[] idbyte = Arrays.copyOfRange(receivedData, 0,4);
+			int idInt = java.nio.ByteBuffer.wrap(idbyte).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
+			String idString = Integer.toString(idInt);
+
+			try
+			{
+				String ip1 = new String(new byte[]{receivedData[4]}, "UTF-8");
+				String ip2 = new String(new byte[]{receivedData[5]}, "UTF-8");
+				String ip3 = new String(new byte[]{receivedData[6]}, "UTF-8");
+				String ip4 = new String(new byte[]{receivedData[7]}, "UTF-8");
+
+				String ipNeighbour = ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4);
+				changeNeighbours(idInt,ipNeighbour);
+
+			} catch (UnsupportedEncodingException e)
+			{
+				e.printStackTrace();
+			}
+
+
+	}
 		udpClient.stop();
 
 	}
