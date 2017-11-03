@@ -18,6 +18,7 @@ public class Datagram
 	{
 		this.header = header;
 		this.data = data;
+		this.header.setDataLength(this.data.length);
 	}
 
 	/**
@@ -28,6 +29,7 @@ public class Datagram
 	{
 		this.header = header;
 		this.data = new byte [0];
+		this.header.setDataLength(this.data.length);
 	}
 
 	/**
@@ -53,6 +55,8 @@ public class Datagram
 		}
 
 		this.data = data;
+
+		this.header.setDataLength(this.data.length);
 	}
 
 	/**
@@ -71,6 +75,7 @@ public class Datagram
 	public void setHeader(ProtocolHeader header)
 	{
 		this.header = header;
+		this.header.setDataLength(this.data.length);
 	}
 
 	/**
@@ -89,6 +94,7 @@ public class Datagram
 	public void setData(byte[] data)
 	{
 		this.data = data;
+		this.header.setDataLength(this.data.length);
 	}
 
 	/**

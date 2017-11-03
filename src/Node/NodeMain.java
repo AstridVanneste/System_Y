@@ -53,7 +53,7 @@ public class NodeMain {
         }
         catch (NotBoundException nbe)
         {
-            System.out.println("NotBoundException in getOwnerIP()");
+            System.out.println("NotBoundException in getIP()");
             nbe.printStackTrace();
         }
     }
