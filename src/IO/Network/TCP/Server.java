@@ -110,20 +110,6 @@ public class Server implements TCPServer
 	}
 
 	@Override
-	public byte[] receive(String remoteHost, int numBytes)
-	{
-		if (this.incomingConnections.containsKey(remoteHost))
-		{
-			return this.incomingConnections.get(remoteHost).readBytes(numBytes);
-		}
-		else
-		{
-			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
-			return new byte[0];
-		}
-	}
-
-	@Override
 	public void stop() throws IOException
 	{
 		this.socket.close();
@@ -163,7 +149,7 @@ public class Server implements TCPServer
 	public String toString()
 	{
 		StringBuilder resBuilder = new StringBuilder();
-		resBuilder.append("Publisher listening on port ");
+		resBuilder.append("TCP Server listening on port ");
 		resBuilder.append(this.portNum);
 		resBuilder.append(" (TCP)");
 		resBuilder.append('\n');

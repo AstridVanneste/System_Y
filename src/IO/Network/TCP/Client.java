@@ -18,25 +18,14 @@ public class Client implements TCPClient, Runnable
 	private Socket clientSocket;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private LinkedList<Byte> buffer;
-	private Thread ownThread;
+	private LinkedList<byte[]> buffer;
 
-	/*
-	public Client(String IP)
-	{
-		this.stop = false;
-		this.portNum = Constants.TCP_PORT;
-		this.IP = IP;
-		this.buffer = new LinkedList<Byte>();
-	}
-	*/
-
-	public Client(String IP, int port)
+	public Client (String IP, int port)
 	{
 		this.stop = false;
 		this.portNum = port;
 		this.IP = IP;
-		this.buffer = new LinkedList<Byte>();
+		this.buffer = new LinkedList<byte[]>();
 	}
 
 	@Override
@@ -47,8 +36,8 @@ public class Client implements TCPClient, Runnable
 			this.clientSocket = new Socket(this.IP, this.portNum);
 			in = new DataInputStream(clientSocket.getInputStream());
 			out = new DataOutputStream(clientSocket.getOutputStream());
-			this.ownThread = new Thread(this);
-			this.ownThread.start();
+			Thread ownThread = new Thread(this);
+			ownThread.start();
 		}
 		catch(IOException e)
 		{
@@ -95,25 +84,8 @@ public class Client implements TCPClient, Runnable
 	@Override
 	public byte[] receive()
 	{
-		byte[] data = new byte [this.buffer.size()];
-
-		for (int i = 0; i < this.buffer.size(); i++)
-		{
-			data[i] = this.buffer.get(i);
-		}
-
-		return data;
-	}
-
-	@Override
-	public byte[] receive(int numBytes)
-	{
-		byte[] data = new byte[numBytes];
-
-		for (int i = 0; i < numBytes; i++)
-		{
-			data[i] = this.buffer.get(i);
-		}
+		byte[] data = this.buffer.getFirst();
+		this.buffer.removeFirst();
 
 		return data;
 	}
@@ -152,10 +124,7 @@ public class Client implements TCPClient, Runnable
 					byte[] data = new byte [this.in.available()];
 					int numBytes = this.in.read(data);
 
-					for (int i = 0; i < numBytes; i++)
-					{
-						this.buffer.add(data[i]);
-					}
+					this.buffer.add(data);
 
 					System.out.println("CLIENT Added " + data.length + " Bytes to internal buffer.");
 				}

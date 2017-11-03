@@ -15,7 +15,7 @@ public class ConnectionHandler implements Runnable
 	private boolean stop;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private LinkedList<Byte> inputBuffer;
+	private LinkedList<byte[]> inputBuffer;
 	private Socket socket;
 	private Thread ownThread;
 
@@ -24,7 +24,7 @@ public class ConnectionHandler implements Runnable
 		System.out.println("Created ConnectionHandler on socket " + socket.getRemoteSocketAddress());
 		this.stop = false;
 		this.socket = socket;
-		this.inputBuffer = new LinkedList<Byte>();
+		this.inputBuffer = new LinkedList<byte[]>();
 	}
 
 	public void start ()
@@ -42,33 +42,11 @@ public class ConnectionHandler implements Runnable
 		}
 	}
 
-	public byte[] readBytes (int numBytes)
-	{
-		byte[] data = new byte [numBytes];
-
-		for (int i = 0; i < numBytes; i++)
-		{
-			data[i] = this.inputBuffer.get(i);
-		}
-
-		return data;
-	}
-
 	public byte[] readBytes()
 	{
-		byte[] data = new byte [this.inputBuffer.size()];
-
-		for (int i = 0; i < this.inputBuffer.size(); i++)
-		{
-			data[i] = this.inputBuffer.get(i);
-		}
-
+		byte[] data = this.inputBuffer.getFirst();
+		this.inputBuffer.removeFirst();
 		return data;
-	}
-
-	public String readString()
-	{
-		return new String(this.readBytes(), Constants.ENCODING);
 	}
 
 	boolean hasData ()
@@ -110,11 +88,7 @@ public class ConnectionHandler implements Runnable
 				{
 					byte[] data = new byte [this.in.available()];
 					int numBytes = this.in.read(data);
-
-					for (int i = 0; i < numBytes; i++)
-					{
-						this.inputBuffer.add(data[i]);
-					}
+					this.inputBuffer.add(data);
 				}
 			}
 			catch (IOException ioe)
