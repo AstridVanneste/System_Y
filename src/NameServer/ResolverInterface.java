@@ -16,18 +16,15 @@ public interface ResolverInterface extends Remote
 	 * @throws RemoteException
 	 */
 	public String getIP(int nodeId) throws RemoteException;
-	/**
-	 * Print out the existing TreeMap
-	 * @throws RemoteException
-	 */
-	public void writeMap() throws RemoteException;
+
+
 	/**
 	 * Removes entry from TreeMap
 	 * @param nodeId
 	 * @return
 	 * @throws RemoteException
 	 */
-	public void removeFromTree(int nodeId) throws RemoteException;
+	public void removeFromTree(int nodeId) throws RemoteException; //todo: Remove when testing complete
 
 	/**
 	 * For a given filename it returns the IP address from the owner of the file
@@ -38,5 +35,5 @@ public interface ResolverInterface extends Remote
 	 */
 	public String getOwnerIP(String filename) throws RemoteException, InvalidParameterException;
 
-	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
+	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when testing is complete
 }
