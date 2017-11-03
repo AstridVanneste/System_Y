@@ -106,10 +106,3 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
 
     Total: 12 bytes
 ```
-
-### Ping Service
-
-#### Ping Service datagram format
-- Number of previous tries?
-- Number of remaining tries before node is declared dead?
-- Time-out timer length?
