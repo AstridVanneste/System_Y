@@ -3,6 +3,7 @@ package IO.Network.TCP;
 import IO.*;
 import IO.File;
 import IO.Network.Constants;
+import IO.Network.Datagrams.ProtocolHeader;
 
 import java.net.*;
 import java.io.*;
@@ -133,7 +134,7 @@ public class Client implements TCPClient, Runnable
 	}
 
 	@Override
-	public void sendFile(File file)
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header)
 	{
 
 	}

@@ -1,6 +1,7 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Datagrams.ProtocolHeader;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,5 +65,11 @@ public interface TCPServer extends Runnable
 
 	public String toString();
 
-	public void sendFile(File file);
+	/**
+	 * sends complete file
+	 * @param filename
+	 * @param remoteHost
+	 * @param header
+	 */
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
 }
