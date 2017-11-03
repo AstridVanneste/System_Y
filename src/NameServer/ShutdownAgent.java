@@ -86,6 +86,8 @@ public class ShutdownAgent implements ShutdownAgentInterface {
 
         //needs to be send to packagging (datagram pakket)
 
+
+
     }
 
     // Sends a broadcast about the dead node. This allows all nodes
