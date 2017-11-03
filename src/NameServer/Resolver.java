@@ -12,9 +12,8 @@ import java.util.Map;
  */
 public class Resolver implements ResolverInterface
 {
-	public Resolver(){
-
-
+	public Resolver()
+	{
 	}
 
 	@Override
@@ -31,24 +30,15 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Deprecated
-	public void removeFromTree(int nodeId) throws RemoteException{
-		if(NameServer.getInstance().map.containsKey(nodeId)){
+	public void removeFromTree(int nodeId) throws RemoteException
+	{
+		if(NameServer.getInstance().map.containsKey(nodeId))
+		{
 			NameServer.getInstance().map.remove(nodeId);
 		}
-		else{
+		else
+		{
 			throw new InvalidParameterException("No node with that ID");
-		}
-	}
-
-	public void writeMap() throws RemoteException{
-		String eol = System.getProperty("line.separator");
-
-		try (Writer writer = new FileWriter("somefile.csv")) {
-			for (Map.Entry<Short, String> entry : NameServer.getInstance().map.entrySet()) {
-				writer.append((entry.getKey().toString())).append(',').append(entry.getValue()).append(eol);
-			}
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
 		}
 	}
 

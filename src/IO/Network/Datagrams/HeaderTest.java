@@ -22,9 +22,9 @@ public class HeaderTest
 		{
 			System.out.print(b);
 		}
-		System.out.println();
+		System.out.println("\n");
 
-		header.setHeader(serial);
+		header = new ProtocolHeader(serial);
 
 		System.out.println(header.toString());
 	}
