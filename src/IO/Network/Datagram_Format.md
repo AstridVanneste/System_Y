@@ -1,4 +1,4 @@
-# IO.Network Protocol for System Y
+# Network Protocol for System Y
 ## Overview
 System Y will use UDP datagrams for various purposes.
 
@@ -65,16 +65,21 @@ The reply code tells the receiver the result of their request. It also tells the
 
 ## Request Codes
 
-- 0x0000  Request to be added to network
-- 0x0001  Request Cluster Health Report
+- 0x0001  Request to be added to network
+- 0x0002  Request Cluster Health Report
+
+- 0x8001  Request for file
 
 ## Reply Codes
 
-- 0x0000  Succesfully added to network, reply to 0x0001
-- 0x0001  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x0001.
-- 0x0002  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
-- 0x0003  Cluster Node is UP. (See data for more info), reply to 0x0002.
-- 0x0004  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
+- 0x0001  Succesfully added to network, reply to 0x0001
+- 0x0002  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x0001.
+- 0x0003  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
+- 0x0004  Cluster Node is UP. (See data for more info), reply to 0x0002.
+- 0x0005  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
+
+
+- 0x8001  Sending file. reply to 0x8001.
 
 ### Discovery Service
 The Discovery Service in System Y will consist of a client sending a broadcast/multicast message onto the network and the Nameserver replying with a unicast message to the new client.
@@ -87,22 +92,22 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
 
 #### Data format for Discovery Request (Multicast)
 ```
-       4 Bytes        Name Length Bytes
-    |<------------->|<----------------->|
-    +---------------+-------------------+
-    |   Name Length | Node Name         |
-    +---------------+-------------------+
+       4 Bytes        Name Length Bytes       4 Bytes
+    |<------------->|<----------------->|<--------------->|
+    +---------------+-------------------+-----------------+
+    |   Name Length | Node Name         | Node Unicast IP |
+    +---------------+-------------------+-----------------+
 
-    Total length: unknown (Name Length + 4)
+    Total length: unknown (Name Length + 8)
 ```
 
 #### Data format for Discovery Reply
 ```
-       4 Bytes          4 Bytes                 4 Bytes
-    |<--------->|<--------------------->|<------------------------->|
-    +-----------+-----------------------+---------------------------+
-    |   Node ID |    Next Neighbour ID  |   Previous Neighbour ID   |
-    +-----------+-----------------------+---------------------------+
+       2 Bytes          2 byte           
+    |<--------->|<-------------------->|
+    +-----------+----------------------+
+    |   Node ID |    Number of Nodes   |
+    +-----------+----------------------+
 
-    Total: 12 bytes
+    Total: 4 bytes
 ```

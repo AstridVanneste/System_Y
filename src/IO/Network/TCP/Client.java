@@ -1,5 +1,7 @@
 package IO.Network.TCP;
 
+import IO.*;
+import IO.File;
 import IO.Network.Constants;
 
 import java.net.*;
@@ -128,6 +130,12 @@ public class Client implements TCPClient, Runnable
 			System.err.println("Error when closing client socket");
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void sendFile(File file)
+	{
+
 	}
 
 	@Override

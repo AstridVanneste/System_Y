@@ -7,7 +7,7 @@ package IO.Network.Datagrams;
 
 public class ProtocolHeader
 {
-	static final int HEADER_LENGTH = 12;
+	public static final int HEADER_LENGTH = 12;
 	private static final int VERSION_LENGTH = 1;
 	private static final int DATA_LENGTH_LENGTH = 3;
 	private static final int TRANSACTION_ID_LENGTH = 4;
@@ -19,13 +19,19 @@ public class ProtocolHeader
 	private static final int REQUEST_CODE_MASK = 0x0000FFFF;
 	private static final int REPLY_CODE_MASK = 0x0000FFFF;
 
+	//REQUEST CODES
 	public static final int REQUEST_DISCOVERY_CODE = 0x00000000;
 	public static final int REQUEST_CLUSTER_HEALTH_REPORT = 0x00000001;
+	public static final int REQUEST_FILE = 0x00008001;
+
+
+	//REPLY CODES
 	public static final int REPLY_SUCCESSFULLY_ADDED = 0x00000000;
 	public static final int REPLY_DUPLICATE_ID = 0x00000001;
 	public static final int REPLY_DUPLICATE_IP = 0x00000002;
 	public static final int REPLY_NODE_UP = 0x00000003;
 	public static final int REPLY_NODE_DOWN = 0x00000004;
+	public static final int REPLY_FILE = 0x00008001;
 
 	private byte version;
 	private int dataLength;

@@ -1,5 +1,7 @@
 package IO.Network;
 
+import IO.Network.Datagrams.ProtocolHeader;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -23,4 +25,11 @@ public class Constants
 	 * Please use this.
 	 */
 	public static final Charset ENCODING = StandardCharsets.UTF_8;
+
+
+	/**
+	 * Segment size for sending a TCP segment
+	 */
+	public static final int MAX_TCP_SEGMENT_SIZE = 1460;
+	public static final int MAX_TCP_FILE_SEGMENT_SIZE = MAX_TCP_SEGMENT_SIZE - ProtocolHeader.HEADER_LENGTH;
 }

@@ -1,5 +1,7 @@
 package IO.Network.TCP;
 
+import IO.File;
+
 import java.util.List;
 
 public interface TCPClient
@@ -38,4 +40,12 @@ public interface TCPClient
 	 * Stops the client
 	 */
 	public void stop();
+
+
+	/**
+	 * Send complete file
+	 * @param file
+	 */
+	public void sendFile(File file);
+
 }

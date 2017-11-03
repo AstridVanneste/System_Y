@@ -58,8 +58,8 @@ public class Server implements UDPServer, Runnable
 
 	@Override
 	public void send(String remoteHost,
-	                 int port,
-	                 byte[] data)
+					 int port,
+					 byte[] data)
 	{
 		try
 		{
@@ -81,8 +81,8 @@ public class Server implements UDPServer, Runnable
 
 	@Override
 	public void send(String remoteHost,
-	                 int port,
-	                 String data)
+					 int port,
+					 String data)
 	{
 		byte[] bytes = data.getBytes();
 		this.send(remoteHost, port, bytes);
@@ -91,8 +91,8 @@ public class Server implements UDPServer, Runnable
 
 	@Override
 	public void send(String remoteHost,
-	                 int port,
-	                 List<Byte> data)
+					 int port,
+					 List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
 

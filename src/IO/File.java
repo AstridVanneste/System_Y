@@ -5,6 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import static java.lang.Long.min;
 
@@ -206,5 +210,33 @@ public class File
 			ioe.printStackTrace();
 			return "File: " + this.filename + "\n" + "Position: " + Long.toString(this.filePos);
 		}
+	}
+
+	public static String mapToCSV(Map<Short, String> map)
+	{
+		String CSV = "";
+
+		Set<Short> keySet = map.keySet();
+
+		for(short ID: keySet)
+		{
+			CSV += ID + ";";
+			CSV += map.get(ID) + "\n";
+		}
+		return CSV;
+	}
+
+	public static TreeMap<Short,String> CSVToMap(String CSV)
+	{
+		TreeMap<Short, String> map = new TreeMap<>();
+
+		for(String s: CSV.split("\n"))
+		{
+			String[] KV = s.split(";");
+			map.put(Short.parseShort(KV[0]),KV[1]);
+		}
+
+
+		return map;
 	}
 }

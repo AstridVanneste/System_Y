@@ -1,5 +1,8 @@
 package NameServer;
 
+import IO.File;
+
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,6 +17,8 @@ public class NameServer
 {
 	public static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_INTERFACE";
 	public static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
+	public static final String MAP_FILE_NAME = "TreeMap.csv";
+
 	private static NameServer nameServer;	//singleton instance of nameserver
 
 	TreeMap<Short,String> map;			//can be accessed throughout entire NameServer package
@@ -86,5 +91,60 @@ public class NameServer
 	public static short getHash(String name)
 	{
 		return (short) Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
+	}
+
+	public void writeMapToFile()
+	{
+		File file = new File(MAP_FILE_NAME);
+
+		try
+		{
+			file.write(File.mapToCSV(this.map).getBytes());
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+	}
+
+	public void readMapFromFile()
+	{
+		File file = new File(MAP_FILE_NAME);
+
+		try
+		{
+			byte[] bytes = file.read();
+			String CSV = new String(bytes);
+			this.map = File.CSVToMap(CSV);
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();;
+		}
+
+	}
+
+	public String toString()
+	{
+		String s = "";
+
+		for(int n: this.map.keySet())
+		{
+			s += "KEY:	" + n + "	VALUE:	" + this.map.get(n) + "\n";
+		}
+
+		return s;
+	}
+
+	@Deprecated
+	public void addToTree(short ID, String IP)
+	{
+		this.map.put(ID,IP);
+	}
+
+	@Deprecated
+	public void removeFromTree(int ID)
+	{
+		this.map.remove(ID);
 	}
 }

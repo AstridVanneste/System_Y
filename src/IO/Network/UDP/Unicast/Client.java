@@ -56,6 +56,8 @@ public class Client implements UDPClient, Runnable
 		}
 	}
 
+
+
 	@Override
 	public void send(String remoteHost, int port, String data)
 	{
@@ -143,5 +145,10 @@ public class Client implements UDPClient, Runnable
 	public int getBufferLength()
 	{
 		return packetBuffer.size();
+	}
+
+	public DatagramSocket getSocket()
+	{
+		return socket;
 	}
 }
