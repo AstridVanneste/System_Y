@@ -44,6 +44,7 @@ public class Node{
 		}
 		this.name = name;
 		udpClient = new Client();
+		udpClient.start();
 	}
 
 	// grant access to the network by sending a multicast to nodes and NS
@@ -54,9 +55,6 @@ public class Node{
 		header.setDataLength(name.length() + 8);
 		header.setTransactionID(1);
 		header.setRequestCode(0);
-
-		byte[] serial = header.serialize();		// necessary??
-		header.setHeader(serial);				// necessary??
 
 
 		// Send name + ip as data
@@ -73,9 +71,10 @@ public class Node{
 
 		System.arraycopy(nameLengthInByte , 0 ,  data,0 ,	nameLengthInByte.length);
 		System.arraycopy(nameInByte       ,	0 ,	data,4 ,	nameInByte.length);
-		System.arraycopy(ipInByte         ,	0 ,	data,nameInByte.length,	ipInByte.length);
+		System.arraycopy(ipInByte         ,	0 ,	data,nameInByte.length + 4,	ipInByte.length);
 
 		Datagram datagram = new Datagram(header, data);
+
 		udpClient.send(multicastIP, multicastPort, datagram.serialize() );
 
 	}
@@ -161,6 +160,7 @@ public class Node{
 		byte[] receivedData = udpClient.receiveData();
 
 		if(receivedData[10] == 0x0000){
+			System.out.println("Package received with code 0x0000");
 			if (receivedData[16] == 0)
 			{
 				setNeighbours();
@@ -202,6 +202,7 @@ public class Node{
 
 			}
 		} else if(receivedData[10] == 0x00000002) {
+			System.out.println("Package received with code 0x0002");
 
 			byte[] idbyte = Arrays.copyOfRange(receivedData, 0,4);
 			int idInt = java.nio.ByteBuffer.wrap(idbyte).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();

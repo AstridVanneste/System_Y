@@ -28,7 +28,21 @@ public class NodeMain {
             ResolverInterface resolverInterface = (ResolverInterface) resolver;
             ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
 
-            //Node node = new Node (resolverInterface,shutdownAgentInterface);
+            Node node = new Node ("axel",resolverInterface,shutdownAgentInterface);
+
+            System.out.println("Access request...");
+            node.accessRequest();
+            System.out.println("Access successful");
+
+            // get answer from server
+            node.getData();
+
+            // if connected to network, send my ip to the neighbours I got from the NS
+            node.sendNeighbours();
+
+            // If i'm a neighbour, set the new node as neighbour
+            node.getData();
+
 
 
         }
