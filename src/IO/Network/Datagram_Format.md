@@ -109,5 +109,5 @@ Replies 1 and 2 contain no data, they do however tell the client why joining the
     |   Node ID |    Number of Nodes   |
     +-----------+----------------------+
 
-    Total: 8 bytes
+    Total: 4 bytes
 ```
