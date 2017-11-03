@@ -1,6 +1,7 @@
 package NameServer;
 
 import IO.Network.UDP.Unicast.*;
+import Util.Serializer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -38,7 +39,7 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     }
 
     @Override
-    public void requestDeadNode(int id) throws RemoteException {
+    public void requestDeadNode(short id) throws RemoteException {
 
         statusNode = pingNode(id);
 
@@ -48,13 +49,13 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     }
 
     @Override
-    public void requestShutdown(int id) throws RemoteException{
+    public void requestShutdown(short id) throws RemoteException{
         deleteNodeFromMap(id);
     }
 
     // Return true if node replies, false if not
     //      Not necessary in interface
-    public boolean pingNode (int id) {
+    public boolean pingNode (short id) {
         try {
             //ping the client
             if(InetAddress.getByName(NameServer.getInstance().map.get(id)).isReachable(1000)){
@@ -68,7 +69,7 @@ public class ShutdownAgent implements ShutdownAgentInterface {
 
     // NS can delete a node from his Map
     //      Not necessary in interface
-    public void deleteNodeFromMap (int id){
+    public void deleteNodeFromMap (short id){
         NameServer.getInstance().map.remove(id);
 
         NameServer.getInstance().writeMapToFile();
@@ -93,7 +94,7 @@ public class ShutdownAgent implements ShutdownAgentInterface {
     // Sends a broadcast about the dead node. This allows all nodes
     //  to remove all links with the files of the dead node
     //      Not necessary in interface
-    public void sendBroadCast (int id){
+    public void sendBroadCast (short id){
 
     }
     
