@@ -10,7 +10,7 @@ public interface UDPServer
 	 * Starts the UDP server.
 	 * @throws IOException
 	 */
-	public void start ()    throws
+	public void start ()	throws
 			IOException;
 
 	/**

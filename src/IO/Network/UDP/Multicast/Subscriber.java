@@ -91,6 +91,14 @@ public class Subscriber implements UDPSubscriber, Runnable
 			{
 				this.socket.receive(incomingPacket);
 				this.packetBuffer.add(incomingPacket);
+
+				byte[] actualData = new byte [incomingPacket.getLength()];
+				System.arraycopy(incomingPacket.getData(), 0, actualData, 0, incomingPacket.getLength());
+
+				DatagramPacket trimmedPacket = incomingPacket;
+				trimmedPacket.setData(actualData);
+
+				this.packetBuffer.add(trimmedPacket);
 			}
 			catch (SocketException se)
 			{
@@ -106,11 +114,11 @@ public class Subscriber implements UDPSubscriber, Runnable
 
 	public boolean hasData()
 	{
-		return !packetBuffer.isEmpty();
+		return !this.packetBuffer.isEmpty();
 	}
 
 	public int getBufferLength()
 	{
-		return packetBuffer.size();
+		return this.packetBuffer.size();
 	}
 }

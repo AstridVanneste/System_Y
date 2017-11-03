@@ -7,6 +7,7 @@ public class HeaderTest
 {
 	public static void main(String args[])
 	{
+		/*
 		ProtocolHeader header = new ProtocolHeader();
 		header.setVersion((byte)1);
 		header.setDataLength(0);
@@ -27,5 +28,6 @@ public class HeaderTest
 		header.setHeader(serial);
 
 		System.out.println(header.toString());
+		*/
 	}
 }
