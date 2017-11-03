@@ -20,6 +20,7 @@ public class Client implements TCPClient, Runnable
 	private LinkedList<Byte> buffer;
 	private Thread ownThread;
 
+	/*
 	public Client(String IP)
 	{
 		this.stop = false;
@@ -27,9 +28,9 @@ public class Client implements TCPClient, Runnable
 		this.IP = IP;
 		this.buffer = new LinkedList<Byte>();
 	}
+	*/
 
-	public Client(String IP,
-	              int port)
+	public Client(String IP, int port)
 	{
 		this.stop = false;
 		this.portNum = port;

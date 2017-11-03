@@ -199,7 +199,8 @@ public class File
 		return (new File(this.filename)).exists();
 	}
 
-	public String toString () {
+	public String toString ()
+	{
 		try
 		{
 			return "File: " + this.filename + "\n" + "Position: " + Long.toString(this.filePos) + "\n" + "Available: " + Integer.toString(this.available());

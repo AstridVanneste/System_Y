@@ -19,8 +19,6 @@ public class NameServer
 	public static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
 	public static final String MAP_FILE_NAME = "TreeMap.csv";
 
-
-
 	private static NameServer nameServer;	//singleton instance of nameserver
 
 	TreeMap<Short,String> map;			//can be accessed throughout entire NameServer package
@@ -57,6 +55,7 @@ public class NameServer
 	    {
 	    	this.shutdownAgentStub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(new ShutdownAgent(), 0);
 		    this.resolverStub = (ResolverInterface) UnicastRemoteObject.exportObject(new Resolver(), 0);
+		    this.discoveryAgent.init();
             this.bind();
         }
         catch (RemoteException re)
@@ -87,7 +86,6 @@ public class NameServer
 	    	System.out.println("RemoteException in  bind()");
             re.printStackTrace();
        }
-
 	}
 
 	public static short getHash(String name)
@@ -149,5 +147,4 @@ public class NameServer
 	{
 		this.map.remove(ID);
 	}
-
 }

@@ -28,6 +28,7 @@ public class Subscriber implements UDPSubscriber, Runnable
 		try
 		{
 			this.socket = new MulticastSocket(this.portNum);
+			//this.socket = new MulticastSocket();
 			this.socket.setReceiveBufferSize(1 << 17);
 			this.socket.joinGroup(InetAddress.getByName(this.ip));
 
@@ -85,12 +86,15 @@ public class Subscriber implements UDPSubscriber, Runnable
 	{
 		while(!this.socket.isClosed())
 		{
+			//System.out.println("Socket isn't closed, packetbuffer size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 			byte[] buffer = new byte[500];
 			DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
 			try
 			{
 				this.socket.receive(incomingPacket);
+				//System.out.println("Received incoming packet, size: "  + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 				this.packetBuffer.add(incomingPacket);
+				//System.out.println("Added to buffer, size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 
 				byte[] actualData = new byte [incomingPacket.getLength()];
 				System.arraycopy(incomingPacket.getData(), 0, actualData, 0, incomingPacket.getLength());
