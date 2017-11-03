@@ -1,6 +1,9 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Constants;
+import IO.Network.Datagrams.ProtocolHeader;
+
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -187,8 +190,64 @@ public class Server implements TCPServer
 	}
 
 	@Override
-	public void sendFile(File file)
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header)
 	{
+		File file = new File(filename);
 
+		try
+		{
+
+			while(file.available() != 0)
+			{
+				int length;
+
+				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
+				{
+					byte[] bytes = new byte[Constants.MAX_TCP_SEGMENT_SIZE];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(remoteHost,bytes);
+				}
+				else
+				{
+					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + file.available()];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(file.available()))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(remoteHost, bytes);
+				}
+
+
+			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
 	}
 }

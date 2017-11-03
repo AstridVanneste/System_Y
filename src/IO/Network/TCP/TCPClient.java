@@ -1,6 +1,7 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Datagrams.ProtocolHeader;
 
 import java.util.List;
 
@@ -43,9 +44,11 @@ public interface TCPClient
 
 
 	/**
-	 * Send complete file
-	 * @param file
+	 * sends complete file
+	 * @param filename
+	 * @param remoteHost
+	 * @param header
 	 */
-	public void sendFile(File file);
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
 
 }
