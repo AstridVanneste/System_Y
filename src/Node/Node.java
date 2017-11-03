@@ -46,6 +46,7 @@ public class Node{
 		udpClient = new Client();
 	}
 
+	// grant access to the network by sending a multicast to nodes and NS
 	public void accessRequest () {
 
 		ProtocolHeader header = new ProtocolHeader();
@@ -113,12 +114,13 @@ public class Node{
 	}
 
 
+	// after been accepted in network send a message to his two neigbours
 	public void sendNeighbours(){
 		byte version = (byte)0;
 		short replyCode = (short)0;
 		short requestCode = (short)2;
 		ProtocolHeader header = new ProtocolHeader(version,2,2,requestCode,replyCode);
-		//put id in a byte buffer
+
 		byte[] idInBytes = ProtocolHeader.intToByteArray(getID());
 
 		byte[] ipToSend = new byte[4];
@@ -157,6 +159,7 @@ public class Node{
 	{
 		udpClient.run();
 		byte[] receivedData = udpClient.receiveData();
+
 		if(receivedData[10] == 0x0000){
 			if (receivedData[16] == 0)
 			{
@@ -202,7 +205,7 @@ public class Node{
 
 			byte[] idbyte = Arrays.copyOfRange(receivedData, 0,4);
 			int idInt = java.nio.ByteBuffer.wrap(idbyte).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-			String idString = Integer.toString(idInt);
+			//String idString = Integer.toString(idInt);
 
 			try
 			{
@@ -214,11 +217,9 @@ public class Node{
 				String ipNeighbour = ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4);
 				changeNeighbours(idInt,ipNeighbour);
 
-			} catch (UnsupportedEncodingException e)
-			{
+			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-
 
 	}
 		udpClient.stop();

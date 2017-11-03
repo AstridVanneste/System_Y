@@ -14,6 +14,7 @@ public class Resolver implements ResolverInterface
 {
 	public Resolver(){
 
+
 	}
 
 	@Override
