@@ -154,7 +154,7 @@ public class Node{
 		}
 	}
 
-
+	// processing the reply of NS and the message of the new neighbour
 	public void getData()
 	{
 		udpClient.run();
