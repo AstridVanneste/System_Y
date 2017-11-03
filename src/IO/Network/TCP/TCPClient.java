@@ -31,13 +31,6 @@ public interface TCPClient
 	public byte[] receive ();
 
 	/**
-	 * read numBytes bytes from the internal receive buffer.
-	 * @param numBytes
-	 * @return
-	 */
-	public byte[] receive (int numBytes);
-
-	/**
 	 * Stops the client
 	 */
 	public void stop();

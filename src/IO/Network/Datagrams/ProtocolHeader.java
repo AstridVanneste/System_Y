@@ -132,7 +132,7 @@ public class ProtocolHeader
 	 * sets version field to a given value
 	 * @param version
 	 */
-	public void setVersion(byte version)
+	public ProtocolHeader setVersion(byte version)
 	{
 		this.version = version;
 		return this;
@@ -152,7 +152,7 @@ public class ProtocolHeader
 	 * sets dataLength field to a given value
 	 * @param dataLength()
 	 */
-	public void setDataLength(int dataLength)
+	public ProtocolHeader setDataLength(int dataLength)
 	{
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
 		return this;
@@ -172,7 +172,7 @@ public class ProtocolHeader
 	 * sets transactionID field to a given value
 	 * @param transactionID
 	 */
-	public void setTransactionID(int transactionID)
+	public ProtocolHeader setTransactionID(int transactionID)
 	{
 		this.transactionID = transactionID;
 		return this;
@@ -192,7 +192,7 @@ public class ProtocolHeader
 	 * sets requestCode field to a given value
 	 * @param requestCode
 	 */
-	public void setRequestCode(int requestCode)
+	public ProtocolHeader setRequestCode(int requestCode)
 	{
 		this.requestCode = requestCode & REQUEST_CODE_MASK;
 		return this;
@@ -211,7 +211,7 @@ public class ProtocolHeader
 	 * sets replyCode field to a given value
 	 * @param replyCode
 	 */
-	public void setReplyCode(int replyCode)
+	public ProtocolHeader setReplyCode(int replyCode)
 	{
 		this.replyCode = replyCode & REPLY_CODE_MASK;
 		return this;
