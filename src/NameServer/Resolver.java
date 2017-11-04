@@ -16,6 +16,8 @@ public class Resolver implements ResolverInterface
 	{
 	}
 
+
+
 	@Override
 	public String getIP(int nodeId) throws RemoteException, InvalidParameterException
 	{

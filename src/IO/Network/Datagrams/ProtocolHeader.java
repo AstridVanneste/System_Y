@@ -22,12 +22,15 @@ public class ProtocolHeader
 	private static final int REPLY_CODE_MASK = 0x0000FFFF;
 
 	//REQUEST CODES
+	public static final int NO_REQUEST = 0x00000000;
 	public static final int REQUEST_DISCOVERY_CODE = 0x00000001;
 	public static final int REQUEST_CLUSTER_HEALTH_REPORT = 0x00000002;
+	public static final int REQUEST_NEW_NEIGHBOUR = 0x00000003;
 	public static final int REQUEST_FILE = 0x00008001;
 
 
 	//REPLY CODES
+	public static final int NO_REPLY = 0x00000000;
 	public static final int REPLY_SUCCESSFULLY_ADDED = 0x00000001;
 	public static final int REPLY_DUPLICATE_ID = 0x00000002;
 	public static final int REPLY_DUPLICATE_IP = 0x00000003;

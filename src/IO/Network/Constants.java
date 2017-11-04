@@ -26,6 +26,7 @@ public class Constants
 	 */
 	public static final Charset ENCODING = StandardCharsets.UTF_8;
 
+	public static final int UDP_NODE_PORT = 2002;
 
 	/**
 	 * Segment size for sending a TCP segment

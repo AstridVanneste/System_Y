@@ -64,8 +64,11 @@ The reply code tells the receiver the result of their request. It also tells the
 
 ## Request Codes
 
+- 0x0000  no request
 - 0x0001  Request to be added to network
 - 0x0002  Request Cluster Health Report
+- 0x0003  you are my new next neighbour (data contains id of my previous next neighbour)
+
 
 - 0x8001  Request for file
 
