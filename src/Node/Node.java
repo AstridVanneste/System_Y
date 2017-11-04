@@ -16,6 +16,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
@@ -25,8 +26,8 @@ public class Node
 {
 	private String ip;
 	private String name;
-	private String previousNeighbour;
-	private String nextNeighbour;
+	private int previousNeighbour;
+	private int nextNeighbour;
 	private short id;
 	private Subscriber subscriber;
 	private ResolverInterface resolverInterface;
@@ -34,28 +35,62 @@ public class Node
 	//private DiscoveryAgentInterface discoveryAgentInterface;
 	private Client udpClient;
 	private Random rand;
+	private short numberOfNodes;
 
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 */
 	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
-		rand = new Random();
+		numberOfNodes = 0;
 		udpClient = new Client();
 
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
 
+
+
 		try
 		{
 			this.ip = InetAddress.getLocalHost().getHostAddress();
-			this.id = getHash(ip);
+			this.id = getHash(name);
 		}
 		catch (UnknownHostException e)
 		{
 			e.printStackTrace();
 		}
 
+		previousNeighbour = this.id;
+		nextNeighbour = this.id;
+
+	}
+
+	public void multicastListener(){
+		if(subscriber.hasData()){
+			byte[] subData = subscriber.receiveData();
+			if((short)((subData[10] << 8) | (subData[11])) == 0x0001){
+
+				byte[] nameLength = new byte[4];
+				//put the namelength in separate array and wrap it into an int
+				nameLength[0] = subData[12];
+				nameLength[1] = subData[13];
+				nameLength[2] = subData[14];
+				nameLength[3] = subData[15];
+
+				ByteBuffer wrapped = ByteBuffer.wrap(nameLength); // big-endian by default
+				int num = wrapped.getShort();
+
+				//get the name and put it in a byte Array
+				byte[] nameArray = new byte[num];
+				for(int i = 0;i<num;i++){
+					nameArray[i] = subData[16+i];
+				}
+
+				String name = new String(nameArray);
+				changeNeighbours(getHash(name));
+
+			}
+		}
 	}
 
 	/**
@@ -64,8 +99,7 @@ public class Node
 	 */
 	public void accessRequest ()
 	{
-		udpClient.start();
-
+		rand = new Random();
 		byte version = (byte)0;
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
@@ -92,7 +126,6 @@ public class Node
 
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
 
-		udpClient.stop();
 	}
 
 	/**
@@ -118,23 +151,23 @@ public class Node
 	 */
 	private void setNeighbours()
 	{
-		previousNeighbour = this.ip;
-		nextNeighbour = this.ip;
+		previousNeighbour = this.id;
+		nextNeighbour = this.id;
 	}
 
 	/**
 	 * If this node has 1 neighbours
 	 */
-	private void setNeighbours(String neighbourIp)
+	private void setNeighbours(int neighbourId)
 	{
-		previousNeighbour = neighbourIp;
-		nextNeighbour = neighbourIp;
+		previousNeighbour = neighbourId;
+		nextNeighbour = neighbourId;
 	}
 
 	/**
 	 * If this node has 2 neighbours
 	 */
-	private void setNeighbours(String previousNeighbour, String nextNeighbour)
+	private void setNeighbours(int previousNeighbour, int nextNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
 		this.nextNeighbour = nextNeighbour;
@@ -157,21 +190,17 @@ public class Node
 
 		byte[] idInBytes = Serializer.intToBytes(getID());
 
-		byte[] ipToSend = new byte[4];
-		String[] ipInParts = ip.split("\\.");																		//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
-		ipToSend[0]=(byte)Integer.parseInt(ipInParts[0]);
-		ipToSend[1]=(byte)Integer.parseInt(ipInParts[1]);
-		ipToSend[2]=(byte)Integer.parseInt(ipInParts[2]);
-		ipToSend[3]=(byte)Integer.parseInt(ipInParts[3]);
+		Datagram datagram = new Datagram(header, idInBytes);
 
-		byte [] data = new byte[8];
-		System.arraycopy(idInBytes,0,data,0,idInBytes.length);
-		System.arraycopy(ipToSend,0,data,4,ipToSend.length);
+		try
+		{
+			udpClient.send(resolverInterface.getIP(nextNeighbour),Constants.UDP_NODE_PORT,datagram.serialize());
+			udpClient.send(resolverInterface.getIP(previousNeighbour),Constants.UDP_NODE_PORT,datagram.serialize());
 
-		Datagram datagram = new Datagram(header, data);
-
-		udpClient.send(nextNeighbour,5000,datagram.serialize());
-		udpClient.send(previousNeighbour,5000,datagram.serialize());
+		} catch (RemoteException e)
+		{
+			e.printStackTrace();
+		}
 
 		udpClient.stop();
 	}
@@ -179,16 +208,71 @@ public class Node
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
 	 */
-	private void changeNeighbours(int id, String ip)
+	private void changeNeighbours(int id)
 	{
-		if(getID()< id)
-		{
-			nextNeighbour = ip;
+		if(numberOfNodes>=1){
+
+			if(id < nextNeighbour)
+			{
+				byte version = (byte)0;
+				short replyCode = ProtocolHeader.NO_REPLY;
+				short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
+				int transactionID = rand.nextInt();
+				byte[] neighbourIdInBytes = Serializer.intToBytes(nextNeighbour);
+				byte[] idInBytes = Serializer.intToBytes(this.id);
+				int dataLength = idInBytes.length + neighbourIdInBytes.length;
+
+				ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+
+				byte[] idPacket = new byte[idInBytes.length + neighbourIdInBytes.length];
+
+				System.arraycopy(idInBytes,0,idPacket,0,idInBytes.length);
+				System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
+
+				Datagram datagram = new Datagram(header, idPacket);
+
+
+				try
+				{
+					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram);
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
+				}
+				nextNeighbour = id;
+			}
 		}
-		if(getID()> id)
-		{
-			previousNeighbour = ip;
+		else if (numberOfNodes == 0){
+			byte version = (byte)0;
+			short replyCode = ProtocolHeader.NO_REPLY;
+			short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
+			int transactionID = rand.nextInt();
+			byte[] idInBytes = Serializer.intToBytes(this.id);
+			int dataLength = idInBytes.length;
+			ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+
+
+
+			Datagram datagram = new Datagram(header, idInBytes);
+
+
+			try
+			{
+				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,datagram);
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+			nextNeighbour = id;
+
+			previousNeighbour = id;
+			nextNeighbour = id;
+			numberOfNodes++;
 		}
+
+
+
+
 	}
 
 	/**
@@ -196,85 +280,45 @@ public class Node
 	 * 1) reply of the NS on the access request of me -> change my neighbours
 	 * 2) request of the new node to update my neighbours
 	 */
+
+
 	public void getData()
 	{
-		udpClient.start();
-		udpClient.run();
 
 		byte[] receivedData = udpClient.receiveData();
 
-		if(receivedData[10] == 0x0000)
+		//check if message contains request from new neighbour
+		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
 		{
-			System.out.println("Package received with code 0x0000");
-			if (receivedData[16] == 0)
-			{
-				setNeighbours();
-			}
-			if (receivedData[16] == 1)
-			{
-				try
-				{
-					String ip1 = new String(new byte[]{receivedData[5]}, "UTF-8");
-					String ip2 = new String(new byte[]{receivedData[6]}, "UTF-8");
-					String ip3 = new String(new byte[]{receivedData[7]}, "UTF-8");
-					String ip4 = new String(new byte[]{receivedData[8]}, "UTF-8");
-					setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4));
-				}
-				catch (UnsupportedEncodingException e)
-				{
-					e.printStackTrace();
-				}
+			//if length == 20 , then previous and next neighbour are present in the data
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 20){
+
+				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
+				nextNeighbour = (int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]));
 
 			}
-			if (receivedData[16] >= 2)
-			{
-				try
-				{
-					String ip1 = new String(new byte[]{receivedData[5]}, "UTF-8");
-					String ip2 = new String(new byte[]{receivedData[6]}, "UTF-8");
-					String ip3 = new String(new byte[]{receivedData[7]}, "UTF-8");
-					String ip4 = new String(new byte[]{receivedData[8]}, "UTF-8");
 
-					String ip5 = new String(new byte[]{receivedData[9]}, "UTF-8");
-					String ip6 = new String(new byte[]{receivedData[10]}, "UTF-8");
-					String ip7 = new String(new byte[]{receivedData[11]}, "UTF-8");
-					String ip8 = new String(new byte[]{receivedData[12]}, "UTF-8");
-
-					setNeighbours(ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4), ip5.concat(".").concat(ip6).concat(".").concat(ip7).concat(".").concat(ip8));
-				}
-				catch (UnsupportedEncodingException e)
-				{
-					e.printStackTrace();
-				}
+			//if length == 16 then the data only contains the previous neighbour
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 16){
+				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
 
 			}
+
 		}
-		else if(receivedData[10] == 0x00000002)
+
+		//check if message contains error message from nameserver
+		if ((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002)
 		{
-			System.out.println("Package received with code 0x0002");
+			id++;
+			accessRequest();
+		}
 
-			byte[] idbyte = Arrays.copyOfRange(receivedData, 0,4);
-			int idInt = java.nio.ByteBuffer.wrap(idbyte).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-			//String idString = Integer.toString(idInt);
-
-			try
-			{
-				String ip1 = new String(new byte[]{receivedData[4]}, "UTF-8");
-				String ip2 = new String(new byte[]{receivedData[5]}, "UTF-8");
-				String ip3 = new String(new byte[]{receivedData[6]}, "UTF-8");
-				String ip4 = new String(new byte[]{receivedData[7]}, "UTF-8");
-
-				String ipNeighbour = ip1.concat(".").concat(ip2).concat(".").concat(ip3).concat(".").concat(ip4);
-				changeNeighbours(idInt,ipNeighbour);
-
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				e.printStackTrace();
-			}
-
-	}
-		udpClient.stop();
+		//check if succesfully added to nameserver
+		if ((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0001)
+		{
+			//nameserver sends the amount of nodes in the tree
+			numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
+		}
 
 	}
 
@@ -317,23 +361,74 @@ public class Node
 		this.name = name;
 	}
 
-	private String getPreviousNeighbour()
+	public int getPreviousNeighbour()
 	{
 		return previousNeighbour;
 	}
 
-	private void setPreviousNeighbour(String previousNeighbour)
+	public void setPreviousNeighbour(int previousNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
 	}
 
-	private String getNextNeighbour()
+	public int getNextNeighbour()
 	{
 		return nextNeighbour;
 	}
 
-	private void setNextNeighbour(String nextNeighbour)
+	public void setNextNeighbour(int nextNeighbour)
 	{
 		this.nextNeighbour = nextNeighbour;
 	}
+
+	public short getId()
+	{
+		return id;
+	}
+
+	public void setId(short id)
+	{
+		this.id = id;
+	}
+
+	public Subscriber getSubscriber()
+	{
+		return subscriber;
+	}
+
+	public void setSubscriber(Subscriber subscriber)
+	{
+		this.subscriber = subscriber;
+	}
+
+	public Client getUdpClient()
+	{
+		return udpClient;
+	}
+
+	public void setUdpClient(Client udpClient)
+	{
+		this.udpClient = udpClient;
+	}
+
+	public Random getRand()
+	{
+		return rand;
+	}
+
+	public void setRand(Random rand)
+	{
+		this.rand = rand;
+	}
+
+	public short getNumberOfNodes()
+	{
+		return numberOfNodes;
+	}
+
+	public void setNumberOfNodes(short numberOfNodes)
+	{
+		this.numberOfNodes = numberOfNodes;
+	}
+
 }
