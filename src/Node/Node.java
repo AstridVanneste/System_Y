@@ -234,7 +234,7 @@ public class Node
 
 				try
 				{
-					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,);
+					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram);
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
@@ -258,7 +258,7 @@ public class Node
 
 			try
 			{
-				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,);
+				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,datagram);
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -290,13 +290,27 @@ public class Node
 		//check if message contains request from new neighbour
 		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
 		{
+			//if length == 20 , then previous and next neighbour are present in the data
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 20){
+
+				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
+				nextNeighbour = (int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]));
+
+			}
+
+			//if length == 16 then the data only contains the previous neighbour
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 16){
+				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
+
+			}
 
 		}
 
 		//check if message contains error message from nameserver
 		if ((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002)
 		{
-				
+			id++;
+			accessRequest();
 		}
 
 		//check if succesfully added to nameserver
@@ -347,23 +361,74 @@ public class Node
 		this.name = name;
 	}
 
-	private String getPreviousNeighbour()
+	public int getPreviousNeighbour()
 	{
 		return previousNeighbour;
 	}
 
-	private void setPreviousNeighbour(String previousNeighbour)
+	public void setPreviousNeighbour(int previousNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
 	}
 
-	private String getNextNeighbour()
+	public int getNextNeighbour()
 	{
 		return nextNeighbour;
 	}
 
-	private void setNextNeighbour(String nextNeighbour)
+	public void setNextNeighbour(int nextNeighbour)
 	{
 		this.nextNeighbour = nextNeighbour;
 	}
+
+	public short getId()
+	{
+		return id;
+	}
+
+	public void setId(short id)
+	{
+		this.id = id;
+	}
+
+	public Subscriber getSubscriber()
+	{
+		return subscriber;
+	}
+
+	public void setSubscriber(Subscriber subscriber)
+	{
+		this.subscriber = subscriber;
+	}
+
+	public Client getUdpClient()
+	{
+		return udpClient;
+	}
+
+	public void setUdpClient(Client udpClient)
+	{
+		this.udpClient = udpClient;
+	}
+
+	public Random getRand()
+	{
+		return rand;
+	}
+
+	public void setRand(Random rand)
+	{
+		this.rand = rand;
+	}
+
+	public short getNumberOfNodes()
+	{
+		return numberOfNodes;
+	}
+
+	public void setNumberOfNodes(short numberOfNodes)
+	{
+		this.numberOfNodes = numberOfNodes;
+	}
+
 }
