@@ -36,6 +36,7 @@ public class Node
 	private Client udpClient;
 	private Random rand;
 	private short numberOfNodes;
+	private int startupTransactionId;
 
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
@@ -103,9 +104,9 @@ public class Node
 		byte version = (byte)0;
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-		int transactionID = rand.nextInt();
+		startupTransactionId = rand.nextInt();
 		int dataLength = name.length() + 8;
-		ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
 
 		byte [] data = new byte[name.length() + 8];
 		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
@@ -234,7 +235,7 @@ public class Node
 
 				try
 				{
-					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram);
+					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
@@ -258,7 +259,7 @@ public class Node
 
 			try
 			{
-				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,datagram);
+				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,datagram.serialize());
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
