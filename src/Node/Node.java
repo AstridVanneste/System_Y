@@ -98,6 +98,40 @@ public class Node
 	}
 
 	/**
+	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 2001
+	 * NS will process this message
+	 */
+	public void neighbourRequest ()
+	{
+		byte version = (byte)0;
+		short replyCode = (short) 0;
+		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+		this.startupTransactionId = rand.nextInt();
+		int dataLength = name.length() + 8;
+		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
+
+		byte [] data = new byte[name.length() + 8];
+		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameInByte = name.getBytes();
+
+		byte[] ipInByte = new byte[4];
+		String[] ipInParts = ip.split("\\.");																	//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
+		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
+
+		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
+		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
+
+		Datagram datagram = new Datagram(header, data);
+
+		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, datagram.serialize() );
+	}
+
+
+	/**
 	 * Node listens on multicast for new incoming nodes.
 	 * if there is so, change the neighbours
 	 */
@@ -236,8 +270,10 @@ public class Node
 		{
 			//nameserver sends the amount of nodes in the tree
 			this.numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
+			neighbourRequest();
 			subscribeOnMulticast();
 			multicastListener();
+
 		}
 
 	}
