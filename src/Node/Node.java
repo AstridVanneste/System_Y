@@ -13,6 +13,7 @@ import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
 import java.io.*;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -140,7 +141,7 @@ public class Node
 		if(subscriber.hasData()){
 			byte[] subData = subscriber.receiveData();
 			if((short)((subData[10] << 8) | (subData[11])) == 0x0001){
-
+				//use serializer
 				byte[] nameLength = new byte[4];
 				//put the namelength in separate array and wrap it into an int
 				nameLength[0] = subData[12];
@@ -244,32 +245,35 @@ public class Node
 	public void unicastListener()
 	{
 
-		byte[] receivedData = udpClient.receiveData();
+
+		DatagramPacket packet = udpClient.receivePacket();
+		Datagram request = new Datagram(packet.getData());
+		byte[] data = request.getData();
 
 		//check if message contains request from new neighbour
-		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
+		if (request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_NEW_NEIGHBOUR)
 		{
 			setNeighbours(
-					(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15])),
-					(int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]))
+					(int)((data[0] << 24) | (data[1] << 16) | (data[2]) << 8| (data[3])),
+					(int)((data[4] << 24) | (data[5] << 16) | (data[6]) << 8| (data[7]))
 			);
 
 		}
 
 		//check if message contains error message from nameserver
-		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002) &&
-				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID) &&
+				(request.getHeader().getTransactionID() == this.startupTransactionId))
 		{
 			askNewName();
 			accessRequest();
 		}
 
 		//check if succesfully added to nameserver
-		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0001) &&
-				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
+				(request.getHeader().getTransactionID() == this.startupTransactionId))
 		{
 			//nameserver sends the amount of nodes in the tree
-			this.numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
+			this.numberOfNodes = (short)(data[2] << 8 | data[3]);
 			neighbourRequest();
 			subscribeOnMulticast();
 			multicastListener();
