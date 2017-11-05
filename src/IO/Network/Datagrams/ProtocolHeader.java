@@ -45,6 +45,7 @@ public class ProtocolHeader
 	private int replyCode;
 
 
+
 	/**
 	 * Empty constructor: fields get no values!!
 	 * Only use this if you set the fields immediately afterwards

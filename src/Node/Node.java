@@ -43,13 +43,12 @@ public class Node
 	 */
 	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
-		numberOfNodes = 0;
-		udpClient = new Client();
+		this.numberOfNodes = 0;
+		this.udpClient = new Client();
+		this.rand = new Random();
 
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
-
-
 
 		try
 		{
@@ -61,10 +60,47 @@ public class Node
 			e.printStackTrace();
 		}
 
-		previousNeighbour = this.id;
-		nextNeighbour = this.id;
-
+		this.previousNeighbour = this.id;
+		this.nextNeighbour = this.id;
 	}
+
+	/**
+	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 2001
+	 * NS will process this message
+	 */
+	public void accessRequest ()
+	{
+		byte version = (byte)0;
+		short replyCode = (short) 0;
+		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+		this.startupTransactionId = rand.nextInt();
+		int dataLength = name.length() + 8;
+		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
+
+		byte [] data = new byte[name.length() + 8];
+		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameInByte = name.getBytes();
+
+		byte[] ipInByte = new byte[4];
+		String[] ipInParts = ip.split("\\.");																	//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
+		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
+
+		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
+		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
+
+		Datagram datagram = new Datagram(header, data);
+
+		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
+	}
+
+	/**
+	 * Node listens on multicast for new incoming nodes.
+	 * if there is so, change the neighbours
+	 */
 
 	public void multicastListener(){
 		if(subscriber.hasData()){
@@ -95,37 +131,125 @@ public class Node
 	}
 
 	/**
-	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 1997
-	 * NS will process this message
+	 * Check which neighbour the new incoming neighbour becomes
 	 */
-	public void accessRequest ()
+	private void changeNeighbours(int id)
 	{
-		rand = new Random();
-		byte version = (byte)0;
-		short replyCode = (short) 0;
-		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-		startupTransactionId = rand.nextInt();
-		int dataLength = name.length() + 8;
-		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
+		if(numberOfNodes>1)
+		{
+			if((this.id < id) && (id < nextNeighbour))
+			{
+				byte version = (byte)0;
+				short replyCode = ProtocolHeader.NO_REPLY;
+				short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
+				int transactionID = rand.nextInt();
+				byte[] neighbourIdInBytes = Serializer.intToBytes(nextNeighbour);
+				byte[] idInBytes = Serializer.intToBytes(this.id);
+				int dataLength = idInBytes.length + neighbourIdInBytes.length;
 
-		byte [] data = new byte[name.length() + 8];
-		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
-		byte [] nameInByte = name.getBytes();
+				ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
 
-		byte[] ipInByte = new byte[4];
-		String[] ipInParts = ip.split("\\.");																		//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
-		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
-		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
-		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
-		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
+				byte[] idPacket = new byte[dataLength];
 
-		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
-		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
-		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
+				System.arraycopy(idInBytes,0,idPacket,0,idInBytes.length);
+				System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
 
-		Datagram datagram = new Datagram(header, data);
+				Datagram datagram = new Datagram(header, idPacket);
 
-		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
+
+				try
+				{
+					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
+				}
+				catch (RemoteException e)
+				{
+					e.printStackTrace();
+				}
+
+				this.nextNeighbour = id;
+			}
+
+			if ((previousNeighbour < id) && (id < this.id))
+			{
+				this.previousNeighbour = id;
+			}
+		}
+
+		else if (numberOfNodes == 1)
+		{
+			byte version = (byte)0;
+			short replyCode = ProtocolHeader.NO_REPLY;
+			short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
+			int transactionID = rand.nextInt();
+			byte[] idInBytes = Serializer.intToBytes(this.id);
+			int dataLength = idInBytes.length;
+
+			ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+
+			Datagram datagram = new Datagram(header, idInBytes);
+
+
+			try
+			{
+				udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+			setNeighbours(id);
+		}
+
+		numberOfNodes++;
+	}
+
+	/**
+	 * The node can receive two types of data (up to now)
+	 * 1) reply of the NS on the access request of me -> change my neighbours
+	 * 2) request of the new node to update my neighbours
+	 */
+	public void unicastListener()
+	{
+
+		byte[] receivedData = udpClient.receiveData();
+
+		//check if message contains request from new neighbour
+		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
+		{
+			//if length == 20 , then previous and next neighbour are present in the data
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 20){
+				setNeighbours(
+						(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15])),
+						(int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]))
+				);
+			}
+
+			//if length == 16 then the data only contains the previous neighbour
+			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 16){
+				setNeighbours(
+						(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]))
+				);
+
+			}
+
+		}
+
+		//check if message contains error message from nameserver
+		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002) &&
+				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		{
+			askNewName();
+			accessRequest();
+		}
+
+		//check if succesfully added to nameserver
+		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0001) &&
+				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		{
+			//nameserver sends the amount of nodes in the tree
+			this.numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
+			subscribeOnMulticast();
+			multicastListener();
+		}
 
 	}
 
@@ -175,161 +299,29 @@ public class Node
 	}
 
 	/**
-	 * After been accepted in network send a message to his two neighbours.
-	 * These neighbours will correct their neighbours
-	 */
-	public void sendNeighbours()
-	{
-		udpClient.start();
-
-		byte version = (byte)0;
-		short replyCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-		short requestCode = (short)2;
-		int transactionID = rand.nextInt();
-		int dataLength = 2;
-		ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
-
-		byte[] idInBytes = Serializer.intToBytes(getID());
-
-		Datagram datagram = new Datagram(header, idInBytes);
-
-		try
-		{
-			udpClient.send(resolverInterface.getIP(nextNeighbour),Constants.UDP_NODE_PORT,datagram.serialize());
-			udpClient.send(resolverInterface.getIP(previousNeighbour),Constants.UDP_NODE_PORT,datagram.serialize());
-
-		} catch (RemoteException e)
-		{
-			e.printStackTrace();
-		}
-
-		udpClient.stop();
-	}
-
-	/**
-	 * Check which neighbour the new incoming neighbour becomes
-	 */
-	private void changeNeighbours(int id)
-	{
-		if(numberOfNodes>=1){
-
-			if(id < nextNeighbour)
-			{
-				byte version = (byte)0;
-				short replyCode = ProtocolHeader.NO_REPLY;
-				short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
-				int transactionID = rand.nextInt();
-				byte[] neighbourIdInBytes = Serializer.intToBytes(nextNeighbour);
-				byte[] idInBytes = Serializer.intToBytes(this.id);
-				int dataLength = idInBytes.length + neighbourIdInBytes.length;
-
-				ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
-
-				byte[] idPacket = new byte[idInBytes.length + neighbourIdInBytes.length];
-
-				System.arraycopy(idInBytes,0,idPacket,0,idInBytes.length);
-				System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
-
-				Datagram datagram = new Datagram(header, idPacket);
-
-
-				try
-				{
-					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
-				} catch (RemoteException e)
-				{
-					e.printStackTrace();
-				}
-				nextNeighbour = id;
-			}
-		}
-		else if (numberOfNodes == 0){
-			byte version = (byte)0;
-			short replyCode = ProtocolHeader.NO_REPLY;
-			short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
-			int transactionID = rand.nextInt();
-			byte[] idInBytes = Serializer.intToBytes(this.id);
-			int dataLength = idInBytes.length;
-			ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
-
-
-
-			Datagram datagram = new Datagram(header, idInBytes);
-
-
-			try
-			{
-				udpClient.send(resolverInterface.getIP(this.id),Constants.UDP_NODE_PORT,datagram.serialize());
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-			nextNeighbour = id;
-
-			previousNeighbour = id;
-			nextNeighbour = id;
-			numberOfNodes++;
-		}
-
-
-
-
-	}
-
-	/**
-	 * The node can receive two types of data (up to now)
-	 * 1) reply of the NS on the access request of me -> change my neighbours
-	 * 2) request of the new node to update my neighbours
-	 */
-
-
-	public void getData()
-	{
-
-		byte[] receivedData = udpClient.receiveData();
-
-		//check if message contains request from new neighbour
-		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
-		{
-			//if length == 20 , then previous and next neighbour are present in the data
-			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 20){
-
-				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
-				nextNeighbour = (int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]));
-
-			}
-
-			//if length == 16 then the data only contains the previous neighbour
-			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 16){
-				previousNeighbour = (int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]));
-
-			}
-
-		}
-
-		//check if message contains error message from nameserver
-		if ((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002)
-		{
-			id++;
-			accessRequest();
-		}
-
-		//check if succesfully added to nameserver
-		if ((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0001)
-		{
-			//nameserver sends the amount of nodes in the tree
-			numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
-		}
-
-	}
-
-	/**
 	 * Calculate the hashcode of the name
 	 * @return ID
 	 */
 	private static short getHash(String name)
 	{
 		return (short) Math.abs(name.hashCode() % 32768);
+	}
+
+	private void askNewName ()
+	{
+		System.out.println("Please enter a new name: ");
+		Scanner scanner = new Scanner(System.in);
+		String name = scanner.nextLine();
+		setName(name);
+		setID(getHash(name));
+	}
+
+	private void askNewIP ()
+	{
+		System.out.println("Please enter a new IP address: ");
+		Scanner scanner = new Scanner(System.in);
+		String ip = scanner.nextLine();
+		setIp(ip);
 	}
 
 	private short getID()
