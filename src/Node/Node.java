@@ -5,20 +5,16 @@ import IO.Network.Datagrams.Datagram;
 import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Unicast.Client;
-import IO.Network.UDP.Unicast.UDPClient;
-import NameServer.NameServer;
+import IO.Network.UDP.Unicast.Server;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
-import java.io.*;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -35,6 +31,7 @@ public class Node
 	private ShutdownAgentInterface shutdownAgentInterface;
 	//private DiscoveryAgentInterface discoveryAgentInterface;
 	private Client udpClient;
+	private Server udpServer;
 	private Random rand;
 	private short numberOfNodes;
 	private int startupTransactionId;
@@ -45,7 +42,6 @@ public class Node
 	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
 		this.numberOfNodes = 0;
-		this.udpClient = new Client();
 		this.rand = new Random();
 
 		this.resolverInterface=resolverInterface;
@@ -66,11 +62,14 @@ public class Node
 	}
 
 	/**
-	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 2001
+	 * Multicast for NS
 	 * NS will process this message
+     * NS has to confirm that the node may access the network before his feature neighbours changes their neighbours
 	 */
 	public void accessRequest ()
 	{
+        this.udpClient = new Client();
+
 		byte version = (byte)0;
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
@@ -96,14 +95,18 @@ public class Node
 		Datagram datagram = new Datagram(header, data);
 
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
+		udpClient.stop();
 	}
 
 	/**
-	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 2001
-	 * NS will process this message
+	 * Multicast for nodes
+	 * Nodes will process this message
+     * Now, the nodes in the network can update their neighbours
 	 */
 	public void neighbourRequest ()
 	{
+	    this.udpClient = new Client();
+
 		byte version = (byte)0;
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
@@ -129,30 +132,31 @@ public class Node
 		Datagram datagram = new Datagram(header, data);
 
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, datagram.serialize() );
+		udpClient.stop();
 	}
 
 
 	/**
 	 * Node listens on multicast for new incoming nodes.
-	 * if there is so, change the neighbours
+	 * if there is so, update the neighbours
 	 */
 
-	public void multicastListener(){
-		if(subscriber.hasData()){
+	public void multicastListener()
+    {
+		if(subscriber.hasData())
+		{
 			DatagramPacket packet = subscriber.receivePacket();
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-			if(request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE){
-
-
+			if(request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
+			{
 				byte[] nameLength = new byte[4];
 				//put the namelength in separate array and wrap it into an int
 				nameLength[0] = data[0];
 				nameLength[1] = data[1];
 				nameLength[2] = data[2];
 				nameLength[3] = data[3];
-
 
 				int num = Serializer.bytesToInt(nameLength);
 
@@ -178,6 +182,8 @@ public class Node
 		{
 			if((this.id < id) && (id < nextNeighbour))
 			{
+			    this.udpClient = new Client();
+
 				byte version = (byte)0;
 				short replyCode = ProtocolHeader.NO_REPLY;
 				short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
@@ -199,6 +205,7 @@ public class Node
 				try
 				{
 					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
+					udpClient.stop();
 				}
 				catch (RemoteException e)
 				{
@@ -216,22 +223,32 @@ public class Node
 
 		else if (numberOfNodes == 1)
 		{
-			byte version = (byte)0;
-			short replyCode = ProtocolHeader.NO_REPLY;
-			short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
-			int transactionID = rand.nextInt();
-			byte[] idInBytes = Serializer.intToBytes(this.id);
-			int dataLength = idInBytes.length;
+		    this.udpClient = new Client();
 
-			ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+            byte version = (byte)0;
+            short replyCode = ProtocolHeader.NO_REPLY;
+            short requestCode = ProtocolHeader.REQUEST_NEW_NEIGHBOUR;
+            int transactionID = rand.nextInt();
+            byte[] neighbourIdInBytes = Serializer.intToBytes(nextNeighbour);
+            byte[] idInBytes = Serializer.intToBytes(this.id);
+            int dataLength = idInBytes.length + neighbourIdInBytes.length;
 
-			Datagram datagram = new Datagram(header, idInBytes);
+            ProtocolHeader header = new ProtocolHeader(version,dataLength,transactionID,requestCode,replyCode);
+
+            byte[] idPacket = new byte[dataLength];
+
+            System.arraycopy(idInBytes,0,idPacket,0,idInBytes.length);
+            System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
+
+            Datagram datagram = new Datagram(header, idPacket);
 
 
-			try
-			{
-				udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
-			} catch (RemoteException e)
+            try
+            {
+                udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
+                udpClient.stop();
+            }
+			catch (RemoteException e)
 			{
 				e.printStackTrace();
 			}
@@ -242,15 +259,18 @@ public class Node
 	}
 
 	/**
-	 * The node can receive two types of data (up to now)
+	 * The node can receive three types of data (up to now)
 	 * 1) reply of the NS on the access request of me -> change my neighbours
-	 * 2) request of the new node to update my neighbours
+     * 2) error replay from NS -> change name
+	 * 3) request of the new node to update my neighbours
 	 */
 	public void unicastListener()
 	{
 
+        this.udpServer = new Server(Constants.UDP_NODE_PORT);
 
-		DatagramPacket packet = udpClient.receivePacket();
+		DatagramPacket packet = udpServer.receivePacket();
+
 		Datagram request = new Datagram(packet.getData());
 		byte[] data = request.getData();
 
