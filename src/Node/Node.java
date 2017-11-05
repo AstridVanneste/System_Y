@@ -215,21 +215,10 @@ public class Node
 		//check if message contains request from new neighbour
 		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
 		{
-			//if length == 20 , then previous and next neighbour are present in the data
-			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 20){
-				setNeighbours(
-						(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15])),
-						(int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]))
-				);
-			}
-
-			//if length == 16 then the data only contains the previous neighbour
-			if ((int)((receivedData[1] << 16) | (receivedData[2] << 8) | (receivedData[3])) == 16){
-				setNeighbours(
-						(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15]))
-				);
-
-			}
+			setNeighbours(
+					(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15])),
+					(int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]))
+			);
 
 		}
 
