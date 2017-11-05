@@ -13,6 +13,7 @@ import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
 import java.io.*;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -98,6 +99,40 @@ public class Node
 	}
 
 	/**
+	 * Grant access to the network by sending a multicast on ip 224.0.0.1 and port 2001
+	 * NS will process this message
+	 */
+	public void neighbourRequest ()
+	{
+		byte version = (byte)0;
+		short replyCode = (short) 0;
+		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+		this.startupTransactionId = rand.nextInt();
+		int dataLength = name.length() + 8;
+		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
+
+		byte [] data = new byte[name.length() + 8];
+		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameInByte = name.getBytes();
+
+		byte[] ipInByte = new byte[4];
+		String[] ipInParts = ip.split("\\.");																	//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
+		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
+
+		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
+		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
+
+		Datagram datagram = new Datagram(header, data);
+
+		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, datagram.serialize() );
+	}
+
+
+	/**
 	 * Node listens on multicast for new incoming nodes.
 	 * if there is so, change the neighbours
 	 */
@@ -106,7 +141,7 @@ public class Node
 		if(subscriber.hasData()){
 			byte[] subData = subscriber.receiveData();
 			if((short)((subData[10] << 8) | (subData[11])) == 0x0001){
-
+				//use serializer
 				byte[] nameLength = new byte[4];
 				//put the namelength in separate array and wrap it into an int
 				nameLength[0] = subData[12];
@@ -210,34 +245,39 @@ public class Node
 	public void unicastListener()
 	{
 
-		byte[] receivedData = udpClient.receiveData();
+
+		DatagramPacket packet = udpClient.receivePacket();
+		Datagram request = new Datagram(packet.getData());
+		byte[] data = request.getData();
 
 		//check if message contains request from new neighbour
-		if ((short) ((receivedData[8] << 8) | (receivedData[9])) == 0x0003)
+		if (request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_NEW_NEIGHBOUR)
 		{
 			setNeighbours(
-					(int)((receivedData[12] << 24) | (receivedData[13] << 16) | (receivedData[14]) << 8| (receivedData[15])),
-					(int)((receivedData[16] << 24) | (receivedData[17] << 16) | (receivedData[18]) << 8| (receivedData[19]))
+					(int)((data[0] << 24) | (data[1] << 16) | (data[2]) << 8| (data[3])),
+					(int)((data[4] << 24) | (data[5] << 16) | (data[6]) << 8| (data[7]))
 			);
 
 		}
 
 		//check if message contains error message from nameserver
-		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0002) &&
-				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID) &&
+				(request.getHeader().getTransactionID() == this.startupTransactionId))
 		{
 			askNewName();
 			accessRequest();
 		}
 
 		//check if succesfully added to nameserver
-		if (((short) ((receivedData[10] << 8) | (receivedData[11])) == 0x0001) &&
-				((int)((receivedData[4] << 24) | (receivedData[5] << 16) | (receivedData[6]) << 8| (receivedData[7])) == this.startupTransactionId))
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
+				(request.getHeader().getTransactionID() == this.startupTransactionId))
 		{
 			//nameserver sends the amount of nodes in the tree
-			this.numberOfNodes = (short)(receivedData[14] << 8 | receivedData[15]);
+			this.numberOfNodes = (short)(data[2] << 8 | data[3]);
+			neighbourRequest();
 			subscribeOnMulticast();
 			multicastListener();
+
 		}
 
 	}
