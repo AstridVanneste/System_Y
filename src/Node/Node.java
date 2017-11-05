@@ -139,23 +139,27 @@ public class Node
 
 	public void multicastListener(){
 		if(subscriber.hasData()){
-			byte[] subData = subscriber.receiveData();
-			if((short)((subData[10] << 8) | (subData[11])) == 0x0001){
-				//use serializer
+			DatagramPacket packet = subscriber.receivePacket();
+			Datagram request = new Datagram(packet.getData());
+			byte[] data = request.getData();
+
+			if(request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE){
+
+
 				byte[] nameLength = new byte[4];
 				//put the namelength in separate array and wrap it into an int
-				nameLength[0] = subData[12];
-				nameLength[1] = subData[13];
-				nameLength[2] = subData[14];
-				nameLength[3] = subData[15];
+				nameLength[0] = data[0];
+				nameLength[1] = data[1];
+				nameLength[2] = data[2];
+				nameLength[3] = data[3];
 
-				ByteBuffer wrapped = ByteBuffer.wrap(nameLength); // big-endian by default
-				int num = wrapped.getShort();
+
+				int num = Serializer.bytesToInt(nameLength);
 
 				//get the name and put it in a byte Array
 				byte[] nameArray = new byte[num];
 				for(int i = 0;i<num;i++){
-					nameArray[i] = subData[16+i];
+					nameArray[i] = data[4+i];
 				}
 
 				String name = new String(nameArray);
