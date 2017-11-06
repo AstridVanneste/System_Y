@@ -6,12 +6,11 @@ import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Server implements UDPServer, Runnable
+public class Server implements UDPServer
 {
 	private int portNum;
 	private DatagramSocket socket;
 	private LinkedList<DatagramPacket> packetBuffer;
-	private Thread thread;
 
 	public Server(int portNum)
 	{
@@ -33,7 +32,7 @@ public class Server implements UDPServer, Runnable
 			e.printStackTrace();
 		}
 
-		thread = new Thread(this);
+		Thread thread = new Thread(this);
 		thread.start();
 	}
 
@@ -57,9 +56,7 @@ public class Server implements UDPServer, Runnable
 	}
 
 	@Override
-	public void send(String remoteHost,
-					 int port,
-					 byte[] data)
+	public void send(String remoteHost, int port, byte[] data)
 	{
 		try
 		{
@@ -80,9 +77,7 @@ public class Server implements UDPServer, Runnable
 	}
 
 	@Override
-	public void send(String remoteHost,
-					 int port,
-					 String data)
+	public void send(String remoteHost, int port, String data)
 	{
 		byte[] bytes = data.getBytes();
 		this.send(remoteHost, port, bytes);
@@ -90,9 +85,7 @@ public class Server implements UDPServer, Runnable
 	}
 
 	@Override
-	public void send(String remoteHost,
-					 int port,
-					 List<Byte> data)
+	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
 
@@ -139,7 +132,6 @@ public class Server implements UDPServer, Runnable
 		{
 			socket.close();
 		}
-
 	}
 
 	@Override

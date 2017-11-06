@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.List;
 
-public interface UDPClient
+public interface UDPClient extends Runnable
 {
 	/**
 	 * Starts the UDP server.
@@ -16,14 +16,14 @@ public interface UDPClient
 	 * @param remoteHost	The remote host that the data should be sent to.
 	 * @param data			The data to be sent.
 	 */
-	public void send (String remoteHost,int port, String data);
+	public void send (String remoteHost, int port, String data);
 
 	/**
 	 * Sends all bytes in the data array.
 	 * @param remoteHost	The remote host that the data should be sent to.
 	 * @param data			The data to be sent.
 	 */
-	public void send (String remoteHost,int port, byte[] data);
+	public void send (String remoteHost, int port, byte[] data);
 
 	/**
 	 * Sends all bytes in the data list.

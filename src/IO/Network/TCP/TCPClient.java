@@ -43,5 +43,4 @@ public interface TCPClient
 	 * @param header
 	 */
 	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
-
 }

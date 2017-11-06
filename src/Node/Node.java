@@ -16,11 +16,14 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node implements Runnable
+public class Node implements Runnable, NodeInteractionInterface
 {
 	private String ip;
 	private String name;
@@ -36,6 +39,8 @@ public class Node implements Runnable
 	private Random rand;
 	private short numberOfNodes;
 	private int startupTransactionId;
+
+	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
@@ -60,11 +65,28 @@ public class Node implements Runnable
 		this.nextNeighbour = this.id;
 	}
 
-	public void start(){
+	public void start()
+	{
+		if(System.getSecurityManager()==null)
+		{
+			System.setSecurityManager(new SecurityManager());
+		}
+
+		try
+		{
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.createRegistry(1099);
+			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
+		}
+		catch(RemoteException re)
+		{
+			System.err.println("Exception when creating stub");
+			re.printStackTrace();
+		}
+
 		udpServer.start();
 		Thread thread = new Thread(this);
 		thread.start();
-
 	}
 
 	/**
@@ -213,7 +235,6 @@ public class Node implements Runnable
 
 				Datagram datagram = new Datagram(header, idPacket);
 
-
 				try
 				{
 					udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
@@ -313,8 +334,7 @@ public class Node implements Runnable
 		}
 
 		//check if succesfully added to nameserver
-		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
-				(request.getHeader().getTransactionID() == this.startupTransactionId))
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) && (request.getHeader().getTransactionID() == this.startupTransactionId))
 		{
 			//nameserver sends the amount of nodes in the tree
 			this.numberOfNodes = (short)(data[2] << 8 | data[3]);
@@ -322,9 +342,7 @@ public class Node implements Runnable
 			subscribeOnMulticast();
 			multicastListener();
 			System.out.println("");
-
 		}
-
 	}
 
 	/**
@@ -334,7 +352,6 @@ public class Node implements Runnable
 	{
 		subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
 		subscriber.start();
-
 	}
 
 	/**
