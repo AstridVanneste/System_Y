@@ -95,7 +95,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [x] Update discovery frame format to take into account multicast IP's (Thomas)
 - [x] Make sure Map rolls-over when calculating an ID lower than the lowest ID (Astrid)
 
-#### Shutdown
+#### Shutdown (Thomas)
 - [ ] Add node shutdown component
 
 #### Failure
