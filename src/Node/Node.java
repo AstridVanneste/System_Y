@@ -8,23 +8,19 @@ import IO.Network.UDP.Unicast.Client;
 import IO.Network.UDP.Unicast.Server;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
-import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
+import Util.Arrays;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node implements NodeInteractionInterface
+public class Node implements Runnable
 {
 	private String ip;
 	private String name;
@@ -41,57 +37,34 @@ public class Node implements NodeInteractionInterface
 	private short numberOfNodes;
 	private int startupTransactionId;
 
-	public static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_AGENT";
-	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION_NAME";
-
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 */
-	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
+	public Node(String name, String ip, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
 		this.numberOfNodes = 0;
 		this.rand = new Random();
 
-		this.resolverInterface = resolverInterface;
-		this.shutdownAgentInterface = shutdownAgentInterface;
+		this.udpServer = new Server(Constants.UDP_NODE_PORT);
 
-		try
-		{
-			this.ip = InetAddress.getLocalHost().getHostAddress();
-			this.id = getHash(name);
-		}
-		catch (UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
+		this.resolverInterface=resolverInterface;
+		this.shutdownAgentInterface=shutdownAgentInterface;
+
+		this.name = name;
+
+		this.ip = ip;
+		System.out.println(ip);
+		this.id = getHash(name);
 
 		this.previousNeighbour = this.id;
 		this.nextNeighbour = this.id;
 	}
 
-	public void init ()
-	{
-		if(System.getSecurityManager()==null)
-		{
-			System.setSecurityManager(new SecurityManager());
-		}
+	public void start(){
+		udpServer.start();
+		Thread thread = new Thread(this);
+		thread.start();
 
-		try
-		{
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
-			Registry registry = LocateRegistry.createRegistry(1099);
-			registry.bind(Node.NODE_INTERACTION_NAME, stub);
-		}
-		catch(RemoteException re)
-		{
-			System.err.println("Exception was thrown when creating stub");
-			re.printStackTrace();
-		}
-		catch (AlreadyBoundException abe)
-		{
-			System.err.println("Exception was thrown when trying to bind stub");
-			abe.printStackTrace();
-		}
 	}
 
 	/**
@@ -102,6 +75,7 @@ public class Node implements NodeInteractionInterface
 	public void accessRequest ()
 	{
         this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -112,6 +86,7 @@ public class Node implements NodeInteractionInterface
 
 		byte [] data = new byte[name.length() + 8];
 		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameLengthInByte2 = Arrays.reverse(nameLengthInByte);
 		byte [] nameInByte = name.getBytes();
 
 		byte[] ipInByte = new byte[4];
@@ -121,12 +96,14 @@ public class Node implements NodeInteractionInterface
 		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
 		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
 
-		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameLengthInByte2,	0, data,0,						nameLengthInByte2.length);
 		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
 		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
 
 		Datagram datagram = new Datagram(header, data);
-
+		System.out.println(Constants.DISCOVERY_MULTICAST_IP);
+		System.out.println(Constants.DISCOVERY_NAMESERVER_PORT);
+		System.out.println(datagram.toString());
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
 		udpClient.stop();
 	}
@@ -139,6 +116,7 @@ public class Node implements NodeInteractionInterface
 	public void neighbourRequest ()
 	{
 	    this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -216,6 +194,7 @@ public class Node implements NodeInteractionInterface
 			if((this.id < id) && (id < nextNeighbour))
 			{
 			    this.udpClient = new Client();
+				udpClient.start();
 
 				byte version = (byte)0;
 				short replyCode = ProtocolHeader.NO_REPLY;
@@ -257,6 +236,7 @@ public class Node implements NodeInteractionInterface
 		else if (numberOfNodes == 1)
 		{
 		    this.udpClient = new Client();
+			udpClient.start();
 
             byte version = (byte)0;
             short replyCode = ProtocolHeader.NO_REPLY;
@@ -297,9 +277,17 @@ public class Node implements NodeInteractionInterface
      * 2) error replay from NS -> change name
 	 * 3) request of the new node to update my neighbours
 	 */
+
+	public void run(){
+		unicastListener();
+	}
+
 	public void unicastListener()
 	{
-        this.udpServer = new Server(Constants.UDP_NODE_PORT);
+
+		while(udpServer.isEmpty()){
+
+		}
 
 		DatagramPacket packet = udpServer.receivePacket();
 
@@ -333,6 +321,7 @@ public class Node implements NodeInteractionInterface
 			neighbourRequest();
 			subscribeOnMulticast();
 			multicastListener();
+			System.out.println("");
 
 		}
 
@@ -441,22 +430,22 @@ public class Node implements NodeInteractionInterface
 
 	public int getPreviousNeighbour()
 	{
-		return this.previousNeighbour;
+		return previousNeighbour;
 	}
 
-	public void setPreviousNeighbour(int id)
+	public void setPreviousNeighbour(int previousNeighbour)
 	{
-		this.previousNeighbour = id;
+		this.previousNeighbour = previousNeighbour;
 	}
 
 	public int getNextNeighbour()
 	{
-		return this.nextNeighbour;
+		return nextNeighbour;
 	}
 
-	public void setNextNeighbour(int id)
+	public void setNextNeighbour(int nextNeighbour)
 	{
-		this.nextNeighbour = id;
+		this.nextNeighbour = nextNeighbour;
 	}
 
 	public short getId()
