@@ -32,20 +32,16 @@ public class Serializer
 	{
 		byte[] result = new byte[4];
 
-		result[0] = (byte)(value & 0x000000FF);
-		result[1] = (byte)((value >>> 8)& 0x000000FF);
-		result[2] = (byte)((value >>> 16) & 0x000000FF);
-		result[3] = (byte)((value >>> 24)& 0x000000FF);
+		result[0] = (byte)((value >>> 24) & 0x000000FF);
+		result[1] = (byte)((value >>> 16) & 0x000000FF);
+		result[2] = (byte)((value >>> 8) & 0x000000FF);
+		result[3] = (byte)(value & 0x000000FF);
 
 		return result;
 	}
 
 	public static int bytesToInt(byte[] data)
 	{
-		for(int i = 0; i< data.length; i++)
-		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
 		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
 	}
 
