@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.List;
 
-public interface UDPServer
+public interface UDPServer extends Runnable
 {
 	/**
 	 * Starts the UDP server.
 	 * @throws IOException
 	 */
-	public void start ()	throws
-			IOException;
+	public void start () throws IOException;
 
 	/**
 	 * Returns the port that the server is running on.<br>

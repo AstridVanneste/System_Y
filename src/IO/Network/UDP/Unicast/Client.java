@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Astrid on 09-Oct-17.
  */
-public class Client implements UDPClient, Runnable
+public class Client implements UDPClient
 {
 	private DatagramSocket socket;
 	private LinkedList<DatagramPacket> packetBuffer;
@@ -55,8 +55,6 @@ public class Client implements UDPClient, Runnable
 			e.printStackTrace();
 		}
 	}
-
-
 
 	@Override
 	public void send(String remoteHost, int port, String data)
@@ -140,16 +138,11 @@ public class Client implements UDPClient, Runnable
 
 	public boolean bufferEmpty()
 	{
-		return packetBuffer.isEmpty();
+		return this.packetBuffer.isEmpty();
 	}
 
 	public int getBufferLength()
 	{
-		return packetBuffer.size();
-	}
-
-	public DatagramSocket getSocket()
-	{
-		return socket;
+		return this.packetBuffer.size();
 	}
 }

@@ -18,7 +18,6 @@ public class Server implements TCPServer
 	private int portNum;
 	private ServerSocket socket;
 	private HashMap<String, ConnectionHandler> incomingConnections;
-	private Thread ownThread;
 
 	public Server (int port)
 	{
@@ -34,8 +33,8 @@ public class Server implements TCPServer
 	{
 		this.socket = new ServerSocket(this.portNum);
 
-		this.ownThread = new Thread(this);
-		this.ownThread.start();
+		Thread ownThread = new Thread(this);
+		ownThread.start();
 	}
 
 	@Override

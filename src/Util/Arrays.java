@@ -8,6 +8,7 @@ public class Arrays
 	 * @param original
 	 * @return
 	 */
+	@Deprecated
 	public static byte[] reverse (byte[] original)
 	{
 		byte reversed [] = new byte [original.length];

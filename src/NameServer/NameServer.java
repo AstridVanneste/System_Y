@@ -19,7 +19,7 @@ public class NameServer
 	public static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
 	public static final String MAP_FILE_NAME = "TreeMap.csv";
 
-	private static NameServer nameServer;	//singleton instance of nameserver
+	private static NameServer instance;	//singleton instance of nameserver
 
 	TreeMap<Short,String> map;			//can be accessed throughout entire NameServer package
 	private ShutdownAgentInterface shutdownAgentStub;
@@ -34,11 +34,11 @@ public class NameServer
 
 	public static NameServer getInstance()
 	{
-		if(nameServer == null)
+		if(instance == null)
 		{
-			nameServer = new NameServer();
+			instance = new NameServer();
 		}
-		return nameServer;
+		return instance;
 	}
 
 	/**

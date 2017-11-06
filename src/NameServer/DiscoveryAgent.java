@@ -52,7 +52,6 @@ public class DiscoveryAgent implements Runnable
 						System.arraycopy(data, 0, nameLenBytes, 0, 4);
 						int nameLen = Util.Serializer.bytesToInt(nameLenBytes);
 
-
 						if (data.length != 8 + nameLen)
 						{
 							System.err.println("Packet data had length of " + Integer.toString(data.length) + ", was supposed to be " + Integer.toString(8 + nameLen));
