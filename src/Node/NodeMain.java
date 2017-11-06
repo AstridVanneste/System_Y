@@ -35,7 +35,6 @@ public class NodeMain {
             System.out.println("Access request...");
             node.accessRequest();
             System.out.println("Access successful");
-            node.start();
 
         }
         catch (RemoteException re)

@@ -112,7 +112,7 @@ public class Subscriber implements UDPSubscriber, Runnable
 			{
 				System.err.println("Error when trying to receive a packet");
 				e.printStackTrace();
-			}
+		}
 		}
 	}
 
@@ -124,5 +124,9 @@ public class Subscriber implements UDPSubscriber, Runnable
 	public int getBufferLength()
 	{
 		return this.packetBuffer.size();
+	}
+
+	public MulticastSocket getSocket() {
+		return socket;
 	}
 }
