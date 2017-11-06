@@ -18,6 +18,8 @@ Version is the version number of the party that sent the datagram, this can chan
 
 ## Header Format
 
+![alt text](https://github.com/AstridVanneste/System_Y/blob/master/res/ProtocolHeader.png "Protocol Header")
+
 ```
                 SEPARATE FIELDS                                         COMPLETE PACKAGE
         1 Byte          3 Bytes                                     4 Bytes
