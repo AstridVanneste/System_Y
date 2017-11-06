@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node
+public class Node implements Runnable
 {
 	private String ip;
 	private String name;
@@ -44,8 +44,12 @@ public class Node
 		this.numberOfNodes = 0;
 		this.rand = new Random();
 
+		this.udpServer = new Server(Constants.UDP_NODE_PORT);
+
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
+
+		this.name = name;
 
 		try
 		{
@@ -59,6 +63,13 @@ public class Node
 
 		this.previousNeighbour = this.id;
 		this.nextNeighbour = this.id;
+	}
+
+	public void start(){
+		udpServer.start();
+		Thread thread = new Thread(this);
+		thread.start();
+
 	}
 
 	/**
@@ -264,10 +275,15 @@ public class Node
      * 2) error replay from NS -> change name
 	 * 3) request of the new node to update my neighbours
 	 */
+
+	public void run(){
+		unicastListener();
+	}
+
 	public void unicastListener()
 	{
 
-        this.udpServer = new Server(Constants.UDP_NODE_PORT);
+
 
 		DatagramPacket packet = udpServer.receivePacket();
 

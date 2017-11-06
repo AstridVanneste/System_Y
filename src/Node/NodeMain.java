@@ -1,5 +1,6 @@
 package Node;
 
+import IO.Network.UDP.Unicast.UDPClient;
 import NameServer.NameServer;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
@@ -16,6 +17,7 @@ import java.rmi.RemoteException;
  */
 public class NodeMain {
     public static void main(String[] args) {
+
         if(System.getSecurityManager()==null)
         {
             System.setSecurityManager(new SecurityManager());
@@ -33,10 +35,7 @@ public class NodeMain {
             System.out.println("Access request...");
             node.accessRequest();
             System.out.println("Access successful");
-
-
-
-
+            node.start();
         }
         catch (RemoteException re)
         {
@@ -48,5 +47,7 @@ public class NodeMain {
             System.out.println("NotBoundException in getIP()");
             nbe.printStackTrace();
         }
+
+
     }
 }
