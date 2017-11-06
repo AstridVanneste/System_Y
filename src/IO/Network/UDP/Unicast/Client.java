@@ -116,23 +116,24 @@ public class Client implements UDPClient, Runnable
 	{
 		while(!this.socket.isClosed())
 		{
-			byte[] buffer = new byte[500];
-			DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
-			try
+			synchronized (this.socket)
 			{
-				this.socket.receive(incomingPacket);
-				//System.out.println("Received " + incomingPacket.getData().length + " Bytes");
-				this.packetBuffer.add(incomingPacket);
-				//System.out.println("Packetbuffer size " + this.packetBuffer.size());
-			}
-			catch (SocketException se)
-			{
-				se.printStackTrace();
-			}
-			catch(IOException e)
-			{
-				System.err.println("Error when trying to receive a packet");
-				e.printStackTrace();
+				byte[] buffer = new byte[500];
+				DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
+				try
+				{
+					this.socket.receive(incomingPacket);
+					//System.out.println("Received " + incomingPacket.getData().length + " Bytes");
+					this.packetBuffer.add(incomingPacket);
+					//System.out.println("Packetbuffer size " + this.packetBuffer.size());
+				} catch (SocketException se)
+				{
+					se.printStackTrace();
+				} catch (IOException e)
+				{
+					System.err.println("Error when trying to receive a packet");
+					e.printStackTrace();
+				}
 			}
 		}
 	}

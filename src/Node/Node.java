@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node
+public class Node implements Runnable
 {
 	private String ip;
 	private String name;
@@ -44,8 +44,12 @@ public class Node
 		this.numberOfNodes = 0;
 		this.rand = new Random();
 
+		this.udpServer = new Server(Constants.UDP_NODE_PORT);
+
 		this.resolverInterface=resolverInterface;
 		this.shutdownAgentInterface=shutdownAgentInterface;
+
+		this.name = name;
 
 		try
 		{
@@ -61,6 +65,13 @@ public class Node
 		this.nextNeighbour = this.id;
 	}
 
+	public void start(){
+		udpServer.start();
+		Thread thread = new Thread(this);
+		thread.start();
+
+	}
+
 	/**
 	 * Multicast for NS
 	 * NS will process this message
@@ -69,6 +80,7 @@ public class Node
 	public void accessRequest ()
 	{
         this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -93,7 +105,9 @@ public class Node
 		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
 
 		Datagram datagram = new Datagram(header, data);
-
+		System.out.println(Constants.DISCOVERY_MULTICAST_IP);
+		System.out.println(Constants.DISCOVERY_NAMESERVER_PORT);
+		System.out.println(datagram.toString());
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
 		udpClient.stop();
 	}
@@ -106,6 +120,7 @@ public class Node
 	public void neighbourRequest ()
 	{
 	    this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -183,6 +198,7 @@ public class Node
 			if((this.id < id) && (id < nextNeighbour))
 			{
 			    this.udpClient = new Client();
+				udpClient.start();
 
 				byte version = (byte)0;
 				short replyCode = ProtocolHeader.NO_REPLY;
@@ -224,6 +240,7 @@ public class Node
 		else if (numberOfNodes == 1)
 		{
 		    this.udpClient = new Client();
+			udpClient.start();
 
             byte version = (byte)0;
             short replyCode = ProtocolHeader.NO_REPLY;
@@ -264,10 +281,17 @@ public class Node
      * 2) error replay from NS -> change name
 	 * 3) request of the new node to update my neighbours
 	 */
+
+	public void run(){
+		unicastListener();
+	}
+
 	public void unicastListener()
 	{
 
-        this.udpServer = new Server(Constants.UDP_NODE_PORT);
+		while(udpServer.isEmpty()){
+
+		}
 
 		DatagramPacket packet = udpServer.receivePacket();
 
