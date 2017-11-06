@@ -9,6 +9,7 @@ import IO.Network.UDP.Unicast.Server;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
+import Util.Arrays;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
@@ -39,7 +40,7 @@ public class Node implements Runnable
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 */
-	public Node(String name, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
+	public Node(String name, String ip, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
 		this.numberOfNodes = 0;
 		this.rand = new Random();
@@ -51,15 +52,9 @@ public class Node implements Runnable
 
 		this.name = name;
 
-		try
-		{
-			this.ip = InetAddress.getLocalHost().getHostAddress();
-			this.id = getHash(name);
-		}
-		catch (UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
+		this.ip = ip;
+		System.out.println(ip);
+		this.id = getHash(name);
 
 		this.previousNeighbour = this.id;
 		this.nextNeighbour = this.id;
@@ -91,6 +86,7 @@ public class Node implements Runnable
 
 		byte [] data = new byte[name.length() + 8];
 		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameLengthInByte2 = Arrays.reverse(nameLengthInByte);
 		byte [] nameInByte = name.getBytes();
 
 		byte[] ipInByte = new byte[4];
@@ -100,7 +96,7 @@ public class Node implements Runnable
 		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
 		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
 
-		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameLengthInByte2,	0, data,0,						nameLengthInByte2.length);
 		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
 		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
 
@@ -325,6 +321,7 @@ public class Node implements Runnable
 			neighbourRequest();
 			subscribeOnMulticast();
 			multicastListener();
+			System.out.println("");
 
 		}
 
