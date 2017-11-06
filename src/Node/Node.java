@@ -60,11 +60,11 @@ public class Node implements Runnable
 		this.nextNeighbour = this.id;
 	}
 
-	public void start(){
+	public void start()
+	{
 		udpServer.start();
 		Thread thread = new Thread(this);
 		thread.start();
-
 	}
 
 	/**
@@ -212,7 +212,6 @@ public class Node implements Runnable
 				System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
 
 				Datagram datagram = new Datagram(header, idPacket);
-
 
 				try
 				{
