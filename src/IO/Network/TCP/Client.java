@@ -3,6 +3,7 @@ package IO.Network.TCP;
 import IO.*;
 import IO.File;
 import IO.Network.Constants;
+import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 
 import java.net.*;
@@ -106,9 +107,108 @@ public class Client implements TCPClient, Runnable
 	}
 
 	@Override
-	public void sendFile(String filename, String remoteHost, ProtocolHeader header)
+	public void sendFile(String filename, ProtocolHeader header)
 	{
+		File file = new File(filename);
+		try
+		{
 
+			while(file.available() != 0)
+			{
+				int length;
+
+				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
+				{
+					byte[] bytes = new byte[Constants.MAX_TCP_SEGMENT_SIZE];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(bytes);
+				}
+				else
+				{
+					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + file.available()];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(file.available()))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(bytes);
+				}
+
+
+			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+	}
+
+	@Override
+	public void receiveFile(String filename, int transactionID)
+	{
+		File file = new File(filename);
+
+		try
+		{
+			while (this.hasData())
+			{
+				Datagram datagram = new Datagram(this.receive());
+
+				if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE)
+				{
+					if (datagram.getHeader().getTransactionID() == transactionID)
+					{
+						file.append(datagram.getData());
+					}
+				}
+			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public boolean hasData()
+	{
+		try
+		{
+			return this.in.available() > 0;
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+		finally
+		{
+			return false;
+		}
 	}
 
 	@Override
@@ -118,7 +218,7 @@ public class Client implements TCPClient, Runnable
 		{
 			try
 			{
-				if (this.in.available() > 0)
+				if (this.hasData())
 				{
 					System.out.println("CLIENT " + this.in.available() + " Bytes available to TCP");
 					byte[] data = new byte [this.in.available()];
