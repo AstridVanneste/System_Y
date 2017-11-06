@@ -15,7 +15,6 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-
 	public String getIP(int nodeId) throws RemoteException;
 
 	/**

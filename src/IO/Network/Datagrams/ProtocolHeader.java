@@ -1,6 +1,8 @@
 package IO.Network.Datagrams;
 
 
+import Util.Serializer;
+
 import java.util.Arrays;
 
 /**
@@ -22,7 +24,6 @@ public class ProtocolHeader
 	private static final int REPLY_CODE_MASK = 0x0000FFFF;
 
 	//REQUEST CODES
-	public static final int NO_REQUEST = 0x00000000;
 	public static final int REQUEST_DISCOVERY_CODE = 0x00000001;
 	public static final int REQUEST_CLUSTER_HEALTH_REPORT = 0x00000002;
 	public static final int REQUEST_NEW_NEIGHBOUR = 0x00000003;
@@ -43,7 +44,6 @@ public class ProtocolHeader
 	private int transactionID;
 	private int requestCode;
 	private int replyCode;
-
 
 
 	/**
@@ -76,7 +76,7 @@ public class ProtocolHeader
 	 * @param requestCode
 	 * @param replyCode
 	 */
-	public ProtocolHeader(byte version, int dataLength,int transactionID, short requestCode, short replyCode)
+	public ProtocolHeader(byte version, int dataLength,int transactionID, int requestCode, int replyCode)
 	{
 		this.version = version;
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
@@ -107,19 +107,19 @@ public class ProtocolHeader
 			i++;
 		}
 
-		this.dataLength = byteArrayToInt(bytes);
+		this.dataLength = Serializer.bytesToInt(bytes);
 
 		offset += DATA_LENGTH_LENGTH;
 
-		this.transactionID =  byteArrayToInt(Arrays.copyOfRange(header, offset, offset + TRANSACTION_ID_LENGTH));
+		this.transactionID =  Serializer.bytesToInt(Arrays.copyOfRange(header, offset, offset + TRANSACTION_ID_LENGTH));
 
 		offset += TRANSACTION_ID_LENGTH;
 
-		this.requestCode = byteArrayToShort(Arrays.copyOfRange(header, offset, offset + REQUEST_CODE_LENGTH));
+		this.requestCode = Serializer.bytesToShort(Arrays.copyOfRange(header, offset, offset + REQUEST_CODE_LENGTH));
 
 		offset += REQUEST_CODE_LENGTH;
 
-		this.replyCode = byteArrayToShort(Arrays.copyOfRange(header, offset, offset + REPLY_CODE_LENGTH));
+		this.replyCode = Serializer.bytesToShort(Arrays.copyOfRange(header, offset, offset + REPLY_CODE_LENGTH));
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class ProtocolHeader
 
 		for(int i = 0; i < TRANSACTION_ID_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[3-i];
+			serial[offset + i] = bytes[i];
 		}
 
 		offset += TRANSACTION_ID_LENGTH;
@@ -278,7 +278,7 @@ public class ProtocolHeader
 
 		for(int i = 0; i < REQUEST_CODE_LENGTH; i++)
 		{
-			serial[offset + i] = bytes[1-i];
+			serial[offset + i] = bytes[i+2];
 		}
 
 		offset += REQUEST_CODE_LENGTH;
@@ -287,42 +287,10 @@ public class ProtocolHeader
 
 		for(int i = 0; i < REPLY_CODE_LENGTH; i++)
 		{
-			serial[offset + i ] = bytes[1-i];
+			serial[offset + i ] = bytes[i+2];
 		}
 
 		return serial;
 	}
 
-	@Deprecated
-	public static byte[] intToByteArray(int value)
-	{
-		byte[] result = new byte[4];
-
-		result[0] = (byte)(value & 0x000000FF);
-		result[1] = (byte)((value >>> 8)& 0x000000FF);
-		result[2] = (byte)((value >>> 16) & 0x000000FF);
-		result[3] = (byte)((value >>> 24)& 0x000000FF);
-
-		return result;
-	}
-
-	@Deprecated
-	public static int byteArrayToInt (byte[] data)
-	{
-		for(int i = 0; i< data.length; i++)
-		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
-		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
-	}
-
-	@Deprecated
-	public static short byteArrayToShort(byte[] data)
-	{
-		for(int i = 0; i< data.length; i++)
-		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
-		return (short) ((data[1]) | (data[0] << 8));
-	}
 }

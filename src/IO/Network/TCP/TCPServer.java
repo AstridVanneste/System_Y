@@ -36,7 +36,7 @@ public interface TCPServer extends Runnable
 	public void send (String remoteHost, List<Byte> data);
 
 	/**
-	 * Reads all bytes from the interal receive buffer.<br>
+	 * Reads all bytes from the internal receive buffer.<br>
 	 * @param	remoteHost	The remote host from whose buffer we want to read.<br>	//todo: Check Grammar
 	 * @return	All data in the buffer for the specified host.<br>
 	 */
@@ -59,9 +59,17 @@ public interface TCPServer extends Runnable
 
 	/**
 	 * sends complete file
-	 * @param filename
 	 * @param remoteHost
+	 * @param filename
 	 * @param header
 	 */
-	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
+	public void sendFile(String remoteHost,String filename,  ProtocolHeader header);
+
+	/**
+	 * receives complete file and writes it to given path.
+	 * @param remoteHost
+	 * @param filename
+	 * @param transactionID
+	 */
+	public void receiveFile(String remoteHost,String filename,  int transactionID);
 }

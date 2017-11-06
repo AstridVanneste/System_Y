@@ -39,8 +39,16 @@ public interface TCPClient
 	/**
 	 * sends complete file
 	 * @param filename
-	 * @param remoteHost
 	 * @param header
 	 */
-	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
+	public void sendFile(String filename, ProtocolHeader header);
+
+	/**
+	 * receives complete file and writes it to given path.
+	 * @param filename
+	 * @param transactionID
+	 */
+	public void receiveFile(String filename, int transactionID);
+
+	public boolean hasData();
 }
