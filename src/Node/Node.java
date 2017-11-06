@@ -80,6 +80,7 @@ public class Node implements Runnable
 	public void accessRequest ()
 	{
         this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -104,7 +105,9 @@ public class Node implements Runnable
 		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
 
 		Datagram datagram = new Datagram(header, data);
-
+		System.out.println(Constants.DISCOVERY_MULTICAST_IP);
+		System.out.println(Constants.DISCOVERY_NAMESERVER_PORT);
+		System.out.println(datagram.toString());
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
 		udpClient.stop();
 	}
@@ -117,6 +120,7 @@ public class Node implements Runnable
 	public void neighbourRequest ()
 	{
 	    this.udpClient = new Client();
+		udpClient.start();
 
 		byte version = (byte)0;
 		short replyCode = (short) 0;
@@ -194,6 +198,7 @@ public class Node implements Runnable
 			if((this.id < id) && (id < nextNeighbour))
 			{
 			    this.udpClient = new Client();
+				udpClient.start();
 
 				byte version = (byte)0;
 				short replyCode = ProtocolHeader.NO_REPLY;
@@ -235,6 +240,7 @@ public class Node implements Runnable
 		else if (numberOfNodes == 1)
 		{
 		    this.udpClient = new Client();
+			udpClient.start();
 
             byte version = (byte)0;
             short replyCode = ProtocolHeader.NO_REPLY;
@@ -283,7 +289,9 @@ public class Node implements Runnable
 	public void unicastListener()
 	{
 
+		while(udpServer.isEmpty()){
 
+		}
 
 		DatagramPacket packet = udpServer.receivePacket();
 
