@@ -8,18 +8,23 @@ import IO.Network.UDP.Unicast.Client;
 import IO.Network.UDP.Unicast.Server;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
+import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node
+public class Node implements NodeInteractionInterface
 {
 	private String ip;
 	private String name;
@@ -36,6 +41,9 @@ public class Node
 	private short numberOfNodes;
 	private int startupTransactionId;
 
+	public static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_AGENT";
+	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION_NAME";
+
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 */
@@ -44,8 +52,8 @@ public class Node
 		this.numberOfNodes = 0;
 		this.rand = new Random();
 
-		this.resolverInterface=resolverInterface;
-		this.shutdownAgentInterface=shutdownAgentInterface;
+		this.resolverInterface = resolverInterface;
+		this.shutdownAgentInterface = shutdownAgentInterface;
 
 		try
 		{
@@ -59,6 +67,31 @@ public class Node
 
 		this.previousNeighbour = this.id;
 		this.nextNeighbour = this.id;
+	}
+
+	public void init ()
+	{
+		if(System.getSecurityManager()==null)
+		{
+			System.setSecurityManager(new SecurityManager());
+		}
+
+		try
+		{
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.createRegistry(1099);
+			registry.bind(Node.NODE_INTERACTION_NAME, stub);
+		}
+		catch(RemoteException re)
+		{
+			System.err.println("Exception was thrown when creating stub");
+			re.printStackTrace();
+		}
+		catch (AlreadyBoundException abe)
+		{
+			System.err.println("Exception was thrown when trying to bind stub");
+			abe.printStackTrace();
+		}
 	}
 
 	/**
@@ -266,7 +299,6 @@ public class Node
 	 */
 	public void unicastListener()
 	{
-
         this.udpServer = new Server(Constants.UDP_NODE_PORT);
 
 		DatagramPacket packet = udpServer.receivePacket();
@@ -409,22 +441,22 @@ public class Node
 
 	public int getPreviousNeighbour()
 	{
-		return previousNeighbour;
+		return this.previousNeighbour;
 	}
 
-	public void setPreviousNeighbour(int previousNeighbour)
+	public void setPreviousNeighbour(int id)
 	{
-		this.previousNeighbour = previousNeighbour;
+		this.previousNeighbour = id;
 	}
 
 	public int getNextNeighbour()
 	{
-		return nextNeighbour;
+		return this.nextNeighbour;
 	}
 
-	public void setNextNeighbour(int nextNeighbour)
+	public void setNextNeighbour(int id)
 	{
-		this.nextNeighbour = nextNeighbour;
+		this.nextNeighbour = id;
 	}
 
 	public short getId()
