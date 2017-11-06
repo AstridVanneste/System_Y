@@ -1,6 +1,7 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Datagrams.ProtocolHeader;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,14 +43,6 @@ public interface TCPServer extends Runnable
 	public byte[] receive (String remoteHost);
 
 	/**
-	 * read numBytes bytes from the internal receive buffer.<br>
-	 * @param remoteHost	The remote host from whose buffer we want to read.<br> //todo: Check Grammar
-	 * @param numBytes		The number of bytes to read.<br>
-	 * @return				The first numBytes bytes in the inputStream for the requested host.<br>
-	 */
-	public byte[] receive (String remoteHost, int numBytes);
-
-	/**
 	 * Stops the server.<br>
 	 * @throws IOException The close() method of the ServerSocket can throw an IOException
 	 */
@@ -64,5 +57,11 @@ public interface TCPServer extends Runnable
 
 	public String toString();
 
-	public void sendFile(File file);
+	/**
+	 * sends complete file
+	 * @param filename
+	 * @param remoteHost
+	 * @param header
+	 */
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
 }

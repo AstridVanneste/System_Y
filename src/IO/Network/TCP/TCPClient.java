@@ -1,6 +1,7 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Datagrams.ProtocolHeader;
 
 import java.util.List;
 
@@ -30,22 +31,17 @@ public interface TCPClient
 	public byte[] receive ();
 
 	/**
-	 * read numBytes bytes from the internal receive buffer.
-	 * @param numBytes
-	 * @return
-	 */
-	public byte[] receive (int numBytes);
-
-	/**
 	 * Stops the client
 	 */
 	public void stop();
 
 
 	/**
-	 * Send complete file
-	 * @param file
+	 * sends complete file
+	 * @param filename
+	 * @param remoteHost
+	 * @param header
 	 */
-	public void sendFile(File file);
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header);
 
 }

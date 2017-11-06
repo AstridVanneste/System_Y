@@ -59,9 +59,8 @@ The transaction ID is assumed to be unique for every request-reply pair. It is c
 ### Request Code
 This field helps the receiver determine what needs to be done with the incoming datagram. It also tells them how to interpret the attached data.
 
-
 ### Reply Code
-The reply code tells the receiver the result of their request. It also tells them how to interpret the attached data.
+The reply code tells the receiver the result of their request. It also tells them how to interpret the attached data. The reply code is left empty (0) in the request.
 
 ## Request Codes
 
@@ -78,11 +77,10 @@ The reply code tells the receiver the result of their request. It also tells the
 - 0x0004  Cluster Node is UP. (See data for more info), reply to 0x0002.
 - 0x0005  Cluster Node is DOWN. (See data for more info), reply to 0x0002.
 
-
 - 0x8001  Sending file. reply to 0x8001.
 
 ### Discovery Service
-The Discovery Service in System Y will consist of a client sending a broadcast/multicast message onto the network and the Nameserver replying with a unicast message to the new client.
+The Discovery Service in System Y will consist of a client sending a multicast message onto the network and the Nameserver replying with a unicast message to the new client.
 The Nameserver can either return reply code 0, reply code 1 or reply code 2.
 When the server returns reply code 0 the data contains the node's ID and the IP's of its neighbours.
 After a new node joins the network, the new node's neighbours are informed that they need to change their next/previous node.

@@ -1,6 +1,9 @@
 package IO.Network.TCP;
 
 import IO.File;
+import IO.Network.Constants;
+import IO.Network.Datagrams.ProtocolHeader;
+
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -107,20 +110,6 @@ public class Server implements TCPServer
 	}
 
 	@Override
-	public byte[] receive(String remoteHost, int numBytes)
-	{
-		if (this.incomingConnections.containsKey(remoteHost))
-		{
-			return this.incomingConnections.get(remoteHost).readBytes(numBytes);
-		}
-		else
-		{
-			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
-			return new byte[0];
-		}
-	}
-
-	@Override
 	public void stop() throws IOException
 	{
 		this.socket.close();
@@ -160,7 +149,7 @@ public class Server implements TCPServer
 	public String toString()
 	{
 		StringBuilder resBuilder = new StringBuilder();
-		resBuilder.append("Publisher listening on port ");
+		resBuilder.append("TCP Server listening on port ");
 		resBuilder.append(this.portNum);
 		resBuilder.append(" (TCP)");
 		resBuilder.append('\n');
@@ -187,8 +176,64 @@ public class Server implements TCPServer
 	}
 
 	@Override
-	public void sendFile(File file)
+	public void sendFile(String filename, String remoteHost, ProtocolHeader header)
 	{
+		File file = new File(filename);
 
+		try
+		{
+
+			while(file.available() != 0)
+			{
+				int length;
+
+				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
+				{
+					byte[] bytes = new byte[Constants.MAX_TCP_SEGMENT_SIZE];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(remoteHost,bytes);
+				}
+				else
+				{
+					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + file.available()];
+
+					int i = 0;
+
+					for(byte b: header.serialize())
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					for(byte b: file.read(file.available()))
+					{
+						bytes[i] = b;
+						i++;
+					}
+
+					this.send(remoteHost, bytes);
+				}
+
+
+			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
 	}
 }
