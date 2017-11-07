@@ -99,6 +99,7 @@ public class DiscoveryAgent implements Runnable
 						}
 
 						// Return succes
+
 						short nodeId = (short) NameServer.getHash(nodeName);
 						short numNodes = (short) NameServer.getInstance().map.size();
 
