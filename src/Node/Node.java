@@ -301,7 +301,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	@Override
 	public void setNextNeighbour (short id) throws RemoteException{
-
+		nextNeighbour = id;
 	}
 
 	@Override
@@ -311,7 +311,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	@Override
 	public void setPreviousNeighbour (short id) throws RemoteException{
-
+		previousNeighbour = id;
 	}
 
 	@Override
