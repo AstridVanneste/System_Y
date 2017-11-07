@@ -25,23 +25,25 @@ import java.util.Scanner;
 
 public class Node implements Runnable, NodeInteractionInterface
 {
-	private String ip;
+	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
+
+	private String ip;	//?
 	private String NSIp;
 	private String name;
-	private int previousNeighbour;
-	private int nextNeighbour;
+	private short previousNeighbour;
+	private short nextNeighbour;
 	private short id;
 	private Subscriber subscriber;
 	private ResolverInterface resolverInterface;
 	private ShutdownAgentInterface shutdownAgentInterface;
-	private Client udpClient;
-	private Server udpServer;
-	private Random rand;
+	private Client udpClient; //?
+	private Server udpServer; //?
+	private Random rand; //?
 	private short numberOfNodes;
-	private int startupTransactionId;
+	private int startupTransactionId; //?
 	private boolean newNode;
-	private boolean accessRequestSent;
-	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
+	private boolean accessRequestSent; //??
+
 
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
@@ -57,19 +59,23 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.newNode = true;
 		this.accessRequestSent = false;
 
-		this.resolverInterface=resolverInterface;
-		this.shutdownAgentInterface=shutdownAgentInterface;
+		//???
+		this.resolverInterface = resolverInterface;
+		this.shutdownAgentInterface = shutdownAgentInterface;
 
 		this.name = name;
 
+		//ZELF OPVRAGEN
 		this.ip = ip;
-		this.id = getHash(name);
+
+		// AANVRAGEN OP NAMESERVER (TIJDELIJKE WAARDE)
+		this.id = -1;
 		System.out.println("Mijn ID is:" + id);
 		System.out.println("Debugging: de volgorde van prints moet zijn..");
 		System.out.println("init done, registery created, make accessrequest, sent accessrequest, thread started, subscribed, ik ben met success toegevoegd aan het netwerk!");
 
-		this.previousNeighbour = this.id;
-		this.nextNeighbour = this.id;
+		this.previousNeighbour = this.id; //??
+		this.nextNeighbour = this.id; //??
 
 		System.out.println("init done");
 	}
@@ -123,6 +129,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			byte[] nameLengthInByte = Serializer.intToBytes(name.length());
 			byte[] nameInByte = name.getBytes();
 
+			//HIER IS APARTE METHODE VOOR (ZIE SERIALIZER)
 			byte[] ipInByte = new byte[4];
 			String[] ipInParts = ip.split("\\.");                                                                    //https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
 			ipInByte[0] = (byte) Integer.parseInt(ipInParts[0]);
@@ -149,7 +156,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	 * New node will update his number of nodes and wait until his neighbours has called his rmi-methods
 	 *
 	 */
-
 	public void multicastListener()
     {
 		if(subscriber.hasData())
@@ -160,11 +166,11 @@ public class Node implements Runnable, NodeInteractionInterface
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-			byte[] newNodeIDInBytes = new byte[2];
+			byte[] newNodeIDInBytes = new byte[2]; //SUGGESTIE: DATAGRAMMEN SUBKLASSEN
 			newNodeIDInBytes[0] = data[0];
 			newNodeIDInBytes[1] = data[1];
 			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
-			short numberOfNodes = (short)(data[2] << 8 | data[3]);
+			short numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
 
 			System.out.println("ontvangde ID: " + newNodeID);
 			System.out.println("# nodes van NS: " + numberOfNodes);
@@ -207,21 +213,20 @@ public class Node implements Runnable, NodeInteractionInterface
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
 	 */
-	private void changeNeighbours(int id)
+	private void changeNeighbours(short newID)
 	{
-			if((this.id < id) && (id < nextNeighbour))
-			{
-				this.nextNeighbour = id;
-			    //NodeInteractionInterface.setPreviousNeighbour(this.id);
-				//NodeInteractionInterface.setNextNeighbour(id);
-			}
+		if((this.id < newID) && (newID < nextNeighbour))
+		{
+			this.nextNeighbour = newID;
+			//NodeInteractionInterface.setPreviousNeighbour(this.newID);
+			//NodeInteractionInterface.setNextNeighbour(newID);
+		}
+		if ((previousNeighbour < newID) && (newID < this.id))
+		{
+			this.previousNeighbour = newID;
+		}
 
-			if ((previousNeighbour < id) && (id < this.id))
-			{
-				this.previousNeighbour = id;
-			}
-
-		this.numberOfNodes++;
+		this.numberOfNodes++; //KAN NOOIT KLOPPEN WANT VERWIJDERING GA JE NIET ZIEN (PARAMETER)
 	}
 
 
@@ -229,10 +234,11 @@ public class Node implements Runnable, NodeInteractionInterface
 	{
 		subscribeOnMulticast();
 		System.out.println("subscribed");
-		while(!subscriber.getSocket().isClosed()) {
+		while(true)
+		{
 			multicastListener();
 		}
-		System.out.println("out of multicastListener. FOUT!");
+		//System.out.println("out of multicastListener. FOUT!");
 	}
 
 	/**
@@ -240,8 +246,8 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	public void subscribeOnMulticast ()
 	{
-		subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
-		subscriber.start();
+		this.subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
+		this.subscriber.start();
 	}
 
 	/**
@@ -249,7 +255,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	public void unsubscribeMulticast ()
 	{
-		subscriber.stop();
+		this.subscriber.stop();
 	}
 
 	/**
@@ -257,23 +263,23 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private void setNeighbours()
 	{
-		previousNeighbour = this.id;
-		nextNeighbour = this.id;
+		this.previousNeighbour = this.id;
+		this.nextNeighbour = this.id;
 	}
 
 	/**
 	 * If this node has 1 neighbours
 	 */
-	private void setNeighbours(int neighbourId)
+	private void setNeighbours(short neighbourId)
 	{
-		previousNeighbour = neighbourId;
-		nextNeighbour = neighbourId;
+		this.previousNeighbour = neighbourId;
+		this.nextNeighbour = neighbourId;
 	}
 
 	/**
 	 * If this node has 2 neighbours
 	 */
-	private void setNeighbours(int previousNeighbour, int nextNeighbour)
+	private void setNeighbours(short previousNeighbour, short nextNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
 		this.nextNeighbour = nextNeighbour;
@@ -283,6 +289,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	 * Calculate the hashcode of the name
 	 * @return ID
 	 */
+	@Deprecated //MOET WEG
 	private static short getHash(String name)
 	{
 		return (short) Math.abs(name.hashCode() % 32768);
@@ -292,12 +299,12 @@ public class Node implements Runnable, NodeInteractionInterface
 	{
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
-		String name = scanner.nextLine();
-		setName(name);
-		setId(getHash(name));
+		this.name = scanner.nextLine();
+		this.setId(getHash(this.name)); //NS
 	}
 
-	private void askNewIP ()
+	@Deprecated
+	private void askNewIP () //IP ADDRESS GWN OPVRAGEN
 	{
 		System.out.println("Please enter a new IP address: ");
 		Scanner scanner = new Scanner(System.in);
@@ -305,11 +312,13 @@ public class Node implements Runnable, NodeInteractionInterface
 		setIp(ip);
 	}
 
+	@Deprecated
 	public String getIp()
 	{
-		return ip;
+		return this.ip;
 	}
 
+	@Deprecated
 	public void setIp(String ip)
 	{
 		this.ip = ip;
@@ -317,37 +326,38 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public String getName()
 	{
-		return name;
+		return this.name;
 	}
 
+	//MOET VEEL WEG
 	public void setName(String name)
 	{
 		this.name = name;
 	}
 
-	public int getPreviousNeighbour()
+	public short getPreviousNeighbour()
 	{
-		return previousNeighbour;
+		return this.previousNeighbour;
 	}
 
-	public void setPreviousNeighbour(int previousNeighbour)
+	public void setPreviousNeighbour(short previousNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
 	}
 
-	public int getNextNeighbour()
+	public short getNextNeighbour()
 	{
-		return nextNeighbour;
+		return this.nextNeighbour;
 	}
 
-	public void setNextNeighbour(int nextNeighbour)
+	public void setNextNeighbour(short nextNeighbour)
 	{
 		this.nextNeighbour = nextNeighbour;
 	}
 
 	public short getId()
 	{
-		return id;
+		return this.id;
 	}
 
 	public void setId(short id)

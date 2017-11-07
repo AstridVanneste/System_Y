@@ -5,11 +5,11 @@ import java.rmi.RemoteException;
 
 public interface NodeInteractionInterface extends Remote
 {
-	public void setNextNeighbour (int id) throws RemoteException;
+	public void setNextNeighbour (short id) throws RemoteException;
 
-	public int getNextNeighbour () throws RemoteException;
+	public short getNextNeighbour () throws RemoteException;
 
-	public void setPreviousNeighbour (int id) throws RemoteException;
+	public void setPreviousNeighbour (short id) throws RemoteException;
 
-	public int getPreviousNeighbour () throws RemoteException;
+	public short getPreviousNeighbour () throws RemoteException;
 }
