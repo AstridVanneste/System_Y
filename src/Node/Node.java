@@ -122,7 +122,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			byte version = (byte) 0;
 			short replyCode = (short) 0;
 			short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-			this.startupTransactionId = rand.nextInt();
+			this.startupTransactionId = rand.nextInt()%127;
 			System.out.println(startupTransactionId);
 			int dataLength = name.length() + 8;
 			ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
@@ -144,7 +144,6 @@ public class Node implements Runnable, NodeInteractionInterface
 			System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);
 
 			Datagram datagram = new Datagram(header, data);
-			System.out.println(datagram.getHeader().getTransactionID());
 			udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
 			udpClient.stop();
 			System.out.println("sent accessrequest");
@@ -166,6 +165,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 			DatagramPacket packet = subscriber.receivePacket();
 			nsIp = packet.getAddress().getHostAddress();
+			System.out.println("Nameserver IP " + nsIp);
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 

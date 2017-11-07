@@ -115,13 +115,13 @@ public class Datagram
 			serial[i] = b;
 			i++;
 		}
-
 		for(byte b: this.data)
 		{
 			serial[i] = b;
 			i++;
 		}
-
+		int test = (int)(serial[4]) | (serial[5] << 8) | (serial[6] << 16) | (serial[7] << 24);
+		System.out.println(test + "tester");
 		return serial;
 	}
 

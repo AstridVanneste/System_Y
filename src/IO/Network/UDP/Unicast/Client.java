@@ -40,6 +40,8 @@ public class Client implements UDPClient
 	@Override
 	public void send(String remoteHost, int port, byte[] data)
 	{
+
+
 		try
 		{
 			this.socket.send(new DatagramPacket(data,0, data.length, InetAddress.getByName(remoteHost), port));
