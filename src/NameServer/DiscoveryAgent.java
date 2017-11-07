@@ -81,6 +81,8 @@ public class DiscoveryAgent implements Runnable
 						System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
 						String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
 
+						System.out.println("Name: " + nodeName + " , ip: " + unicastIp);
+
 						if (NameServer.getInstance().map.containsValue(unicastIp))
 						{
 							// Return failure
