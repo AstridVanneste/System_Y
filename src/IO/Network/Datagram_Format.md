@@ -18,6 +18,8 @@ Version is the version number of the party that sent the datagram, this can chan
 
 ## Header Format
 
+![alt text](https://github.com/AstridVanneste/System_Y/blob/master/res/ProtocolHeader.png "Protocol Header")
+
 ```
                 SEPARATE FIELDS                                         COMPLETE PACKAGE
         1 Byte          3 Bytes                                     4 Bytes
@@ -64,7 +66,6 @@ The reply code tells the receiver the result of their request. It also tells the
 
 ## Request Codes
 
-- 0x0000  no request
 - 0x0001  Request to be added to network
 - 0x0002  Request Cluster Health Report
 - 0x0003  you are my new next neighbour (data contains id of my previous next neighbour)

@@ -47,7 +47,5 @@ public class NodeMain {
             System.out.println("NotBoundException in getIP()");
             nbe.printStackTrace();
         }
-
-
     }
 }

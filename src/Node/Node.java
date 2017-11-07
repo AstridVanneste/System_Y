@@ -16,11 +16,14 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node implements Runnable
+public class Node implements Runnable, NodeInteractionInterface
 {
 	private String ip;
 	private String name;
@@ -36,6 +39,8 @@ public class Node implements Runnable
 	private Random rand;
 	private short numberOfNodes;
 	private int startupTransactionId;
+
+	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	/**
 	 * Initialize the new node with his RMI-applications, name, ip and ID
@@ -60,11 +65,28 @@ public class Node implements Runnable
 		this.nextNeighbour = this.id;
 	}
 
-	public void start(){
+	public void start()
+	{
+		if(System.getSecurityManager()==null)
+		{
+			System.setSecurityManager(new SecurityManager());
+		}
+
+		try
+		{
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.createRegistry(1099);
+			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
+		}
+		catch(RemoteException re)
+		{
+			System.err.println("Exception when creating stub");
+			re.printStackTrace();
+		}
+
 		udpServer.start();
 		Thread thread = new Thread(this);
 		thread.start();
-
 	}
 
 	/**
@@ -105,49 +127,46 @@ public class Node implements Runnable
 		System.out.println(Constants.DISCOVERY_NAMESERVER_PORT);
 		System.out.println(datagram.toString());
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize() );
-        System.out.println("Multicast for NS...");
-        udpClient.stop();
-
+		udpClient.stop();
 	}
 
-//	/**
-//	 * Multicast for nodes
-//	 * Nodes will process this message
-//     * Now, the nodes in the network can update their neighbours
-//	 */
-//	public void neighbourRequest ()
-//	{
-//	    this.udpClient = new Client();
-//		udpClient.start();
-//
-//		byte version = (byte)0;
-//		short replyCode = (short) 0;
-//		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-//		this.startupTransactionId = rand.nextInt();
-//		int dataLength = name.length() + 8;
-//		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
-//
-//		byte [] data = new byte[name.length() + 8];
-//		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
-//		byte [] nameInByte = name.getBytes();
-//
-//		byte[] ipInByte = new byte[4];
-//		String[] ipInParts = ip.split("\\.");																	//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
-//		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
-//		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
-//		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
-//		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
-//
-//		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
-//		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
-//		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
-//
-//		Datagram datagram = new Datagram(header, data);
-//
-//		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, datagram.serialize() );
-//        System.out.println("Multicast for Nodes...");
-//        udpClient.stop();
-//	}
+	/**
+	 * Multicast for nodes
+	 * Nodes will process this message
+     * Now, the nodes in the network can update their neighbours
+	 */
+	public void neighbourRequest ()
+	{
+	    this.udpClient = new Client();
+		udpClient.start();
+
+		byte version = (byte)0;
+		short replyCode = (short) 0;
+		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+		this.startupTransactionId = rand.nextInt();
+		int dataLength = name.length() + 8;
+		ProtocolHeader header = new ProtocolHeader(version,dataLength,startupTransactionId,requestCode,replyCode);
+
+		byte [] data = new byte[name.length() + 8];
+		byte [] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte [] nameInByte = name.getBytes();
+
+		byte[] ipInByte = new byte[4];
+		String[] ipInParts = ip.split("\\.");																	//https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
+		ipInByte[0]=(byte)Integer.parseInt(ipInParts[0]);
+		ipInByte[1]=(byte)Integer.parseInt(ipInParts[1]);
+		ipInByte[2]=(byte)Integer.parseInt(ipInParts[2]);
+		ipInByte[3]=(byte)Integer.parseInt(ipInParts[3]);
+
+		System.arraycopy(nameLengthInByte,	0, data,0,						nameLengthInByte.length);
+		System.arraycopy(nameInByte,		0, data,4,						nameInByte.length);
+		System.arraycopy(ipInByte,			0, data,nameInByte.length + 4 ,	ipInByte.length);
+
+		Datagram datagram = new Datagram(header, data);
+
+		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, datagram.serialize() );
+		udpClient.stop();
+	}
 
 
 	/**
@@ -163,7 +182,7 @@ public class Node implements Runnable
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-			if(request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
+			if(request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 			{
 				byte[] nameLength = new byte[4];
 				//put the namelength in separate array and wrap it into an int
@@ -184,30 +203,7 @@ public class Node implements Runnable
 				changeNeighbours(getHash(name));
 
 			}
-
-
-            //check if succesfully added to nameserver
-            if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
-                    (request.getHeader().getTransactionID() == this.startupTransactionId))
-            {
-                //nameserver sends the amount of nodes in the tree
-                this.numberOfNodes = (short)(data[2] << 8 | data[3]);
-                System.out.println("Number of Nodes: " + this.numberOfNodes);
-//                neighbourRequest();
-//                subscribeOnMulticast();
-//                multicastListener();
-
-            }
-
-            //check if message contains error message from nameserver
-            if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID) &&
-                    (request.getHeader().getTransactionID() == this.startupTransactionId))
-            {
-                askNewName();
-                accessRequest();
-            }
-
-        }
+		}
 	}
 
 	/**
@@ -238,7 +234,6 @@ public class Node implements Runnable
 				System.arraycopy(neighbourIdInBytes,0,idPacket,idInBytes.length,neighbourIdInBytes.length);
 
 				Datagram datagram = new Datagram(header, idPacket);
-
 
 				try
 				{
@@ -287,7 +282,8 @@ public class Node implements Runnable
                 udpClient.send(resolverInterface.getIP(id),Constants.UDP_NODE_PORT,datagram.serialize());
                 udpClient.stop();
             }
-			catch (RemoteException e) {
+			catch (RemoteException e)
+			{
 				e.printStackTrace();
 			}
 			setNeighbours(id);
@@ -304,34 +300,49 @@ public class Node implements Runnable
 	 */
 
 	public void run(){
-
-        subscribeOnMulticast();;
-	    while(!subscriber.getSocket().isClosed()) {
-            multicastListener();
-        }
+		unicastListener();
 	}
 
 	public void unicastListener()
 	{
 
-        while(udpServer.isEmpty()) {
-        }
-            DatagramPacket packet = udpServer.receivePacket();
+		while(udpServer.isEmpty()){
 
-            Datagram request = new Datagram(packet.getData());
-            byte[] data = request.getData();
+		}
 
-            //check if message contains request from new neighbour
-            if (request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_NEW_NEIGHBOUR) {
-                setNeighbours(
-                        (int) ((data[0] << 24) | (data[1] << 16) | (data[2]) << 8 | (data[3])),
-                        (int) ((data[4] << 24) | (data[5] << 16) | (data[6]) << 8 | (data[7]))
-                );
-                this.start();
+		DatagramPacket packet = udpServer.receivePacket();
 
-            }
+		Datagram request = new Datagram(packet.getData());
+		byte[] data = request.getData();
 
+		//check if message contains request from new neighbour
+		if (request.getHeader().getReplyCode() == ProtocolHeader.REQUEST_NEW_NEIGHBOUR)
+		{
+			setNeighbours(
+					(int)((data[0] << 24) | (data[1] << 16) | (data[2]) << 8| (data[3])),
+					(int)((data[4] << 24) | (data[5] << 16) | (data[6]) << 8| (data[7]))
+			);
 
+		}
+
+		//check if message contains error message from nameserver
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID) &&
+				(request.getHeader().getTransactionID() == this.startupTransactionId))
+		{
+			askNewName();
+			accessRequest();
+		}
+
+		//check if succesfully added to nameserver
+		if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) && (request.getHeader().getTransactionID() == this.startupTransactionId))
+		{
+			//nameserver sends the amount of nodes in the tree
+			this.numberOfNodes = (short)(data[2] << 8 | data[3]);
+			neighbourRequest();
+			subscribeOnMulticast();
+			multicastListener();
+			System.out.println("");
+		}
 	}
 
 	/**
@@ -341,7 +352,6 @@ public class Node implements Runnable
 	{
 		subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
 		subscriber.start();
-
 	}
 
 	/**

@@ -29,8 +29,7 @@ public class File
 	 * @return      A byte array containing all bytes of the file we read.
 	 * @throws IOException  An IOException can be thrown by the FileChannel.read() method, or because the file is too large.
 	 */
-	public byte[] read ()   throws
-			IOException
+	public byte[] read () throws IOException
 	{
 		FileInputStream inputStream = new FileInputStream(this.filename);
 
@@ -64,8 +63,7 @@ public class File
 	 * @return      A byte array containing all bytes of the file we read.
 	 * @throws IOException  An IOException can be thrown by the FileChannel.read() method, or because the file is too large.
 	 */
-	public byte[] read (int numBytes)   throws
-			IOException
+	public byte[] read (int numBytes) throws IOException
 	{
 		FileInputStream inputStream = new FileInputStream(this.filename);
 
@@ -99,8 +97,7 @@ public class File
 	 * Creates a file if it does not yet exist.
 	 * @throws IOException An IOException can be thrown by the FileOutputStream Constructor, the FileChannel.write or the FileChannel.close method.
 	 */
-	public void write (byte[] data) throws
-			IOException
+	public void write (byte[] data) throws IOException
 	{
 		FileOutputStream outputStream = new FileOutputStream(this.filename);
 
@@ -115,12 +112,14 @@ public class File
 
 	/**
 	 * Uses the new Java NIO API to append to files as fast as possible.
+	 * Creates a file when necessary.
 	 * @param data  The data to be appended to the file.
 	 * @throws IOException An IOException can be thrown by the FileOutputStream Constructor, the FileChannel.write or the FileChannel.close method.
 	 */
-	public void append (byte[] data)	throws
-			IOException
+	public void append (byte[] data) throws IOException
 	{
+		System.out.println("APPENDING FILE");
+
 		FileOutputStream outputStream = new FileOutputStream(this.filename, true);
 
 		FileChannel channel = outputStream.getChannel();
@@ -214,16 +213,19 @@ public class File
 
 	public static String mapToCSV(Map<Short, String> map)
 	{
-		String CSV = "";
+		StringBuilder CSVBuilder = new StringBuilder();
 
 		Set<Short> keySet = map.keySet();
 
 		for(short ID: keySet)
 		{
-			CSV += ID + ";";
-			CSV += map.get(ID) + "\n";
+			CSVBuilder.append(ID);
+			CSVBuilder.append(';');
+			CSVBuilder.append(map.get(ID));
+			CSVBuilder.append('\n');
 		}
-		return CSV;
+
+		return CSVBuilder.toString();
 	}
 
 	public static TreeMap<Short,String> CSVToMap(String CSV)

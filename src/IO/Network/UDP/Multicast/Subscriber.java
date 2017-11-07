@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Created by Astrid on 09-Oct-17.
  */
-public class Subscriber implements UDPSubscriber, Runnable
+public class Subscriber implements UDPSubscriber
 {
 	private int portNum;
 	private String ip;

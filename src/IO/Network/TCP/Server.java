@@ -2,6 +2,7 @@ package IO.Network.TCP;
 
 import IO.File;
 import IO.Network.Constants;
+import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 
 
@@ -18,7 +19,6 @@ public class Server implements TCPServer
 	private int portNum;
 	private ServerSocket socket;
 	private HashMap<String, ConnectionHandler> incomingConnections;
-	private Thread ownThread;
 
 	public Server (int port)
 	{
@@ -34,8 +34,8 @@ public class Server implements TCPServer
 	{
 		this.socket = new ServerSocket(this.portNum);
 
-		this.ownThread = new Thread(this);
-		this.ownThread.start();
+		Thread ownThread = new Thread(this);
+		ownThread.start();
 	}
 
 	@Override
@@ -176,10 +176,9 @@ public class Server implements TCPServer
 	}
 
 	@Override
-	public void sendFile(String filename, String remoteHost, ProtocolHeader header)
+	public void sendFile(String remoteHost, String filename, ProtocolHeader header)
 	{
 		File file = new File(filename);
-
 		try
 		{
 
@@ -235,5 +234,38 @@ public class Server implements TCPServer
 		{
 			ioe.printStackTrace();
 		}
+	}
+
+	@Override
+	public void receiveFile(String remoteHost,String filename,  int transactionID)
+	{
+		File file = new File(filename);
+
+
+		try
+		{
+			//file.write("".getBytes());
+			while (this.hasData(remoteHost))
+			{
+
+				Datagram datagram = new Datagram(this.receive(remoteHost));
+
+				//if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE)
+				//{
+					System.out.println("TRANSACTION ID: " + datagram.getHeader().getTransactionID());
+					System.out.println("REPLY CODE: " + datagram.getHeader().getReplyCode());
+					System.out.println("RECEIVED");
+					//if (datagram.getHeader().getTransactionID() == transactionID)
+					//{
+						file.append(datagram.getData());
+					//}
+				//}
+			}
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+		}
+
 	}
 }

@@ -17,7 +17,6 @@ public class ConnectionHandler implements Runnable
 	private DataOutputStream out;
 	private LinkedList<byte[]> inputBuffer;
 	private Socket socket;
-	private Thread ownThread;
 
 	public ConnectionHandler (Socket socket)
 	{
@@ -33,8 +32,8 @@ public class ConnectionHandler implements Runnable
 		{
 			this.in = new DataInputStream(this.socket.getInputStream());
 			this.out = new DataOutputStream(this.socket.getOutputStream());
-			this.ownThread = new Thread (this);
-			this.ownThread.start();
+			Thread ownThread = new Thread(this);
+			ownThread.start();
 		}
 		catch (IOException ioe)
 		{
