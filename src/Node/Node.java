@@ -28,7 +28,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String ip;	//?
-	private String NSIp;
+	private String nsIp;
 	private String name;
 	private short previousNeighbour;
 	private short nextNeighbour;
@@ -89,6 +89,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 		try
 		{
+			subscribeOnMulticast();
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1098);
 			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
@@ -122,6 +123,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			short replyCode = (short) 0;
 			short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
 			this.startupTransactionId = rand.nextInt();
+			System.out.println(startupTransactionId);
 			int dataLength = name.length() + 8;
 			ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
@@ -142,7 +144,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);
 
 			Datagram datagram = new Datagram(header, data);
-
+			System.out.println(datagram.getHeader().getTransactionID());
 			udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
 			udpClient.stop();
 			System.out.println("sent accessrequest");
@@ -163,6 +165,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			System.out.println("data received!");
 
 			DatagramPacket packet = subscriber.receivePacket();
+			nsIp = packet.getAddress().getHostAddress();
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
@@ -172,10 +175,10 @@ public class Node implements Runnable, NodeInteractionInterface
 			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
 			short numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
 
-			System.out.println("ontvangde ID: " + newNodeID);
+			System.out.println("ontvangen ID: " + newNodeID);
 			System.out.println("# nodes van NS: " + numberOfNodes);
 			System.out.println("Kloppen de replycodes? " + request.getHeader().getReplyCode()+ " == " + ProtocolHeader.REPLY_SUCCESSFULLY_ADDED);
-			System.out.println("TransactionID " + request.getHeader().getTransactionID() + " vergelijk met server..");
+			System.out.println("TransactionID " + this.startupTransactionId + " vergelijk met server.. " + request.getHeader().getTransactionID());
 			System.out.println("Ben ik nieuw?" + newNode);
 
 			if (!newNode)
@@ -208,6 +211,9 @@ public class Node implements Runnable, NodeInteractionInterface
 				}
 			}
 		}
+		/*else{
+			System.out.println("merde");
+		}*/
 	}
 
 	/**
@@ -232,11 +238,17 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void run()
 	{
-		subscribeOnMulticast();
 		System.out.println("subscribed");
 		while(true)
 		{
 			multicastListener();
+			try
+			{
+				Thread.sleep(1);
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		//System.out.println("out of multicastListener. FOUT!");
 	}
