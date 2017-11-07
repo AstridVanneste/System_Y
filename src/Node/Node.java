@@ -6,8 +6,10 @@ import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Unicast.Client;
 import IO.Network.UDP.Unicast.Server;
+import NameServer.Resolver;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
+import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
 import Util.Arrays;
 import Util.Serializer;
@@ -15,6 +17,9 @@ import Util.Serializer;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -37,12 +42,11 @@ public class Node implements Runnable, NodeInteractionInterface
 	private ResolverInterface resolverInterface;
 	private ShutdownAgentInterface shutdownAgentInterface;
 	private Client udpClient; //?
-	private Server udpServer; //?
-	private Random rand; //?
 	private short numberOfNodes;
 	private int startupTransactionId; //?
 	private boolean newNode;
 	private boolean accessRequestSent; //??
+	private NodeInteractionInterface nodeInteractionInterface;
 
 
 	/**
@@ -55,7 +59,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	public Node(String name, String ip, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
 	{
 		this.numberOfNodes = 0;
-		this.rand = new Random();
 		this.newNode = true;
 		this.accessRequestSent = false;
 
@@ -122,6 +125,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			byte version = (byte) 0;
 			short replyCode = (short) 0;
 			short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+			Random rand = new Random();
 			this.startupTransactionId = rand.nextInt()%127;
 			System.out.println(startupTransactionId);
 			int dataLength = name.length() + 8;
@@ -173,7 +177,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			newNodeIDInBytes[0] = data[0];
 			newNodeIDInBytes[1] = data[1];
 			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
-			short numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
+			numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
 
 			System.out.println("ontvangen ID: " + newNodeID);
 			System.out.println("# nodes van NS: " + numberOfNodes);
@@ -187,6 +191,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 				{
 					changeNeighbours(newNodeID);
+					short numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
 				}
 			}
 			if (newNode)
@@ -211,10 +216,11 @@ public class Node implements Runnable, NodeInteractionInterface
 				}
 			}
 		}
-		/*else{
-			System.out.println("merde");
-		}*/
 	}
+
+
+
+
 
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
@@ -224,15 +230,29 @@ public class Node implements Runnable, NodeInteractionInterface
 		if((this.id < newID) && (newID < nextNeighbour))
 		{
 			this.nextNeighbour = newID;
-			//NodeInteractionInterface.setPreviousNeighbour(this.newID);
-			//NodeInteractionInterface.setNextNeighbour(newID);
+
+			Registry reg = null;
+			try
+			{
+				reg = LocateRegistry.getRegistry(resolverInterface.getIP(newID));
+				Remote neighbourNode = reg.lookup(Node.NODE_INTERACTION_NAME);
+				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) neighbourNode;
+
+				neighbourInterface.setNextNeighbour(nextNeighbour);
+				neighbourInterface.setPreviousNeighbour(id);
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			} catch (NotBoundException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		if ((previousNeighbour < newID) && (newID < this.id))
 		{
 			this.previousNeighbour = newID;
 		}
 
-		this.numberOfNodes++; //KAN NOOIT KLOPPEN WANT VERWIJDERING GA JE NIET ZIEN (PARAMETER)
 	}
 
 
@@ -279,6 +299,27 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = this.id;
 	}
 
+	@Override
+	public void setNextNeighbour (short id) throws RemoteException{
+
+	}
+
+	@Override
+	public short getNextNeighbour () throws RemoteException{
+		return  0;
+	}
+
+	@Override
+	public void setPreviousNeighbour (short id) throws RemoteException{
+
+	}
+
+	@Override
+	public short getPreviousNeighbour () throws RemoteException{
+		return 0;
+	}
+
+
 	/**
 	 * If this node has 1 neighbours
 	 */
@@ -287,6 +328,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.previousNeighbour = neighbourId;
 		this.nextNeighbour = neighbourId;
 	}
+
+
 
 	/**
 	 * If this node has 2 neighbours
@@ -347,26 +390,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.name = name;
 	}
 
-	public short getPreviousNeighbour()
-	{
-		return this.previousNeighbour;
-	}
-
-	public void setPreviousNeighbour(short previousNeighbour)
-	{
-		this.previousNeighbour = previousNeighbour;
-	}
-
-	public short getNextNeighbour()
-	{
-		return this.nextNeighbour;
-	}
-
-	public void setNextNeighbour(short nextNeighbour)
-	{
-		this.nextNeighbour = nextNeighbour;
-	}
-
 	public short getId()
 	{
 		return this.id;
@@ -375,36 +398,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	public void setId(short id)
 	{
 		this.id = id;
-	}
-
-	public Subscriber getSubscriber()
-	{
-		return subscriber;
-	}
-
-	public void setSubscriber(Subscriber subscriber)
-	{
-		this.subscriber = subscriber;
-	}
-
-	public Client getUdpClient()
-	{
-		return udpClient;
-	}
-
-	public void setUdpClient(Client udpClient)
-	{
-		this.udpClient = udpClient;
-	}
-
-	public Random getRand()
-	{
-		return rand;
-	}
-
-	public void setRand(Random rand)
-	{
-		this.rand = rand;
 	}
 
 	public short getNumberOfNodes()
