@@ -93,7 +93,7 @@ public class Subscriber implements UDPSubscriber
 			{
 				this.socket.receive(incomingPacket);
 				//System.out.println("Received incoming packet, size: "  + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
-				this.packetBuffer.add(incomingPacket);
+				//this.packetBuffer.add(incomingPacket);
 				//System.out.println("Added to buffer, size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 
 				byte[] actualData = new byte [incomingPacket.getLength()];

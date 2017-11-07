@@ -110,9 +110,10 @@ public class DiscoveryAgent implements Runnable
 						replyData[3] = (byte) (numNodes & 0x00FF);
 
 						ProtocolHeader replyHeader = new ProtocolHeader(request.getHeader());
-						replyHeader.setReplyCode(0x0001);
+						replyHeader.setReplyCode(ProtocolHeader.REPLY_SUCCESSFULLY_ADDED);
 						Datagram replyDatagram = new Datagram(replyHeader);
 						replyDatagram.setData(replyData);
+						System.out.println("TransactionID: " + replyHeader.getTransactionID());
 
 						Client replyClient = new Client();
 						replyClient.start();

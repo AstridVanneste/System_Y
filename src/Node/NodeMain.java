@@ -31,10 +31,7 @@ public class NodeMain {
             ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
 
             Node node = new Node ("a","10.0.0.3",resolverInterface,shutdownAgentInterface);
-
-            System.out.println("Access request...");
-            node.accessRequest();
-            System.out.println("Access successful");
+            node.start();
 
         }
         catch (RemoteException re)
