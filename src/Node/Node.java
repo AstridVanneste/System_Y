@@ -15,6 +15,7 @@ import Util.Serializer;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -25,7 +26,7 @@ import java.util.Scanner;
 
 public class Node implements Runnable, NodeInteractionInterface
 {
-	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
+	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String ip;	//?
 	private String NSIp;
@@ -80,6 +81,11 @@ public class Node implements Runnable, NodeInteractionInterface
 		System.out.println("init done");
 	}
 
+	public static Node getInstance()
+	{
+		return null;
+	}
+
 	public void start()
 	{
 		if(System.getSecurityManager()==null)
@@ -91,12 +97,16 @@ public class Node implements Runnable, NodeInteractionInterface
 		{
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1098);
-			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
+			registry.bind(Node.NODE_INTERACTION_NAME, stub);
 		}
 		catch(RemoteException re)
 		{
 			System.err.println("Exception when creating stub");
 			re.printStackTrace();
+		}
+		catch(AlreadyBoundException abe)
+		{
+			abe.printStackTrace();
 		}
 		System.out.println("registry created");
 
@@ -353,6 +363,11 @@ public class Node implements Runnable, NodeInteractionInterface
 	public void setNextNeighbour(short nextNeighbour)
 	{
 		this.nextNeighbour = nextNeighbour;
+	}
+
+	public ResolverInterface getResolverStub()
+	{
+		return this.resolverInterface;
 	}
 
 	public short getId()

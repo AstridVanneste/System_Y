@@ -18,14 +18,6 @@ public interface ResolverInterface extends Remote
 	public String getIP(int nodeId) throws RemoteException;
 
 	/**
-	 * Removes entry from TreeMap
-	 * @param nodeId
-	 * @return
-	 * @throws RemoteException
-	 */
-	public void removeFromTree(int nodeId) throws RemoteException; //todo: Remove when testing complete
-
-	/**
 	 * For a given filename it returns the IP address from the owner of the file
 	 * in the form of a String
 	 * @param filename
@@ -34,5 +26,22 @@ public interface ResolverInterface extends Remote
 	 */
 	public String getOwnerIP(String filename) throws RemoteException, InvalidParameterException;
 
+	/**
+	 *returns previous neighbour of node with given ID
+	 * @param ID
+	 */
+	public short getPrevious(short ID);
+
+	/**
+	 * returns next neighbour of node with given ID
+	 * @param ID
+	 * @return
+	 */
+	public short getNext(short ID);
+
+
 	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when testing is complete
+
+	public void removeFromTree(int nodeId) throws RemoteException; //todo: Remove when testing complete
+
 }

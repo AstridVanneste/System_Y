@@ -1,11 +1,9 @@
 package NameServer;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+
 import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
-import java.util.Map;
+
 
 /**
  * Created by Astrid on 22-10-2017.
@@ -58,10 +56,38 @@ public class Resolver implements ResolverInterface
 		}
 	}
 
+	@Override
+	public short getPrevious(short ID)
+	{
+		if(NameServer.getInstance().map.firstKey() > ID)
+		{
+			return NameServer.getInstance().map.lastKey();
+		}
+		else
+		{
+			return NameServer.getInstance().map.lowerKey(ID);
+		}
+	}
+
+	@Override
+	public short getNext(short ID)
+	{
+		if(NameServer.getInstance().map.lastKey() < ID)
+		{
+			return NameServer.getInstance().map.firstKey();
+		}
+		else
+		{
+			return NameServer.getInstance().map.lowerKey(ID);
+		}
+	}
+
 
 	@Deprecated
 	public void addToTree(short ID, String IP) throws RemoteException
 	{
 		NameServer.getInstance().map.put(ID,IP);
 	}
+
+
 }
