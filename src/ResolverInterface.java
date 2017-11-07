@@ -37,4 +37,5 @@ public interface ResolverInterface extends Remote
 	public String lookup(String filename) throws RemoteException, InvalidParameterException;
 
 	public void addToTree(int ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
+
 }
