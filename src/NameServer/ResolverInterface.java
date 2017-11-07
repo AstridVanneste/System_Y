@@ -35,4 +35,5 @@ public interface ResolverInterface extends Remote
 	public String getOwnerIP(String filename) throws RemoteException, InvalidParameterException;
 
 	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when testing is complete
+
 }

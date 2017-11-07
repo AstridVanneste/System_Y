@@ -32,7 +32,6 @@ public class Node implements Runnable, NodeInteractionInterface
 {
 	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
-	private String ip;	//?
 	private String nsIp;
 	private String name;
 	private short previousNeighbour;
@@ -45,7 +44,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	private short numberOfNodes;
 	private int startupTransactionId; //?
 	private boolean newNode;
-	private boolean accessRequestSent; //??
 	private NodeInteractionInterface nodeInteractionInterface;
 
 
@@ -60,7 +58,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	{
 		this.numberOfNodes = 0;
 		this.newNode = true;
-		this.accessRequestSent = false;
 
 		//???
 		this.resolverInterface = resolverInterface;
@@ -68,23 +65,15 @@ public class Node implements Runnable, NodeInteractionInterface
 
 		this.name = name;
 
-		//ZELF OPVRAGEN
-		this.ip = ip;
-
-		// AANVRAGEN OP NAMESERVER (TIJDELIJKE WAARDE)
-		this.id = -1;
-		System.out.println("Mijn ID is:" + id);
-		System.out.println("Debugging: de volgorde van prints moet zijn..");
-		System.out.println("init done, registery created, make accessrequest, sent accessrequest, thread started, subscribed, ik ben met success toegevoegd aan het netwerk!");
-
-		this.previousNeighbour = this.id; //??
-		this.nextNeighbour = this.id; //??
-
 		System.out.println("init done");
 	}
 
 	public void start()
 	{
+		id = getHash(name);
+		previousNeighbour = id;
+		nextNeighbour = id;
+
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -117,43 +106,43 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	public void accessRequest ()
 	{
-		if(!accessRequestSent) {
-			System.out.println("Make accessrequest");
-			this.udpClient = new Client();
-			udpClient.start();
+		System.out.println("Make accessrequest");
+		this.udpClient = new Client();
+		udpClient.start();
 
-			byte version = (byte) 0;
-			short replyCode = (short) 0;
-			short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-			Random rand = new Random();
-			this.startupTransactionId = rand.nextInt()%127;
-			System.out.println(startupTransactionId);
-			int dataLength = name.length() + 8;
-			ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
+		byte version = (byte) 0;
+		short replyCode = (short) 0;
+		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
+		Random rand = new Random();
+		this.startupTransactionId = rand.nextInt()%127;
+		System.out.println(startupTransactionId);
+		int dataLength = name.length() + 8;
+		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
-			byte[] data = new byte[name.length() + 8];
-			byte[] nameLengthInByte = Serializer.intToBytes(name.length());
-			byte[] nameInByte = name.getBytes();
+		byte[] data = new byte[name.length() + 8];
+		byte[] nameLengthInByte = Serializer.intToBytes(name.length());
+		byte[] nameInByte = name.getBytes();
 
-			//HIER IS APARTE METHODE VOOR (ZIE SERIALIZER)
-			byte[] ipInByte = new byte[4];
-			String[] ipInParts = ip.split("\\.");                                                                    //https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
-			ipInByte[0] = (byte) Integer.parseInt(ipInParts[0]);
-			ipInByte[1] = (byte) Integer.parseInt(ipInParts[1]);
-			ipInByte[2] = (byte) Integer.parseInt(ipInParts[2]);
-			ipInByte[3] = (byte) Integer.parseInt(ipInParts[3]);
-
-			System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
-			System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
-			System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);
-
-			Datagram datagram = new Datagram(header, data);
-			udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
-			udpClient.stop();
-			System.out.println("sent accessrequest");
-			accessRequestSent = true;
+		//HIER IS APARTE METHODE VOOR (ZIE SERIALIZER)
+		byte[] ipInByte = new byte[4];
+		try
+		{
+			ipInByte = Serializer.ipStringToBytes(resolverInterface.getIP(id));
+		} catch (RemoteException e)
+		{
+			e.printStackTrace();
 		}
+
+		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
+		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
+		System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);
+
+		Datagram datagram = new Datagram(header, data);
+		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
+		udpClient.stop();
+		System.out.println("sent accessrequest");
 	}
+
 
 	/**
 	 * Old nodes and new nodes listen on multicast for the acceptance of a new node
@@ -177,21 +166,14 @@ public class Node implements Runnable, NodeInteractionInterface
 			newNodeIDInBytes[0] = data[0];
 			newNodeIDInBytes[1] = data[1];
 			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
-			numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
-
-			System.out.println("ontvangen ID: " + newNodeID);
-			System.out.println("# nodes van NS: " + numberOfNodes);
-			System.out.println("Kloppen de replycodes? " + request.getHeader().getReplyCode()+ " == " + ProtocolHeader.REPLY_SUCCESSFULLY_ADDED);
-			System.out.println("TransactionID " + this.startupTransactionId + " vergelijk met server.. " + request.getHeader().getTransactionID());
-			System.out.println("Ben ik nieuw?" + newNode);
+			numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
 
 			if (!newNode)
 			{
-				System.out.println("Ik, geen nieuwe node, heb data ontvangen. ik doe rmi op nieuwe node");
 				if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 				{
 					changeNeighbours(newNodeID);
-					short numberOfNodes = (short)(data[2] << 8 | data[3]); //SERIALIZER
+					short numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
 				}
 			}
 			if (newNode)
@@ -200,7 +182,6 @@ public class Node implements Runnable, NodeInteractionInterface
 				if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID) &&
 						(request.getHeader().getTransactionID() == this.startupTransactionId))
 				{
-					System.out.println("ik, nieuwe node, moet naam veranderen");
 					askNewName();
 					accessRequest();
 				}
@@ -209,18 +190,14 @@ public class Node implements Runnable, NodeInteractionInterface
 				if ((request.getHeader().getReplyCode() == (int)ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
 						(request.getHeader().getTransactionID() == this.startupTransactionId))
 				{
+
 					//nameserver sends the amount of nodes in the tree
-					System.out.println("ik ben met success toegevoegd aan netwerk! ben geen nieuwe node meer");
 					setNumberOfNodes(numberOfNodes);
 					newNode = false;
 				}
 			}
 		}
 	}
-
-
-
-
 
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
@@ -355,28 +332,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
 		this.name = scanner.nextLine();
-		this.setId(getHash(this.name)); //NS
-	}
-
-	@Deprecated
-	private void askNewIP () //IP ADDRESS GWN OPVRAGEN
-	{
-		System.out.println("Please enter a new IP address: ");
-		Scanner scanner = new Scanner(System.in);
-		String ip = scanner.nextLine();
-		setIp(ip);
-	}
-
-	@Deprecated
-	public String getIp()
-	{
-		return this.ip;
-	}
-
-	@Deprecated
-	public void setIp(String ip)
-	{
-		this.ip = ip;
+		this.id = getHash(name); //NS
 	}
 
 	public String getName()
