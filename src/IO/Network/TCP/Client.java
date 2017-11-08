@@ -29,6 +29,10 @@ public class Client implements Runnable
 		this.buffer = new LinkedList<byte[]>();
 	}
 
+	/**
+	 * Returns the port that the client is running on
+	 * @return
+	 */
 	public void start()
 	{
 		try
@@ -46,7 +50,10 @@ public class Client implements Runnable
 		}
 	}
 
-
+	/**
+	 * Sends all bytes in the data array
+	 * @param data
+	 */
 	public void send(byte[] data)
 	{
 		try
@@ -60,6 +67,10 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Sends all bytes in the data list.
+	 * @param data
+	 */
 	public void send(List<Byte> data)
 	{
 		byte[] arrayData = new byte[data.size()];
@@ -80,6 +91,10 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * reads all bytes from the interal receive buffer
+	 * @return
+	 */
 	public byte[] receive()
 	{
 		byte[] data = this.buffer.getFirst();
@@ -88,6 +103,9 @@ public class Client implements Runnable
 		return data;
 	}
 
+	/**
+	 * Stops the client
+	 */
 	public void stop()
 	{
 		try
@@ -102,6 +120,11 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Send complete file
+	 * @param filename
+	 * @param header
+	 */
 	public void sendFile(String filename, ProtocolHeader header)
 	{
 		File file = new File(filename);
@@ -162,6 +185,11 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Receives complete file and writes to given path
+	 * @param filename
+	 * @param transactionID
+	 */
 	public void receiveFile(String filename, int transactionID)
 	{
 		File file = new File(filename);
@@ -188,6 +216,10 @@ public class Client implements Runnable
 
 	}
 
+	/**
+	 * Returns true if there is data in the buffer.
+	 * @return
+	 */
 	public boolean hasData()
 	{
 		try
@@ -203,6 +235,7 @@ public class Client implements Runnable
 			return false;
 		}
 	}
+
 
 	public void run()
 	{

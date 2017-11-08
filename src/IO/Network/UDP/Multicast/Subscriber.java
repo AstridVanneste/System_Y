@@ -22,7 +22,9 @@ public class Subscriber implements Runnable
 		this.packetBuffer = new LinkedList<DatagramPacket>();
 	}
 
-
+	/**
+	 * Start Multicast Subscriber
+	 */
 	public void start()
 	{
 		try
@@ -42,11 +44,19 @@ public class Subscriber implements Runnable
 		}
 	}
 
+	/**
+	 * reads all bytes from the interal receive buffer
+	 * @return	All data in the buffer for the specified host.
+	 */
 	public byte[] receiveData()
 	{
 		return this.receivePacket().getData();
 	}
 
+	/**
+	 * read packet from internal receive buffer.
+	 * @return				The first packet in the internal receive buffer.
+	 */
 	public DatagramPacket receivePacket()
 	{
 		if(!this.packetBuffer.isEmpty())
@@ -61,6 +71,9 @@ public class Subscriber implements Runnable
 		}
 	}
 
+	/**
+	 * Stops the Multicast Subscriber.
+	 */
 	public void stop()
 	{
 		if(this.socket != null)
@@ -113,11 +126,19 @@ public class Subscriber implements Runnable
 		}
 	}
 
+	/**
+	 * Returns true if the receiveBuffer contains data.
+	 * @return
+	 */
 	public boolean hasData()
 	{
 		return !this.packetBuffer.isEmpty();
 	}
 
+	/**
+	 * Returns the amount of data present in the receiveBuffer.
+	 * @return
+	 */
 	public int getBufferLength()
 	{
 		return this.packetBuffer.size();

@@ -19,6 +19,9 @@ public class Client implements Runnable
 		this.packetBuffer = new LinkedList<DatagramPacket>();
 	}
 
+	/**
+	 * Starts the UDP server.
+	 */
 	public void start()
 	{
 		try
@@ -36,10 +39,14 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Sends a string
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param port			The port to send to
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, byte[] data)
 	{
-
-
 		try
 		{
 			this.socket.send(new DatagramPacket(data,0, data.length, InetAddress.getByName(remoteHost), port));
@@ -56,11 +63,23 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Sends a string
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param port			The port to send to
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, String data)
 	{
 		this.send(remoteHost,port,data.getBytes());
 	}
 
+	/**
+	 * Sends a string
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param port			The port to send to
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
@@ -75,11 +94,19 @@ public class Client implements Runnable
 		this.send(remoteHost,port,bytes);
 	}
 
+	/**
+	 * reads all bytes from the interal receive buffer
+	 * @return	All data in the buffer for the specified host.
+	 */
 	public byte[] receiveData()
 	{
 		return this.receivePacket().getData();
 	}
 
+	/**
+	 * read packet from internal receive buffer.
+	 * @return				The first packet in the internal receive buffer.
+	 */
 	public DatagramPacket receivePacket()
 	{
 		//System.out.println("BUFFERLENGTH" + packetBuffer.size());
@@ -96,6 +123,10 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Stops the server
+	 * @throws IOException
+	 */
 	public void stop()
 	{
 		if(this.socket != null)
@@ -131,11 +162,19 @@ public class Client implements Runnable
 		}
 	}
 
+	/**
+	 * Returns true if receiveBuffer is empty.
+	 * @return
+	 */
 	public boolean bufferEmpty()
 	{
 		return this.packetBuffer.isEmpty();
 	}
 
+	/**
+	 * Returns the length of the receiveBuffer.
+	 * @return
+	 */
 	public int getBufferLength()
 	{
 		return this.packetBuffer.size();

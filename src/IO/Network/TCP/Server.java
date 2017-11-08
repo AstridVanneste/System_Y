@@ -28,6 +28,10 @@ public class Server implements Runnable
 		this.incomingConnections = new HashMap<String, ConnectionHandler> ();
 	}
 
+	/**
+	 * Starts the TCP server.
+	 * @throws IOException	An IOException can be thrown by the ServerSocket constructor
+	 */
 	public void start() throws
 			IOException
 	{
@@ -37,11 +41,21 @@ public class Server implements Runnable
 		ownThread.start();
 	}
 
+	/**
+	 * Sends a string. to the specified remote host.<br>
+	 * @param remoteHost	The remote host that the data should be sent to.<br>
+	 * @param data			The data to be sent.<br>
+	 */
 	public void send(String remoteHost, String data)
 	{
 		this.send(remoteHost, data.getBytes());
 	}
 
+	/**
+	 * Sends all bytes in the data array to the specified remote host.<br>
+	 * @param remoteHost	The remote host that the data should be sent to.<br>
+	 * @param data			The data to be sent.<br>
+	 */
 	public void send(String remoteHost, byte[] data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -62,6 +76,11 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Sends all bytes in the data list to specified the remote host.<br>
+	 * @param remoteHost	The remote host that the data should be sent to.<br>
+	 * @param data			The data to be sent.<br>
+	 */
 	public void send(String remoteHost, List<Byte> data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -91,6 +110,11 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Reads all bytes from the interal receive buffer.<br>
+	 * @param	remoteHost	The remote host from whose buffer we want to read.<br>
+	 * @return	All data in the buffer for the specified host.<br>
+	 */
 	public byte[] receive(String remoteHost)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -104,6 +128,10 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Stops the server.<br>
+	 * @throws IOException The close() method of the ServerSocket can throw an IOException
+	 */
 	public void stop() throws IOException
 	{
 		this.socket.close();
@@ -139,6 +167,10 @@ public class Server implements Runnable
 		return this.incomingConnections.get(remoteHost).hasData();
 	}
 
+	/**
+	 * Returns easy to read format for Server
+	 * @return
+	 */
 	public String toString()
 	{
 		StringBuilder resBuilder = new StringBuilder();
@@ -167,6 +199,7 @@ public class Server implements Runnable
 
 		return resBuilder.toString();
 	}
+
 
 	public void sendFile(String remoteHost, String filename, ProtocolHeader header)
 	{
