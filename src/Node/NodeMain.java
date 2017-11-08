@@ -18,7 +18,7 @@ public class NodeMain {
     public static void main(String[] args) {
 
         Node node = Node.getInstance();
-        node.start("a");
+        node.start();
 
 
     }

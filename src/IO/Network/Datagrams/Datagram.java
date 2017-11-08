@@ -121,9 +121,6 @@ public class Datagram
 			i++;
 		}
 		int test = (int)(serial[4]) | (serial[5] << 8) | (serial[6] << 16) | (serial[7] << 24);
-		System.out.println(test + "tester");
 		return serial;
 	}
-
-
 }
