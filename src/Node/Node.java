@@ -215,10 +215,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		try
 		{
 			reg = LocateRegistry.getRegistry(nsIp);
-			Remote resolver = reg.lookup(NameServer.RESOLVER_NAME);
-			Remote shutdownAgent = reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
-			ResolverInterface resolverInterface = (ResolverInterface) resolver;
-			ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
+			this.resolverStub = (ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME);
+			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -234,10 +232,10 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private void changeNeighbours(short newID)
 	{
-		if((this.id < newID) && (newID < nextNeighbour))
+		if((this.id < newID) && ((newID < this.nextNeighbour) || this.id == this.nextNeighbour))
 		{
 			this.nextNeighbour = newID;
-			System.out.println("Next for old node " + nextNeighbour);
+			System.out.println("Next for old node " + this.nextNeighbour);
 			Registry reg = null;
 			try
 			{
@@ -256,7 +254,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if ((previousNeighbour < newID) && (newID < this.id))
+		if (((this.previousNeighbour < newID) || (this.previousNeighbour == this.id)) && (newID < this.id))
 		{
 			System.out.println("previous for old node : " + previousNeighbour);
 			this.previousNeighbour = newID;
