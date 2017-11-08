@@ -35,7 +35,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
 
-	private String nsIp;
 	private String name;
 	private short id;
 	private short previousNeighbour;
@@ -198,14 +197,14 @@ public class Node implements Runnable, NodeInteractionInterface
 					this.id = newNodeID;
 					setNeighbours();
 					newNode = false;
-					nsIp = packet.getAddress().getHostAddress();
-					nameServerBind();
+					String nsIp = packet.getAddress().getHostAddress();
+					nameServerBind(nsIp);
 				}
 			}
 		}
 	}
 
-	public void nameServerBind(){
+	public void nameServerBind(String nsIp){
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
