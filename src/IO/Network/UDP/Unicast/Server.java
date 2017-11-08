@@ -19,6 +19,10 @@ public class Server implements Runnable
 		this.packetBuffer = new LinkedList<>();
 	}
 
+	/**
+	 * Starts the UDP server.
+	 * @throws IOException
+	 */
 	public void start()
 	{
 		try
@@ -35,11 +39,22 @@ public class Server implements Runnable
 		thread.start();
 	}
 
+	/**
+	 * Returns the port that the server is running on.<br>
+	 * @return	The port that the server runs on.<br>
+	 */
 	public int getPort()
 	{
 		return this.portNum;
 	}
 
+	/**
+	 *
+	 * Sets the port the server is running on.<br>
+	 * <b>WARNING:</b> Before the port is changed, the server needs to be stopped.<br>
+	 * <b>WARNING:</b> After the port is changed, the server needs to be restarted.<br>
+	 * @param	port	The new port the server should listen on.<br>
+	 */
 	public void setPort(int port)
 	{
 		if (!this.socket.isBound())
@@ -52,6 +67,11 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Sends all bytes in the data array.
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, byte[] data)
 	{
 		try
@@ -72,6 +92,11 @@ public class Server implements Runnable
 		//System.out.println("");
 	}
 
+	/**
+	 * Sends a string
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, String data)
 	{
 		byte[] bytes = data.getBytes();
@@ -79,6 +104,11 @@ public class Server implements Runnable
 
 	}
 
+	/**
+	 * Sends all bytes in the data array.
+	 * @param remoteHost	The remote host that the data should be sent to.
+	 * @param data			The data to be sent.
+	 */
 	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
@@ -91,6 +121,10 @@ public class Server implements Runnable
 		this.send(remoteHost, port, bytes);
 	}
 
+	/**
+	 * reads all bytes from the interal receive buffer
+	 * @return	All data in the buffer for the specified host.
+	 */
 	public byte[] receiveData()
 	{
 		if(this.receivePacket() != null)
@@ -103,6 +137,10 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * read packet from internal receive buffer.
+	 * @return	The first packet in the internal receive buffer.
+	 */
 	public DatagramPacket receivePacket()
 	{
 		if(!packetBuffer.isEmpty())
@@ -117,6 +155,10 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Stops the server
+	 * @throws IOException
+	 */
 	public void stop()
 	{
 		if (this.socket != null)
@@ -144,6 +186,10 @@ public class Server implements Runnable
 		}
 	}
 
+	/**
+	 * Returns true if receive buffer is empty.
+	 * @return
+	 */
 	public boolean isEmpty()
 	{
 		return packetBuffer.isEmpty();
