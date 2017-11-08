@@ -13,7 +13,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-	public String lookup(short nodeId) throws RemoteException;
+	public String lookup(int nodeId) throws RemoteException;
 	/**
 	 * Print out the existing TreeMap
 	 * @throws RemoteException

@@ -14,12 +14,10 @@ import Util.Serializer;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.rmi.*;
 import java.rmi.AlreadyBoundException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -35,6 +33,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	private FailureAgent failureAgent;
 
 	private String name;
+	private String nsIp;
 	private short id;
 	private short previousNeighbour;
 	private short nextNeighbour;
@@ -165,7 +164,6 @@ public class Node implements Runnable, NodeInteractionInterface
 
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
-
 			short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
 			numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
 
@@ -196,10 +194,11 @@ public class Node implements Runnable, NodeInteractionInterface
 					//nameserver sends the amount of nodes in the tree
 					setNumberOfNodes(numberOfNodes);
 					this.id = newNodeID;
+					this.nsIp = packet.getAddress().getHostAddress();
+					System.out.println("nameserver ip : " + this.nsIp);
+					nameServerBind(nsIp);
 					setNeighbours();
 					newNode = false;
-					String nsIp = packet.getAddress().getHostAddress();
-					nameServerBind(nsIp);
 					System.out.println("toegevoegd");
 				}
 			}
@@ -230,21 +229,29 @@ public class Node implements Runnable, NodeInteractionInterface
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
 	 */
-	private void changeNeighbours(short newID)
+	private synchronized void changeNeighbours(short newID)
 	{
-		if((this.id < newID) && ((newID < this.nextNeighbour) || this.id == this.nextNeighbour))
+		if(this.id == this.nextNeighbour && this.id == this.previousNeighbour)
 		{
 			this.nextNeighbour = newID;
+			this.previousNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
+			System.out.println("previous for old node " + this.previousNeighbour);
 			Registry reg = null;
 			try
 			{
-				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-
-				neighbourInterface.setNextNeighbour(nextNeighbour);
-				neighbourInterface.setPreviousNeighbour(id);
-
+				NodeInteractionInterface neighbourInterface = null;
+				try
+				{
+					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
+					neighbourInterface.setNextNeighbour(id);
+					neighbourInterface.setPreviousNeighbour(id);
+				} catch (MalformedURLException e)
+				{
+					e.printStackTrace();
+				}
+				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -253,33 +260,39 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if (((this.previousNeighbour < newID) || (this.previousNeighbour == this.id)) && (newID < this.id))
-		{
-			if(previousNeighbour == nextNeighbour){
-				Registry reg = null;
+		if ((newID < this.nextNeighbour || this.nextNeighbour < this.id) && (this.id != this.nextNeighbour) && ((this.id < newID) || (this.nextNeighbour < this.id))){
+			Registry reg = null;
+			try
+			{
+				NodeInteractionInterface neighbourInterface = null;
 				try
 				{
-					reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-					NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-
-					neighbourInterface.setNextNeighbour(this.id);
+					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
+					neighbourInterface.setNextNeighbour(this.nextNeighbour);
 					neighbourInterface.setPreviousNeighbour(this.id);
-
-				} catch (RemoteException e)
-				{
-					e.printStackTrace();
-				} catch (NotBoundException e)
+				} catch (MalformedURLException e)
 				{
 					e.printStackTrace();
 				}
+				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			} catch (NotBoundException e)
+			{
+				e.printStackTrace();
 			}
-			else{
-				this.previousNeighbour = newID;
-				System.out.println("previous for old node : " + previousNeighbour);
-			}
+			this.nextNeighbour = newID;
+			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-
+		if (((this.previousNeighbour < newID) || (this.id < previousNeighbour))  && (this.previousNeighbour != this.id) && ((newID < this.id) || this.id < previousNeighbour))
+		{
+			this.previousNeighbour = newID;
+		}
 	}
+
+
 
 
 	public void run()

@@ -11,12 +11,12 @@ import java.security.InvalidParameterException;
 public class Resolver implements ResolverInterface
 {
 	public Resolver()
-	{
-	}
+{
+}
 
 
 	@Override
-	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
+	public String getIP(int nodeId) throws RemoteException, InvalidParameterException
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
@@ -88,6 +88,5 @@ public class Resolver implements ResolverInterface
 	{
 		NameServer.getInstance().map.put(ID,IP);
 	}
-
 
 }

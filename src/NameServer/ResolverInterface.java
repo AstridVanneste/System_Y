@@ -15,7 +15,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-	public String getIP(short nodeId) throws RemoteException;
+	public String getIP(int nodeId) throws RemoteException;
 
 	/**
 	 * For a given filename it returns the IP address from the owner of the file
