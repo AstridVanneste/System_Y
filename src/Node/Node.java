@@ -51,6 +51,10 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public Node()
 	{
+		this.newNode = true;
+		this.resolverStub = null;
+		this.shutdownStub = null;
+		this.id = -1;
 
 	}
 
@@ -63,13 +67,10 @@ public class Node implements Runnable, NodeInteractionInterface
 		return Node.instance;
 	}
 
-	public void start( String name, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
+	public void start(String name)
 	{
-		this.newNode = true;
 		this.name = name;
-		this.resolverStub = resolverStub;
-		this.shutdownStub = shutdownStub;
-		this.id = -1;
+
 
 		if(System.getSecurityManager()==null)
 		{
@@ -159,7 +160,6 @@ public class Node implements Runnable, NodeInteractionInterface
 			System.out.println("data received!");
 
 			DatagramPacket packet = subscriber.receivePacket();
-			nsIp = packet.getAddress().getHostAddress();
 
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
@@ -195,9 +195,34 @@ public class Node implements Runnable, NodeInteractionInterface
 					this.id = newNodeID;
 					setNeighbours();
 					newNode = false;
+					nsIp = packet.getAddress().getHostAddress();
+					nameServerBind();
 				}
 			}
 		}
+	}
+
+	public void nameServerBind(){
+		if(System.getSecurityManager()==null)
+		{
+			System.setSecurityManager(new SecurityManager());
+		}
+		Registry reg = null;
+		try
+		{
+			reg = LocateRegistry.getRegistry(nsIp);
+			Remote resolver = reg.lookup(NameServer.RESOLVER_NAME);
+			Remote shutdownAgent = reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
+			ResolverInterface resolverInterface = (ResolverInterface) resolver;
+			ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
+		} catch (RemoteException e)
+		{
+			e.printStackTrace();
+		} catch (NotBoundException e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
