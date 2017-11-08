@@ -15,9 +15,8 @@ import java.rmi.RemoteException;
  * Created by Axel on 25/10/2017.
  */
 public class NodeMain {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
 
         Node node = Node.getInstance();
-
-    }
 }
