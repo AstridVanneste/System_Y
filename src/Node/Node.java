@@ -46,6 +46,8 @@ public class Node implements Runnable, NodeInteractionInterface
 	private int startupTransactionId;
 	private boolean newNode;
 
+	private static Node instance;
+
 
 	public Node()
 	{
@@ -54,7 +56,11 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public static Node getInstance()
 	{
-		return null;
+		if(Node.instance == null)
+		{
+			Node.instance = new Node();
+		}
+		return Node.instance;
 	}
 
 	public void start( String name, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
