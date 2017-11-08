@@ -98,10 +98,14 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
+
 						// Return succes
 
 						short nodeId = (short) NameServer.getHash(nodeName);
 						short numNodes = (short) NameServer.getInstance().map.size();
+
+						NameServer.getInstance().map.put(nodeId, unicastIp);
+						NameServer.getInstance().writeMapToFile();
 
 						byte[] replyData = new byte[4];
 						replyData[0] = (byte) ((nodeId >>> 8) & 0x00FF);
