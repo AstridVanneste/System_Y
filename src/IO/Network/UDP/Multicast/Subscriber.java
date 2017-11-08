@@ -22,6 +22,7 @@ public class Subscriber implements Runnable
 		this.packetBuffer = new LinkedList<DatagramPacket>();
 	}
 
+
 	public void start()
 	{
 		try
@@ -120,9 +121,5 @@ public class Subscriber implements Runnable
 	public int getBufferLength()
 	{
 		return this.packetBuffer.size();
-	}
-
-	public MulticastSocket getSocket() {
-		return socket;
 	}
 }
