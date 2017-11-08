@@ -6,9 +6,8 @@ import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Unicast.Client;
 import IO.Network.UDP.Unicast.Server;
-import NameServer.Resolver;
-import NameServer.ResolverInterface;
-//import NameServer.DiscoveryAgentInterface;
+import NameServer.*;
+import Util.Arrays;
 import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
@@ -32,17 +31,18 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	private String nsIp;
 	private String name;
+	private short id;
 	private short previousNeighbour;
 	private short nextNeighbour;
-	private short id;
 	private Subscriber subscriber;
+	private ResolverInterface resolverInterface;
+	private ShutdownAgentInterface shutdownAgentInterface;
+	private NodeInteractionInterface nodeInteractionInterface;
 	private ResolverInterface resolverStub;
 	private ShutdownAgentInterface shutdownStub;
-	private Client udpClient; //?
 	private short numberOfNodes;
-	private int startupTransactionId; //?
+	private int startupTransactionId;
 	private boolean newNode;
-	private NodeInteractionInterface nodeInteractionInterface;
 
 
 	/**
@@ -57,11 +57,13 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.numberOfNodes = 0;
 		this.newNode = true;
 
-		//???
+		this.resolverInterface = resolverInterface;
+		this.shutdownAgentInterface = shutdownAgentInterface;
 		this.resolverStub = resolverStub;
 		this.shutdownStub = shutdownStub;
 
 		this.name = name;
+		this.id = -1;
 
 		System.out.println("init done");
 	}
@@ -73,10 +75,6 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void start()
 	{
-		id = getHash(name);
-		previousNeighbour = id;
-		nextNeighbour = id;
-
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -85,6 +83,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		try
 		{
 			subscribeOnMulticast();
+
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1098);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
@@ -98,23 +97,21 @@ public class Node implements Runnable, NodeInteractionInterface
 		{
 			abe.printStackTrace();
 		}
-		System.out.println("registry created");
 
 		this.accessRequest();
 
 		Thread thread = new Thread(this);
 		thread.start();
-		System.out.println("thread started");
 	}
 
 	/**
 	 * Multicast for NS
 	 * NS will process this message and has to confirm that the node may access the network
 	 */
-	public void accessRequest ()
-	{
+	public void accessRequest () {
 		System.out.println("Make accessrequest");
-		this.udpClient = new Client();
+
+		Client udpClient = new Client();
 		udpClient.start();
 
 		byte version = (byte) 0;
@@ -130,13 +127,12 @@ public class Node implements Runnable, NodeInteractionInterface
 		byte[] nameLengthInByte = Serializer.intToBytes(name.length());
 		byte[] nameInByte = name.getBytes();
 
-		//HIER IS APARTE METHODE VOOR (ZIE SERIALIZER)
 		byte[] ipInByte = new byte[4];
-		try
-		{
-			ipInByte = Serializer.ipStringToBytes(resolverStub.getIP(id));
-		} catch (RemoteException e)
-		{
+
+try {
+			ipInByte = Serializer.ipStringToBytes(InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e) {
+
 			e.printStackTrace();
 		}
 
@@ -147,6 +143,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		Datagram datagram = new Datagram(header, data);
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
 		udpClient.stop();
+
 		System.out.println("sent accessrequest");
 	}
 
@@ -165,22 +162,19 @@ public class Node implements Runnable, NodeInteractionInterface
 
 			DatagramPacket packet = subscriber.receivePacket();
 			nsIp = packet.getAddress().getHostAddress();
-			System.out.println("Nameserver IP " + nsIp);
+
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-			byte[] newNodeIDInBytes = new byte[2]; //SUGGESTIE: DATAGRAMMEN SUBKLASSEN
-			newNodeIDInBytes[0] = data[0];
-			newNodeIDInBytes[1] = data[1];
-			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
-			numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
+			short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
+			numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
 
 			if (!newNode)
 			{
 				if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 				{
 					changeNeighbours(newNodeID);
-					short numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
+					this.numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
 				}
 			}
 			if (newNode)
@@ -200,6 +194,8 @@ public class Node implements Runnable, NodeInteractionInterface
 
 					//nameserver sends the amount of nodes in the tree
 					setNumberOfNodes(numberOfNodes);
+					this.id = newNodeID;
+					setNeighbours();
 					newNode = false;
 				}
 			}
@@ -224,6 +220,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 				neighbourInterface.setNextNeighbour(nextNeighbour);
 				neighbourInterface.setPreviousNeighbour(id);
+
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -242,7 +239,6 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void run()
 	{
-		System.out.println("subscribed");
 		while(true)
 		{
 			multicastListener();
@@ -254,7 +250,6 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		//System.out.println("out of multicastListener. FOUT!");
 	}
 
 	/**
@@ -305,22 +300,12 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = nextNeighbour;
 	}
 
-	/**
-	 * Calculate the hashcode of the name
-	 * @return ID
-	 */
-	@Deprecated //MOET WEG
-	private static short getHash(String name)
-	{
-		return (short) Math.abs(name.hashCode() % 32768);
-	}
-
 	private void askNewName ()
 	{
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
 		this.name = scanner.nextLine();
-		this.id = getHash(name); //NS
+		this.id = NameServer.getHash(name);
 	}
 
 	public String getName()
