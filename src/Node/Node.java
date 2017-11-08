@@ -11,6 +11,7 @@ import Util.Arrays;
 import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
+import com.sun.tools.jdeprscan.scan.Scan;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -67,10 +68,11 @@ public class Node implements Runnable, NodeInteractionInterface
 		return Node.instance;
 	}
 
-	public void start(String name)
+	public void start()
 	{
-		this.name = name;
-
+		System.out.println("give me a name");
+		Scanner scanner = new Scanner(System.in);
+		this.name = scanner.nextLine();
 
 		if(System.getSecurityManager()==null)
 		{
