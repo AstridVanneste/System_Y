@@ -36,7 +36,6 @@ public class Serializer
 		result[1] = (byte)((value >>> 16) & 0x000000FF);
 		result[2] = (byte)((value >>> 8) & 0x000000FF);
 		result[3] = (byte)(value & 0x000000FF);
-
 		return result;
 	}
 
