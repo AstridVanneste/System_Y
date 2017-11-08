@@ -71,6 +71,10 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void start()
 	{
+		System.out.println("give me a name");
+		Scanner scanner = new Scanner(System.in);
+		this.name = scanner.nextLine();
+
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -115,7 +119,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
 		Random rand = new Random();
 		this.startupTransactionId = rand.nextInt()%127;
-		System.out.println(startupTransactionId);
 		int dataLength = name.length() + 8;
 		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
