@@ -11,7 +11,7 @@ public class HeaderTest
 		ProtocolHeader header = new ProtocolHeader();
 		header.setVersion((byte)1);
 		header.setDataLength(0);
-		header.setTransactionID(2);
+		header.setTransactionID(245);
 		header.setRequestCode(1);
 		header.setReplyCode(2);
 
@@ -21,7 +21,7 @@ public class HeaderTest
 
 		for(byte b: serial)
 		{
-			System.out.print(b);
+			System.out.print(b + " ");
 		}
 		System.out.println("\n");
 

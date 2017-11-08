@@ -11,12 +11,10 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
-import Util.Arrays;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -30,7 +28,7 @@ import java.util.Scanner;
 
 public class Node implements Runnable, NodeInteractionInterface
 {
-	private static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
+	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String nsIp;
 	private String name;
@@ -38,8 +36,8 @@ public class Node implements Runnable, NodeInteractionInterface
 	private short nextNeighbour;
 	private short id;
 	private Subscriber subscriber;
-	private ResolverInterface resolverInterface;
-	private ShutdownAgentInterface shutdownAgentInterface;
+	private ResolverInterface resolverStub;
+	private ShutdownAgentInterface shutdownStub;
 	private Client udpClient; //?
 	private short numberOfNodes;
 	private int startupTransactionId; //?
@@ -51,21 +49,26 @@ public class Node implements Runnable, NodeInteractionInterface
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 * @param name: name of new node
 	 * @param ip: ip of new node
-	 * @param resolverInterface
-	 * @param shutdownAgentInterface
+	 * @param resolverStub
+	 * @param shutdownStub
 	 */
-	public Node(String name, String ip, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
+	public Node(String name, String ip, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
 	{
 		this.numberOfNodes = 0;
 		this.newNode = true;
 
 		//???
-		this.resolverInterface = resolverInterface;
-		this.shutdownAgentInterface = shutdownAgentInterface;
+		this.resolverStub = resolverStub;
+		this.shutdownStub = shutdownStub;
 
 		this.name = name;
 
 		System.out.println("init done");
+	}
+
+	public static Node getInstance()
+	{
+		return null;
 	}
 
 	public void start()
@@ -84,12 +87,16 @@ public class Node implements Runnable, NodeInteractionInterface
 			subscribeOnMulticast();
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1098);
-			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
+			registry.bind(Node.NODE_INTERACTION_NAME, stub);
 		}
 		catch(RemoteException re)
 		{
 			System.err.println("Exception when creating stub");
 			re.printStackTrace();
+		}
+		catch(AlreadyBoundException abe)
+		{
+			abe.printStackTrace();
 		}
 		System.out.println("registry created");
 
@@ -127,7 +134,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		byte[] ipInByte = new byte[4];
 		try
 		{
-			ipInByte = Serializer.ipStringToBytes(resolverInterface.getIP(id));
+			ipInByte = Serializer.ipStringToBytes(resolverStub.getIP(id));
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -211,7 +218,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			Registry reg = null;
 			try
 			{
-				reg = LocateRegistry.getRegistry(resolverInterface.getIP(newID));
+				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
 				Remote neighbourNode = reg.lookup(Node.NODE_INTERACTION_NAME);
 				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) neighbourNode;
 
@@ -276,25 +283,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = this.id;
 	}
 
-	@Override
-	public void setNextNeighbour (short id) throws RemoteException{
-		nextNeighbour = id;
-	}
-
-	@Override
-	public short getNextNeighbour () throws RemoteException{
-		return  0;
-	}
-
-	@Override
-	public void setPreviousNeighbour (short id) throws RemoteException{
-		previousNeighbour = id;
-	}
-
-	@Override
-	public short getPreviousNeighbour () throws RemoteException{
-		return 0;
-	}
 
 
 	/**
@@ -344,6 +332,36 @@ public class Node implements Runnable, NodeInteractionInterface
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public short getPreviousNeighbour()
+	{
+		return this.previousNeighbour;
+	}
+
+	public void setPreviousNeighbour(short previousNeighbour)
+	{
+		this.previousNeighbour = previousNeighbour;
+	}
+
+	public short getNextNeighbour()
+	{
+		return this.nextNeighbour;
+	}
+
+	public void setNextNeighbour(short nextNeighbour)
+	{
+		this.nextNeighbour = nextNeighbour;
+	}
+
+	public ResolverInterface getResolverStub()
+	{
+		return this.resolverStub;
+	}
+
+	public ShutdownAgentInterface getShutdownStub()
+	{
+		return this.shutdownStub;
 	}
 
 	public short getId()
