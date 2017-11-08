@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class Server implements TCPServer
+public class Server implements Runnable
 {
 	private boolean stop;
 	private int portNum;
@@ -28,7 +28,6 @@ public class Server implements TCPServer
 		this.incomingConnections = new HashMap<String, ConnectionHandler> ();
 	}
 
-	@Override
 	public void start() throws
 			IOException
 	{
@@ -38,13 +37,11 @@ public class Server implements TCPServer
 		ownThread.start();
 	}
 
-	@Override
 	public void send(String remoteHost, String data)
 	{
 		this.send(remoteHost, data.getBytes());
 	}
 
-	@Override
 	public void send(String remoteHost, byte[] data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -65,7 +62,6 @@ public class Server implements TCPServer
 		}
 	}
 
-	@Override
 	public void send(String remoteHost, List<Byte> data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -95,7 +91,6 @@ public class Server implements TCPServer
 		}
 	}
 
-	@Override
 	public byte[] receive(String remoteHost)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -109,13 +104,11 @@ public class Server implements TCPServer
 		}
 	}
 
-	@Override
 	public void stop() throws IOException
 	{
 		this.socket.close();
 	}
 
-	@Override
 	public void run()
 	{
 		try
@@ -175,7 +168,6 @@ public class Server implements TCPServer
 		return resBuilder.toString();
 	}
 
-	@Override
 	public void sendFile(String remoteHost, String filename, ProtocolHeader header)
 	{
 		File file = new File(filename);
@@ -236,7 +228,6 @@ public class Server implements TCPServer
 		}
 	}
 
-	@Override
 	public void receiveFile(String remoteHost,String filename,  int transactionID)
 	{
 		File file = new File(filename);

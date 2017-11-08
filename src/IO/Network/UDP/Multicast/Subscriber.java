@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Created by Astrid on 09-Oct-17.
  */
-public class Subscriber implements UDPSubscriber
+public class Subscriber implements Runnable
 {
 	private int portNum;
 	private String ip;
@@ -22,7 +22,6 @@ public class Subscriber implements UDPSubscriber
 		this.packetBuffer = new LinkedList<DatagramPacket>();
 	}
 
-	@Override
 	public void start()
 	{
 		try
@@ -42,13 +41,11 @@ public class Subscriber implements UDPSubscriber
 		}
 	}
 
-	@Override
 	public byte[] receiveData()
 	{
 		return this.receivePacket().getData();
 	}
 
-	@Override
 	public DatagramPacket receivePacket()
 	{
 		if(!this.packetBuffer.isEmpty())
@@ -63,7 +60,6 @@ public class Subscriber implements UDPSubscriber
 		}
 	}
 
-	@Override
 	public void stop()
 	{
 		if(this.socket != null)

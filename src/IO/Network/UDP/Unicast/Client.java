@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Astrid on 09-Oct-17.
  */
-public class Client implements UDPClient
+public class Client implements Runnable
 {
 	private DatagramSocket socket;
 	private LinkedList<DatagramPacket> packetBuffer;
@@ -19,7 +19,6 @@ public class Client implements UDPClient
 		this.packetBuffer = new LinkedList<DatagramPacket>();
 	}
 
-	@Override
 	public void start()
 	{
 		try
@@ -37,7 +36,6 @@ public class Client implements UDPClient
 		}
 	}
 
-	@Override
 	public void send(String remoteHost, int port, byte[] data)
 	{
 
@@ -58,13 +56,11 @@ public class Client implements UDPClient
 		}
 	}
 
-	@Override
 	public void send(String remoteHost, int port, String data)
 	{
 		this.send(remoteHost,port,data.getBytes());
 	}
 
-	@Override
 	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
@@ -79,13 +75,11 @@ public class Client implements UDPClient
 		this.send(remoteHost,port,bytes);
 	}
 
-	@Override
 	public byte[] receiveData()
 	{
 		return this.receivePacket().getData();
 	}
 
-	@Override
 	public DatagramPacket receivePacket()
 	{
 		//System.out.println("BUFFERLENGTH" + packetBuffer.size());
@@ -102,7 +96,6 @@ public class Client implements UDPClient
 		}
 	}
 
-	@Override
 	public void stop()
 	{
 		if(this.socket != null)
