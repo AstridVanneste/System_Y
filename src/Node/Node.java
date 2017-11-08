@@ -13,6 +13,8 @@ import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -45,27 +47,9 @@ public class Node implements Runnable, NodeInteractionInterface
 	private boolean newNode;
 
 
-	/**
-	 * Initialize the new node with his RMI-applications, name, ip and ID
-	 * @param name: name of new node
-	 * @param ip: ip of new node
-	 * @param resolverStub
-	 * @param shutdownStub
-	 */
-	public Node(String name, String ip, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
+	public Node()
 	{
-		this.numberOfNodes = 0;
-		this.newNode = true;
 
-		this.resolverInterface = resolverInterface;
-		this.shutdownAgentInterface = shutdownAgentInterface;
-		this.resolverStub = resolverStub;
-		this.shutdownStub = shutdownStub;
-
-		this.name = name;
-		this.id = -1;
-
-		System.out.println("init done");
 	}
 
 	public static Node getInstance()
@@ -73,8 +57,14 @@ public class Node implements Runnable, NodeInteractionInterface
 		return null;
 	}
 
-	public void start()
+	public void start( String name, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
 	{
+		this.newNode = true;
+		this.name = name;
+		this.resolverStub = resolverStub;
+		this.shutdownStub = shutdownStub;
+		this.id = -1;
+
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -129,12 +119,14 @@ public class Node implements Runnable, NodeInteractionInterface
 
 		byte[] ipInByte = new byte[4];
 
-try {
+		try
+		{
 			ipInByte = Serializer.ipStringToBytes(InetAddress.getLocalHost().getHostAddress());
-		} catch (UnknownHostException e) {
-
+		} catch (UnknownHostException e)
+		{
 			e.printStackTrace();
 		}
+
 
 		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
 		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
