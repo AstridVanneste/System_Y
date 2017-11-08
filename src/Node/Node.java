@@ -32,15 +32,15 @@ public class Node implements Runnable, NodeInteractionInterface
 {
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
+	private LifeCycleManager lifeCycleManager;
+	private FailureAgent failureAgent;
+
 	private String nsIp;
 	private String name;
 	private short id;
 	private short previousNeighbour;
 	private short nextNeighbour;
 	private Subscriber subscriber;
-	private ResolverInterface resolverInterface;
-	private ShutdownAgentInterface shutdownAgentInterface;
-	private NodeInteractionInterface nodeInteractionInterface;
 	private ResolverInterface resolverStub;
 	private ShutdownAgentInterface shutdownStub;
 	private short numberOfNodes;
@@ -56,7 +56,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.resolverStub = null;
 		this.shutdownStub = null;
 		this.id = -1;
-
+		this.name = "";
 	}
 
 	public static Node getInstance()
@@ -64,6 +64,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
+			Node.instance.start();
 		}
 		return Node.instance;
 	}
@@ -336,6 +337,16 @@ public class Node implements Runnable, NodeInteractionInterface
 	public String getName()
 	{
 		return this.name;
+	}
+
+	public LifeCycleManager getLifeCycleManager()
+	{
+		return this.lifeCycleManager;
+	}
+
+	public FailureAgent getFailureAgent()
+	{
+		return this.failureAgent;
 	}
 
 	//MOET VEEL WEG
