@@ -56,5 +56,15 @@ public class LifeCycleManager
 			re.printStackTrace();
 			//CALL FAILURE
 		}
+
+
+		try
+		{
+			Node.getInstance().getShutdownStub().requestShutdown(Node.getInstance().getId());
+		}
+		catch(RemoteException re)
+		{
+			re.printStackTrace();
+		}
 	}
 }

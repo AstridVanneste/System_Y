@@ -30,14 +30,14 @@ public interface ResolverInterface extends Remote
 	 *returns previous neighbour of node with given ID
 	 * @param ID
 	 */
-	public short getPrevious(short ID);
+	public short getPrevious(short ID) throws RemoteException;
 
 	/**
 	 * returns next neighbour of node with given ID
 	 * @param ID
 	 * @return
 	 */
-	public short getNext(short ID);
+	public short getNext(short ID) throws RemoteException;
 
 
 	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when testing is complete

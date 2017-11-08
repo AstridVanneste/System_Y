@@ -11,12 +11,9 @@ import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
-import Util.Arrays;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -39,8 +36,8 @@ public class Node implements Runnable, NodeInteractionInterface
 	private short nextNeighbour;
 	private short id;
 	private Subscriber subscriber;
-	private ResolverInterface resolverInterface;
-	private ShutdownAgentInterface shutdownAgentInterface;
+	private ResolverInterface resolverStub;
+	private ShutdownAgentInterface shutdownStub;
 	private Client udpClient; //?
 	private short numberOfNodes;
 	private int startupTransactionId; //?
@@ -52,17 +49,17 @@ public class Node implements Runnable, NodeInteractionInterface
 	 * Initialize the new node with his RMI-applications, name, ip and ID
 	 * @param name: name of new node
 	 * @param ip: ip of new node
-	 * @param resolverInterface
-	 * @param shutdownAgentInterface
+	 * @param resolverStub
+	 * @param shutdownStub
 	 */
-	public Node(String name, String ip, ResolverInterface resolverInterface, ShutdownAgentInterface shutdownAgentInterface)
+	public Node(String name, String ip, ResolverInterface resolverStub, ShutdownAgentInterface shutdownStub)
 	{
 		this.numberOfNodes = 0;
 		this.newNode = true;
 
 		//???
-		this.resolverInterface = resolverInterface;
-		this.shutdownAgentInterface = shutdownAgentInterface;
+		this.resolverStub = resolverStub;
+		this.shutdownStub = shutdownStub;
 
 		this.name = name;
 
@@ -137,7 +134,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		byte[] ipInByte = new byte[4];
 		try
 		{
-			ipInByte = Serializer.ipStringToBytes(resolverInterface.getIP(id));
+			ipInByte = Serializer.ipStringToBytes(resolverStub.getIP(id));
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -221,7 +218,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			Registry reg = null;
 			try
 			{
-				reg = LocateRegistry.getRegistry(resolverInterface.getIP(newID));
+				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
 				Remote neighbourNode = reg.lookup(Node.NODE_INTERACTION_NAME);
 				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) neighbourNode;
 
@@ -359,7 +356,12 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public ResolverInterface getResolverStub()
 	{
-		return this.resolverInterface;
+		return this.resolverStub;
+	}
+
+	public ShutdownAgentInterface getShutdownStub()
+	{
+		return this.shutdownStub;
 	}
 
 	public short getId()
