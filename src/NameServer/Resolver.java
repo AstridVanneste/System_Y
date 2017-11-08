@@ -89,13 +89,4 @@ public class Resolver implements ResolverInterface
 		NameServer.getInstance().map.put(ID,IP);
 	}
 
-	public short lastKey() throws RemoteException{
-		return NameServer.getInstance().map.lastKey();
-	}
-
-	public short firstKey() throws RemoteException{
-		return NameServer.getInstance().map.firstKey();
-	}
-
-
 }

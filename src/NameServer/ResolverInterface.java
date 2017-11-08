@@ -44,17 +44,4 @@ public interface ResolverInterface extends Remote
 
 	public void removeFromTree(int nodeId) throws RemoteException; //todo: Remove when testing complete
 
-	/**
-	 *
-	 * @return the last key in the map
-	 * @throws RemoteException
-	 */
-	public short lastKey() throws RemoteException;
-
-	/**
-	 *
-	 * @return the first in the map
-	 * @throws RemoteException
-	 */
-	public short firstKey() throws RemoteException;
 }

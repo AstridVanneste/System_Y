@@ -231,17 +231,6 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private synchronized void changeNeighbours(short newID)
 	{
-		short highestID = 0;
-		short lowestID = 0;
-		try
-		{
-			highestID = resolverStub.lastKey();
-			lowestID = resolverStub.firstKey();
-		} catch (RemoteException e)
-		{
-			e.printStackTrace();
-		}
-
 		if(this.id == this.nextNeighbour && this.id == this.previousNeighbour)
 		{
 			this.nextNeighbour = newID;
@@ -271,7 +260,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if ((newID < this.nextNeighbour || newID == lowestID) && (this.id != this.nextNeighbour) && (this.id < newID)){
+		if ((newID < this.nextNeighbour || this.nextNeighbour < this.id) && (this.id != this.nextNeighbour) && ((this.id < newID) || (this.nextNeighbour < this.id))){
 			Registry reg = null;
 			try
 			{
@@ -279,7 +268,8 @@ public class Node implements Runnable, NodeInteractionInterface
 				try
 				{
 					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
-					neighbourInterface.setNextNeighbour(nextNeighbour);
+					neighbourInterface.setNextNeighbour(this.nextNeighbour);
+					neighbourInterface.setPreviousNeighbour(this.id);
 				} catch (MalformedURLException e)
 				{
 					e.printStackTrace();
@@ -296,29 +286,8 @@ public class Node implements Runnable, NodeInteractionInterface
 			this.nextNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-		if ((this.previousNeighbour < newID || this.previousNeighbour == highestID)  && (this.previousNeighbour != this.id) && (newID< this.id))
+		if (((this.previousNeighbour < newID) || (this.id < previousNeighbour))  && (this.previousNeighbour != this.id) && ((newID < this.id) || this.id < previousNeighbour))
 		{
-			Registry reg = null;
-			try
-			{
-				NodeInteractionInterface neighbourInterface = null;
-				try
-				{
-					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
-					neighbourInterface.setPreviousNeighbour(this.previousNeighbour);
-				} catch (MalformedURLException e)
-				{
-					e.printStackTrace();
-				}
-				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
-			} catch (NotBoundException e)
-			{
-				e.printStackTrace();
-			}
 			this.previousNeighbour = newID;
 		}
 	}

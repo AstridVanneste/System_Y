@@ -38,17 +38,4 @@ public interface ResolverInterface extends Remote
 
 	public void addToTree(int ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
 
-	/**
-	 *
-	 * @return the last key in the map
-	 * @throws RemoteException
-	 */
-	public short lastKey() throws RemoteException;
-
-	/**
-	 *
-	 * @return the first in the map
-	 * @throws RemoteException
-	 */
-	public short firstKey() throws RemoteException;
 }
