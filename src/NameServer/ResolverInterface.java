@@ -46,8 +46,15 @@ public interface ResolverInterface extends Remote
 
 	/**
 	 *
-	 * @return the highest id in the map
+	 * @return the last key in the map
 	 * @throws RemoteException
 	 */
-	public short highestID() throws RemoteException;
+	public short lastKey() throws RemoteException;
+
+	/**
+	 *
+	 * @return the first in the map
+	 * @throws RemoteException
+	 */
+	public short firstKey() throws RemoteException;
 }

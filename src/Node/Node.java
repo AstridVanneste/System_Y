@@ -231,10 +231,12 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private synchronized void changeNeighbours(short newID)
 	{
-		short highestId = 0;
+		short highestID = 0;
+		short lowestID = 0;
 		try
 		{
-			highestId = resolverStub.highestID();
+			highestID = resolverStub.lastKey();
+			lowestID = resolverStub.firstKey();
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -269,7 +271,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if ((newID < this.nextNeighbour) && (this.id != this.nextNeighbour) && (this.id < newID)){
+		if ((newID < this.nextNeighbour || newID == lowestID) && (this.id != this.nextNeighbour) && (this.id < newID)){
 			Registry reg = null;
 			try
 			{
@@ -294,7 +296,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			this.nextNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-		if ((this.previousNeighbour < newID || this.previousNeighbour == highestId)  && (this.previousNeighbour != this.id) && (newID< this.id))
+		if ((this.previousNeighbour < newID || this.previousNeighbour == highestID)  && (this.previousNeighbour != this.id) && (newID< this.id))
 		{
 			Registry reg = null;
 			try
