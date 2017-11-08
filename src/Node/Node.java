@@ -59,16 +59,13 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.shutdownAgentInterface = shutdownAgentInterface;
 
 		this.name = name;
+		this.id = -1;
 
 		System.out.println("init done");
 	}
 
 	public void start()
 	{
-//		this.id = NameServer.getHash(name);
-//		previousNeighbour = id;
-//		nextNeighbour = id;
-
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -125,7 +122,6 @@ public class Node implements Runnable, NodeInteractionInterface
 			e.printStackTrace();
 		}
 
-
 		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
 		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
 		System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);
@@ -156,9 +152,6 @@ public class Node implements Runnable, NodeInteractionInterface
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-//			byte[] newNodeIDInBytes = new byte[2]; //SUGGESTIE: DATAGRAMMEN SUBKLASSEN
-//			newNodeIDInBytes[0] = data[0];
-//			newNodeIDInBytes[1] = data[1];
 			short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
 			numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
 
@@ -167,7 +160,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 				{
 					changeNeighbours(newNodeID);
-					short numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
+					this.numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
 				}
 			}
 			if (newNode)
