@@ -55,6 +55,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.shutdownStub = null;
 		this.id = -1;
 		this.name = "";
+		this.lifeCycleManager = new LifeCycleManager();
+		this.failureAgent = new FailureAgent();
 	}
 
 	public static Node getInstance()
