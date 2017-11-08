@@ -123,6 +123,4 @@ public class Datagram
 		int test = (int)(serial[4]) | (serial[5] << 8) | (serial[6] << 16) | (serial[7] << 24);
 		return serial;
 	}
-
-
 }
