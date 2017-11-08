@@ -255,8 +255,28 @@ public class Node implements Runnable, NodeInteractionInterface
 		}
 		if (((this.previousNeighbour < newID) || (this.previousNeighbour == this.id)) && (newID < this.id))
 		{
-			System.out.println("previous for old node : " + previousNeighbour);
-			this.previousNeighbour = newID;
+			if(previousNeighbour == nextNeighbour){
+				Registry reg = null;
+				try
+				{
+					reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+					NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+
+					neighbourInterface.setNextNeighbour(this.id);
+					neighbourInterface.setPreviousNeighbour(this.id);
+
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
+				} catch (NotBoundException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else{
+				this.previousNeighbour = newID;
+				System.out.println("previous for old node : " + previousNeighbour);
+			}
 		}
 
 	}

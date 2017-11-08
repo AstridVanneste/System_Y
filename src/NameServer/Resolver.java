@@ -16,7 +16,7 @@ public class Resolver implements ResolverInterface
 
 
 	@Override
-	public String getIP(int nodeId) throws RemoteException, InvalidParameterException
+	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
