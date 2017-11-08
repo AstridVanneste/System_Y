@@ -16,6 +16,9 @@ public class LifeCycleManager
 	}
 
 
+	/**
+	 * Gracefully removes the node from the system.
+	 */
 	public void shutdown()
 	{
 		String IPprevious = "";
