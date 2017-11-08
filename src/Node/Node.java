@@ -13,6 +13,8 @@ import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -129,12 +131,14 @@ public class Node implements Runnable, NodeInteractionInterface
 
 		byte[] ipInByte = new byte[4];
 
-try {
+		try
+		{
 			ipInByte = Serializer.ipStringToBytes(InetAddress.getLocalHost().getHostAddress());
-		} catch (UnknownHostException e) {
-
+		} catch (UnknownHostException e)
+		{
 			e.printStackTrace();
 		}
+
 
 		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
 		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
