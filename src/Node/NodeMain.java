@@ -17,31 +17,9 @@ import java.rmi.RemoteException;
 public class NodeMain {
     public static void main(String[] args) {
 
-        if(System.getSecurityManager()==null)
-        {
-            System.setSecurityManager(new SecurityManager());
-        }
-        try
-        {
-            Registry reg = LocateRegistry.getRegistry(1099);
-            Remote resolver = reg.lookup(NameServer.RESOLVER_NAME);
-            Remote shutdownAgent = reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
-            ResolverInterface resolverInterface = (ResolverInterface) resolver;
-            ShutdownAgentInterface shutdownAgentInterface = (ShutdownAgentInterface) shutdownAgent;
+        Node node = Node.getInstance();
+        node.start("a");
 
-            Node node = new Node ("a","10.0.0.3",resolverInterface,shutdownAgentInterface);
-            node.start();
 
-        }
-        catch (RemoteException re)
-        {
-            System.out.println("RemoteException in LocateRegistry.getRegistry()");
-            re.printStackTrace();
-        }
-        catch (NotBoundException nbe)
-        {
-            System.out.println("NotBoundException in getIP()");
-            nbe.printStackTrace();
-        }
     }
 }
