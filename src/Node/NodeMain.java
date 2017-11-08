@@ -19,6 +19,4 @@ public class NodeMain {
     {
 
         Node node = Node.getInstance();
-        //node.start("a");
-    }
 }

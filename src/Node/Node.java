@@ -185,6 +185,7 @@ public class Node implements Runnable, NodeInteractionInterface
 				{
 					askNewName();
 					accessRequest();
+					System.out.println("niet toegevoegd");
 				}
 
 				//check if successfully added to NS
@@ -199,6 +200,7 @@ public class Node implements Runnable, NodeInteractionInterface
 					newNode = false;
 					String nsIp = packet.getAddress().getHostAddress();
 					nameServerBind(nsIp);
+					System.out.println("toegevoegd");
 				}
 			}
 		}
@@ -235,7 +237,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		if((this.id < newID) && (newID < nextNeighbour))
 		{
 			this.nextNeighbour = newID;
-
+			System.out.println("Next for old node " + nextNeighbour);
 			Registry reg = null;
 			try
 			{
@@ -256,6 +258,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		}
 		if ((previousNeighbour < newID) && (newID < this.id))
 		{
+			System.out.println("previous for old node : " + previousNeighbour);
 			this.previousNeighbour = newID;
 		}
 
@@ -362,16 +365,19 @@ public class Node implements Runnable, NodeInteractionInterface
 	public void setPreviousNeighbour(short previousNeighbour)
 	{
 		this.previousNeighbour = previousNeighbour;
+		System.out.println("Previous for new Node : " + previousNeighbour);
 	}
 
 	public short getNextNeighbour()
 	{
 		return this.nextNeighbour;
+
 	}
 
 	public void setNextNeighbour(short nextNeighbour)
 	{
 		this.nextNeighbour = nextNeighbour;
+		System.out.println("Next for new Node : " + nextNeighbour);
 	}
 
 	public ResolverInterface getResolverStub()
