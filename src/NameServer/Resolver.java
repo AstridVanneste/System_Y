@@ -11,12 +11,12 @@ import java.security.InvalidParameterException;
 public class Resolver implements ResolverInterface
 {
 	public Resolver()
-	{
-	}
+{
+}
 
 
 	@Override
-	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
+	public String getIP(int nodeId) throws RemoteException, InvalidParameterException
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
@@ -87,6 +87,10 @@ public class Resolver implements ResolverInterface
 	public void addToTree(short ID, String IP) throws RemoteException
 	{
 		NameServer.getInstance().map.put(ID,IP);
+	}
+
+	public short highestID() throws RemoteException{
+		return NameServer.getInstance().map.lastKey();
 	}
 
 

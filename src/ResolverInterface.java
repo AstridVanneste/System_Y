@@ -13,7 +13,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-	public String lookup(short nodeId) throws RemoteException;
+	public String lookup(int nodeId) throws RemoteException;
 	/**
 	 * Print out the existing TreeMap
 	 * @throws RemoteException
@@ -38,4 +38,10 @@ public interface ResolverInterface extends Remote
 
 	public void addToTree(int ID, String IP) throws RemoteException;   // todo: Remove when RMI testing is complete
 
+	/**
+	 *
+	 * @return the highest id in the map
+	 * @throws RemoteException
+	 */
+	public short highestID() throws RemoteException;
 }

@@ -15,7 +15,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException
 	 */
-	public String getIP(short nodeId) throws RemoteException;
+	public String getIP(int nodeId) throws RemoteException;
 
 	/**
 	 * For a given filename it returns the IP address from the owner of the file
@@ -44,4 +44,10 @@ public interface ResolverInterface extends Remote
 
 	public void removeFromTree(int nodeId) throws RemoteException; //todo: Remove when testing complete
 
+	/**
+	 *
+	 * @return the highest id in the map
+	 * @throws RemoteException
+	 */
+	public short highestID() throws RemoteException;
 }
