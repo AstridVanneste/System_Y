@@ -44,7 +44,7 @@ public class DiscoveryAgent implements Runnable
 				{
 					DatagramPacket packet = this.multicastSub.receivePacket();
 					Datagram request = new Datagram(packet.getData());
-
+					System.out.println(request.getHeader().getTransactionID());
 					if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 					{
 						byte[] data = request.getData();

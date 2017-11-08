@@ -6,11 +6,8 @@ import IO.Network.UDP.Multicast.*;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Unicast.Client;
 import IO.Network.UDP.Unicast.Server;
-import NameServer.Resolver;
-import NameServer.ResolverInterface;
+import NameServer.*;
 //import NameServer.DiscoveryAgentInterface;
-import NameServer.ShutdownAgent;
-import NameServer.ShutdownAgentInterface;
 import Util.Arrays;
 import Util.Serializer;
 
@@ -34,17 +31,16 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	private String nsIp;
 	private String name;
+	private short id;
 	private short previousNeighbour;
 	private short nextNeighbour;
-	private short id;
 	private Subscriber subscriber;
 	private ResolverInterface resolverInterface;
 	private ShutdownAgentInterface shutdownAgentInterface;
-	private Client udpClient; //?
-	private short numberOfNodes;
-	private int startupTransactionId; //?
-	private boolean newNode;
 	private NodeInteractionInterface nodeInteractionInterface;
+	private short numberOfNodes;
+	private int startupTransactionId;
+	private boolean newNode;
 
 
 	/**
@@ -59,7 +55,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.numberOfNodes = 0;
 		this.newNode = true;
 
-		//???
 		this.resolverInterface = resolverInterface;
 		this.shutdownAgentInterface = shutdownAgentInterface;
 
@@ -70,9 +65,9 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void start()
 	{
-		id = getHash(name);
-		previousNeighbour = id;
-		nextNeighbour = id;
+//		this.id = NameServer.getHash(name);
+//		previousNeighbour = id;
+//		nextNeighbour = id;
 
 		if(System.getSecurityManager()==null)
 		{
@@ -82,6 +77,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		try
 		{
 			subscribeOnMulticast();
+
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1098);
 			registry.rebind(Node.NODE_INTERACTION_NAME, stub);
@@ -91,23 +87,21 @@ public class Node implements Runnable, NodeInteractionInterface
 			System.err.println("Exception when creating stub");
 			re.printStackTrace();
 		}
-		System.out.println("registry created");
 
 		this.accessRequest();
 
 		Thread thread = new Thread(this);
 		thread.start();
-		System.out.println("thread started");
 	}
 
 	/**
 	 * Multicast for NS
 	 * NS will process this message and has to confirm that the node may access the network
 	 */
-	public void accessRequest ()
-	{
+	public void accessRequest () {
 		System.out.println("Make accessrequest");
-		this.udpClient = new Client();
+
+		Client udpClient = new Client();
 		udpClient.start();
 
 		byte version = (byte) 0;
@@ -123,15 +117,14 @@ public class Node implements Runnable, NodeInteractionInterface
 		byte[] nameLengthInByte = Serializer.intToBytes(name.length());
 		byte[] nameInByte = name.getBytes();
 
-		//HIER IS APARTE METHODE VOOR (ZIE SERIALIZER)
 		byte[] ipInByte = new byte[4];
-		try
-		{
-			ipInByte = Serializer.ipStringToBytes(resolverInterface.getIP(id));
-		} catch (RemoteException e)
-		{
+
+		try {
+			ipInByte = Serializer.ipStringToBytes(InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+
 
 		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
 		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
@@ -140,6 +133,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		Datagram datagram = new Datagram(header, data);
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
 		udpClient.stop();
+
 		System.out.println("sent accessrequest");
 	}
 
@@ -158,15 +152,15 @@ public class Node implements Runnable, NodeInteractionInterface
 
 			DatagramPacket packet = subscriber.receivePacket();
 			nsIp = packet.getAddress().getHostAddress();
-			System.out.println("Nameserver IP " + nsIp);
+
 			Datagram request = new Datagram(packet.getData());
 			byte[] data = request.getData();
 
-			byte[] newNodeIDInBytes = new byte[2]; //SUGGESTIE: DATAGRAMMEN SUBKLASSEN
-			newNodeIDInBytes[0] = data[0];
-			newNodeIDInBytes[1] = data[1];
-			short newNodeID = Serializer.bytesToShort(newNodeIDInBytes);
-			numberOfNodes = Serializer.bytesToShort(new byte[]{data[2],data[3]});
+//			byte[] newNodeIDInBytes = new byte[2]; //SUGGESTIE: DATAGRAMMEN SUBKLASSEN
+//			newNodeIDInBytes[0] = data[0];
+//			newNodeIDInBytes[1] = data[1];
+			short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
+			numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
 
 			if (!newNode)
 			{
@@ -193,6 +187,8 @@ public class Node implements Runnable, NodeInteractionInterface
 
 					//nameserver sends the amount of nodes in the tree
 					setNumberOfNodes(numberOfNodes);
+					this.id = newNodeID;
+					setNeighbours();
 					newNode = false;
 				}
 			}
@@ -217,6 +213,7 @@ public class Node implements Runnable, NodeInteractionInterface
 
 				neighbourInterface.setNextNeighbour(nextNeighbour);
 				neighbourInterface.setPreviousNeighbour(id);
+
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -235,7 +232,6 @@ public class Node implements Runnable, NodeInteractionInterface
 
 	public void run()
 	{
-		System.out.println("subscribed");
 		while(true)
 		{
 			multicastListener();
@@ -247,7 +243,6 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		//System.out.println("out of multicastListener. FOUT!");
 	}
 
 	/**
@@ -317,22 +312,12 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = nextNeighbour;
 	}
 
-	/**
-	 * Calculate the hashcode of the name
-	 * @return ID
-	 */
-	@Deprecated //MOET WEG
-	private static short getHash(String name)
-	{
-		return (short) Math.abs(name.hashCode() % 32768);
-	}
-
 	private void askNewName ()
 	{
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
 		this.name = scanner.nextLine();
-		this.id = getHash(name); //NS
+		this.id = NameServer.getHash(name);
 	}
 
 	public String getName()
