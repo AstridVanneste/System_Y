@@ -16,6 +16,11 @@ public class FailureAgent
 
 	}
 
+
+	/**
+	 * Called every time a Remote Exception is called in the node. It removes a node with a given ID from the system.
+	 * @param ID
+	 */
 	public void failure(short ID)
 	{
 		String IPprev = "";

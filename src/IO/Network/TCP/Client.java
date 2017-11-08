@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Client implements TCPClient, Runnable
+public class Client implements Runnable
 {
 	private boolean stop;
 	private int portNum;
@@ -29,7 +29,6 @@ public class Client implements TCPClient, Runnable
 		this.buffer = new LinkedList<byte[]>();
 	}
 
-	@Override
 	public void start()
 	{
 		try
@@ -47,7 +46,7 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
+
 	public void send(byte[] data)
 	{
 		try
@@ -61,7 +60,6 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
 	public void send(List<Byte> data)
 	{
 		byte[] arrayData = new byte[data.size()];
@@ -82,7 +80,6 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
 	public byte[] receive()
 	{
 		byte[] data = this.buffer.getFirst();
@@ -91,7 +88,6 @@ public class Client implements TCPClient, Runnable
 		return data;
 	}
 
-	@Override
 	public void stop()
 	{
 		try
@@ -106,7 +102,6 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
 	public void sendFile(String filename, ProtocolHeader header)
 	{
 		File file = new File(filename);
@@ -167,7 +162,6 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
 	public void receiveFile(String filename, int transactionID)
 	{
 		File file = new File(filename);
@@ -194,7 +188,6 @@ public class Client implements TCPClient, Runnable
 
 	}
 
-	@Override
 	public boolean hasData()
 	{
 		try
@@ -211,7 +204,6 @@ public class Client implements TCPClient, Runnable
 		}
 	}
 
-	@Override
 	public void run()
 	{
 		while (!this.stop)

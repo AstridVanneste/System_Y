@@ -6,7 +6,7 @@ import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Server implements UDPServer
+public class Server implements Runnable
 {
 	private int portNum;
 	private DatagramSocket socket;
@@ -19,7 +19,6 @@ public class Server implements UDPServer
 		this.packetBuffer = new LinkedList<>();
 	}
 
-	@Override
 	public void start()
 	{
 		try
@@ -36,13 +35,11 @@ public class Server implements UDPServer
 		thread.start();
 	}
 
-	@Override
 	public int getPort()
 	{
 		return this.portNum;
 	}
 
-	@Override
 	public void setPort(int port)
 	{
 		if (!this.socket.isBound())
@@ -55,7 +52,6 @@ public class Server implements UDPServer
 		}
 	}
 
-	@Override
 	public void send(String remoteHost, int port, byte[] data)
 	{
 		try
@@ -76,7 +72,6 @@ public class Server implements UDPServer
 		//System.out.println("");
 	}
 
-	@Override
 	public void send(String remoteHost, int port, String data)
 	{
 		byte[] bytes = data.getBytes();
@@ -84,7 +79,6 @@ public class Server implements UDPServer
 
 	}
 
-	@Override
 	public void send(String remoteHost, int port, List<Byte> data)
 	{
 		byte[] bytes = new byte[data.size()];
@@ -97,7 +91,6 @@ public class Server implements UDPServer
 		this.send(remoteHost, port, bytes);
 	}
 
-	@Override
 	public byte[] receiveData()
 	{
 		if(this.receivePacket() != null)
@@ -110,7 +103,6 @@ public class Server implements UDPServer
 		}
 	}
 
-	@Override
 	public DatagramPacket receivePacket()
 	{
 		if(!packetBuffer.isEmpty())
@@ -125,7 +117,6 @@ public class Server implements UDPServer
 		}
 	}
 
-	@Override
 	public void stop()
 	{
 		if (this.socket != null)
@@ -134,7 +125,6 @@ public class Server implements UDPServer
 		}
 	}
 
-	@Override
 	public void run()
 	{
 		while(!this.socket.isClosed())
