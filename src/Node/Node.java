@@ -240,8 +240,7 @@ public class Node implements Runnable, NodeInteractionInterface
 			try
 			{
 				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-				Remote neighbourNode = reg.lookup(Node.NODE_INTERACTION_NAME);
-				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) neighbourNode;
+				NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 
 				neighbourInterface.setNextNeighbour(nextNeighbour);
 				neighbourInterface.setPreviousNeighbour(id);
