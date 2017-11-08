@@ -11,7 +11,6 @@ import Util.Arrays;
 import NameServer.ShutdownAgent;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
-import com.sun.tools.jdeprscan.scan.Scan;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -118,7 +117,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
 		Random rand = new Random();
 		this.startupTransactionId = rand.nextInt()%127;
-		System.out.println(startupTransactionId);
 		int dataLength = name.length() + 8;
 		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
