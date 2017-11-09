@@ -117,7 +117,9 @@ public class Node implements Runnable, NodeInteractionInterface
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
 		Random rand = new Random();
+
 		this.startupTransactionId = rand.nextInt()%127;
+
 		int dataLength = name.length() + 8;
 		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
@@ -260,7 +262,11 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if ((newID < this.nextNeighbour || this.nextNeighbour < this.id) && (this.id != this.nextNeighbour) && ((this.id < newID) || (this.nextNeighbour < this.id))){
+		if (
+				(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
+				(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
+				(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
+				){
 			Registry reg = null;
 			try
 			{
@@ -283,17 +289,19 @@ public class Node implements Runnable, NodeInteractionInterface
 			{
 				e.printStackTrace();
 			}
+
 			this.nextNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-		if (((this.previousNeighbour < newID) || (this.id < previousNeighbour))  && (this.previousNeighbour != this.id) && ((newID < this.id) || this.id < previousNeighbour))
+		if (
+				(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id) ||
+				(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
+				(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
+				)
 		{
 			this.previousNeighbour = newID;
 		}
 	}
-
-
-
 
 	public void run()
 	{
@@ -336,8 +344,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = this.id;
 	}
 
-
-
 	/**
 	 * If this node has 1 neighbours
 	 */
@@ -346,8 +352,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.previousNeighbour = neighbourId;
 		this.nextNeighbour = neighbourId;
 	}
-
-
 
 	/**
 	 * If this node has 2 neighbours
