@@ -233,6 +233,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private synchronized void changeNeighbours(short newID)
 	{
+		// You'r the first node so edit both neighbours of the new node
 		if(this.id == this.nextNeighbour && this.id == this.previousNeighbour)
 		{
 			this.nextNeighbour = newID;
@@ -262,10 +263,13 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
+
+		// The node will change the previous and next id of the new node in following cases:
 		if (
 				(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
 				(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
 				(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
+
 				){
 			Registry reg = null;
 			try
@@ -293,6 +297,8 @@ public class Node implements Runnable, NodeInteractionInterface
 			this.nextNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
+
+		// The node will change the previous and next id of the new node in following cases:
 		if (
 				(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id) ||
 				(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
@@ -391,24 +397,24 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.name = name;
 	}
 
-	public short getPreviousNeighbour()
+	public short getPreviousNeighbour() throws RemoteException
 	{
 		return this.previousNeighbour;
 	}
 
-	public void setPreviousNeighbour(short previousNeighbour)
+	public void setPreviousNeighbour(short previousNeighbour) throws RemoteException
 	{
 		this.previousNeighbour = previousNeighbour;
 		System.out.println("Previous for new Node : " + previousNeighbour);
 	}
 
-	public short getNextNeighbour()
+	public short getNextNeighbour() throws RemoteException
 	{
 		return this.nextNeighbour;
 
 	}
 
-	public void setNextNeighbour(short nextNeighbour)
+	public void setNextNeighbour(short nextNeighbour) throws RemoteException
 	{
 		this.nextNeighbour = nextNeighbour;
 		System.out.println("Next for new Node : " + nextNeighbour);
