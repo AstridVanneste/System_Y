@@ -244,21 +244,22 @@ public class Node implements Runnable, NodeInteractionInterface
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
-				try
+				/*try
 				{
-					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
-					neighbourInterface.setNextNeighbour(id);
-					neighbourInterface.setPreviousNeighbour(id);
+					//neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
+
 				} catch (MalformedURLException e)
 				{
 					e.printStackTrace();
-				}
-				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+				}*/
+				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+				neighbourInterface.setNextNeighbour(id);
+				neighbourInterface.setPreviousNeighbour(id);
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
-			} catch (NotBoundException e)
+			}catch (NotBoundException e)
 			{
 				e.printStackTrace();
 			}
