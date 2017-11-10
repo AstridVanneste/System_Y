@@ -117,7 +117,9 @@ public class Node implements Runnable, NodeInteractionInterface
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
 		Random rand = new Random();
+
 		this.startupTransactionId = rand.nextInt()%127;
+
 		int dataLength = name.length() + 8;
 		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
@@ -231,6 +233,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	 */
 	private synchronized void changeNeighbours(short newID)
 	{
+		// You'r the first node so edit both neighbours of the new node
 		if(this.id == this.nextNeighbour && this.id == this.previousNeighbour)
 		{
 			this.nextNeighbour = newID;
@@ -261,7 +264,14 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 		}
-		if ((newID < this.nextNeighbour || this.nextNeighbour < this.id) && (this.id != this.nextNeighbour) && ((this.id < newID) || (this.nextNeighbour < this.id))){
+
+		// The node will change the previous and next id of the new node in following cases:
+		if (
+				(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
+				(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
+				(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
+
+				){
 			Registry reg = null;
 			try
 			{
@@ -284,17 +294,21 @@ public class Node implements Runnable, NodeInteractionInterface
 			{
 				e.printStackTrace();
 			}
+
 			this.nextNeighbour = newID;
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-		if (((this.previousNeighbour < newID) || (this.id < previousNeighbour))  && (this.previousNeighbour != this.id) && ((newID < this.id) || this.id < previousNeighbour))
+
+		// The node will change the previous and next id of the new node in following cases:
+		if (
+				(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id) ||
+				(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
+				(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
+				)
 		{
 			this.previousNeighbour = newID;
 		}
 	}
-
-
-
 
 	public void run()
 	{
@@ -337,8 +351,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.nextNeighbour = this.id;
 	}
 
-
-
 	/**
 	 * If this node has 1 neighbours
 	 */
@@ -347,8 +359,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.previousNeighbour = neighbourId;
 		this.nextNeighbour = neighbourId;
 	}
-
-
 
 	/**
 	 * If this node has 2 neighbours
@@ -388,24 +398,24 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.name = name;
 	}
 
-	public short getPreviousNeighbour()
+	public short getPreviousNeighbour() throws RemoteException
 	{
 		return this.previousNeighbour;
 	}
 
-	public void setPreviousNeighbour(short previousNeighbour)
+	public void setPreviousNeighbour(short previousNeighbour) throws RemoteException
 	{
 		this.previousNeighbour = previousNeighbour;
 		System.out.println("Previous for new Node : " + previousNeighbour);
 	}
 
-	public short getNextNeighbour()
+	public short getNextNeighbour() throws RemoteException
 	{
 		return this.nextNeighbour;
 
 	}
 
-	public void setNextNeighbour(short nextNeighbour)
+	public void setNextNeighbour(short nextNeighbour) throws RemoteException
 	{
 		this.nextNeighbour = nextNeighbour;
 		System.out.println("Next for new Node : " + nextNeighbour);
