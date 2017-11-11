@@ -80,6 +80,7 @@ public class Resolver implements ResolverInterface
 		System.out.println("EQUALS: " + Boolean.toString((NameServer.getInstance().map.lastKey().equals(ID))));
 		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals( ID))
 		{
+
 			return NameServer.getInstance().map.firstKey();
 		}
 		else
