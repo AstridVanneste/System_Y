@@ -20,7 +20,6 @@ public class NodeMain
     public static void main(String[] args)
     {
         Node.getInstance();
-        Node.getInstance().start();
 
 
         Scanner scanner = new Scanner(System.in);
