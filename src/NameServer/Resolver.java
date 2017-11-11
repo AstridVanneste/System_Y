@@ -1,6 +1,7 @@
 package NameServer;
 
 
+import javax.print.attribute.standard.MediaSize;
 import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
 
@@ -59,7 +60,10 @@ public class Resolver implements ResolverInterface
 	@Override
 	public short getPrevious(short ID)
 	{
-		if(NameServer.getInstance().map.firstKey() > ID)
+		System.out.println("FIRST: " + NameServer.getInstance().map.firstKey());
+		System.out.println("ID: " + ID);
+		//if(NameServer.getInstance().map.firstKey() >= ID)
+		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
 		{
 			return NameServer.getInstance().map.lastKey();
 		}
@@ -72,13 +76,16 @@ public class Resolver implements ResolverInterface
 	@Override
 	public short getNext(short ID)
 	{
-		if(NameServer.getInstance().map.lastKey() < ID)
+		System.out.println("LAST: " + NameServer.getInstance().map.lastKey());
+		System.out.println("ID: " + ID);
+		System.out.println("EQUALS: " + Boolean.toString((NameServer.getInstance().map.lastKey().equals(ID))));
+		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals( ID))
 		{
 			return NameServer.getInstance().map.firstKey();
 		}
 		else
 		{
-			return NameServer.getInstance().map.lowerKey(ID);
+			return NameServer.getInstance().map.higherKey(ID);
 		}
 	}
 
