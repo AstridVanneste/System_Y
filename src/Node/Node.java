@@ -73,7 +73,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		System.out.println("give me a name");
 		Scanner scanner = new Scanner(System.in);
 		this.name = scanner.nextLine();
-
+		System.setProperty("java.rmi.server.hostname","10.0.0.4");
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
