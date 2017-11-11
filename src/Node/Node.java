@@ -63,7 +63,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
-			Node.instance.start();
 		}
 		return Node.instance;
 	}
@@ -82,8 +81,10 @@ public class Node implements Runnable, NodeInteractionInterface
 		try
 		{
 			subscribeOnMulticast();
-
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this);
+			NodeInteractionInterface stub = null;
+			stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(getInstance(),0);
+			if (stub != null)
+				System.out.println("gelukt!");
 			Registry registry = LocateRegistry.createRegistry(1098);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
 		}
