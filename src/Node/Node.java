@@ -83,18 +83,18 @@ public class Node implements Runnable, NodeInteractionInterface
 		{
 			subscribeOnMulticast();
 
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this);
-			Registry registry = LocateRegistry.createRegistry(1098);
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
+			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
+
 		}
 		catch(RemoteException re)
 		{
 			System.err.println("Exception when creating stub");
 			re.printStackTrace();
-		}
-		catch(AlreadyBoundException abe)
+		} catch (AlreadyBoundException e)
 		{
-			abe.printStackTrace();
+			e.printStackTrace();
 		}
 
 		this.accessRequest();
@@ -253,6 +253,7 @@ public class Node implements Runnable, NodeInteractionInterface
 					e.printStackTrace();
 				}*/
 				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+				System.out.println(resolverStub.getIP(newID));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbour(id);
 				neighbourInterface.setPreviousNeighbour(id);
