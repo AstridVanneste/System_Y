@@ -36,7 +36,7 @@ public class ShutdownAgent implements ShutdownAgentInterface
 	 * @return
 	 */
 	@Deprecated
-    public boolean pingNode (short id)
+    public static boolean pingNode (short id)		//WERKT NIET
 	{
         try
 		{
@@ -51,6 +51,8 @@ public class ShutdownAgent implements ShutdownAgentInterface
             e.printStackTrace();
         }
         return false;
+
+
     }
 
 	/**

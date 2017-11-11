@@ -56,6 +56,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		this.name = "";
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
+		this.previousNeighbour = -1;
+		this.nextNeighbour = -1;
 	}
 
 	public static Node getInstance()
@@ -73,7 +75,6 @@ public class Node implements Runnable, NodeInteractionInterface
 		System.out.println("give me a name");
 		Scanner scanner = new Scanner(System.in);
 		this.name = scanner.nextLine();
-		System.setProperty("java.rmi.server.hostname","10.0.0.4");
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -165,9 +166,19 @@ public class Node implements Runnable, NodeInteractionInterface
 			DatagramPacket packet = subscriber.receivePacket();
 
 			Datagram request = new Datagram(packet.getData());
+			System.out.println(request.getHeader().toString());
+
 			byte[] data = request.getData();
+
+			for(byte b: data)
+			{
+				System.out.print(b + " ");
+			}
+
 			short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
 			numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
+
+			System.out.println("new node id: " + newNodeID);
 
 			if (!newNode)
 			{
@@ -192,14 +203,18 @@ public class Node implements Runnable, NodeInteractionInterface
 				if ((request.getHeader().getReplyCode() == (int)ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
 						(request.getHeader().getTransactionID() == this.startupTransactionId))
 				{
-
 					//nameserver sends the amount of nodes in the tree
 					setNumberOfNodes(numberOfNodes);
 					this.id = newNodeID;
+					System.out.println("own ID: " + newNodeID);
 					this.nsIp = packet.getAddress().getHostAddress();
 					System.out.println("nameserver ip : " + this.nsIp);
 					nameServerBind(nsIp);
-					setNeighbours();
+					if(numberOfNodes == 0)
+					{
+						this.nextNeighbour = this.id;
+						this.previousNeighbour = this.id;
+					}
 					newNode = false;
 					System.out.println("toegevoegd");
 				}
@@ -267,25 +282,28 @@ public class Node implements Runnable, NodeInteractionInterface
 		}
 
 		// The node will change the previous and next id of the new node in following cases:
+		//you are the previous of the new node and need to change the neighbours of the new node and your old next neighbour
 		if (
-				(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
+				(		(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
 						(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
 						(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
 
-				){
+				))
+		{
 			Registry reg = null;
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
-				try
-				{
-					neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
-					neighbourInterface.setNextNeighbour(this.nextNeighbour);
-					neighbourInterface.setPreviousNeighbour(this.id);
-				} catch (MalformedURLException e)
-				{
-					e.printStackTrace();
-				}
+				reg = LocateRegistry.getRegistry(this.resolverStub.getIP(newID));
+				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+				neighbourInterface.setNextNeighbour(this.nextNeighbour);
+				neighbourInterface.setPreviousNeighbour(this.id);
+
+				reg = LocateRegistry.getRegistry(this.resolverStub.getIP(this.nextNeighbour));
+				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+				neighbourInterface.setPreviousNeighbour(newID);
+				this.nextNeighbour = newID;
+
 				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
 				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 			} catch (RemoteException e)
@@ -296,19 +314,21 @@ public class Node implements Runnable, NodeInteractionInterface
 				e.printStackTrace();
 			}
 
-			this.nextNeighbour = newID;
+
 			System.out.println("Next for old node " + this.nextNeighbour);
 		}
-
+	/*
 		// The node will change the previous and next id of the new node in following cases:
+		// nothing needs to be done
 		if (
-				(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id) ||
+				(		(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id)||
 						(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
 						(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
-				)
+				))
 		{
-			this.previousNeighbour = newID;
+			//this.previousNeighbour = newID;
 		}
+		*/
 	}
 
 	public void run()

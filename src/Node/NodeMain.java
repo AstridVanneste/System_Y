@@ -1,6 +1,6 @@
 package Node;
 
-import NameServer.NameServer;
+import NameServer.ShutdownAgent;
 import NameServer.ResolverInterface;
 //import NameServer.DiscoveryAgentInterface;
 import NameServer.ShutdownAgentInterface;
@@ -21,10 +21,15 @@ public class NodeMain
     {
         Node.getInstance().start();
 
+		Scanner scanner = new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
         while(true){
-            scanner.nextLine();
+
+            System.out.println("press enter to see neighbours");
+            if(scanner.nextLine().equals("p"))
+			{
+				break;
+			}
 
             try
             {
@@ -34,7 +39,31 @@ public class NodeMain
             {
                 e.printStackTrace();
             }
-
         }
+
+        try
+		{
+			Registry reg = LocateRegistry.getRegistry("10.0.0.3");
+			NodeInteractionInterface stub = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+
+		}
+		catch (Exception e)
+		{
+			try
+			{
+				System.out.println("DOOOD");
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
+				System.out.println("NEXT: " + Node.getInstance().getNextNeighbour());
+				System.out.println("PREVIOUS: " + Node.getInstance().getPreviousNeighbour());
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+			}
+		}
+		System.out.println("kleir");
+
+
+
     }
 }

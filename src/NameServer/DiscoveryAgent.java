@@ -81,7 +81,7 @@ public class DiscoveryAgent implements Runnable
 						System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
 						String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
 
-						System.out.println("Name: " + nodeName + " , ip: " + unicastIp);
+						System.out.println("Name: " + nodeName + " , IP: " + unicastIp );
 
 						if (NameServer.getInstance().map.containsValue(unicastIp))
 						{
@@ -103,6 +103,8 @@ public class DiscoveryAgent implements Runnable
 
 						short nodeId = (short) NameServer.getHash(nodeName);
 						short numNodes = (short) NameServer.getInstance().map.size();
+
+						System.out.println("Name: " + nodeName + " , IP: " + unicastIp + " , ID: " + nodeId);
 
 						NameServer.getInstance().map.put(nodeId, unicastIp);
 						NameServer.getInstance().writeMapToFile();
