@@ -24,7 +24,7 @@ public class LifeCycleManager
 		String IPprevious = "";
 		String IPnext = "";
 
-		/*try
+		try
 		{
 			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
@@ -32,14 +32,14 @@ public class LifeCycleManager
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-		}*/
+		}
 
 
 		try
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
 			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			//previousNode.setNextNeighbour(Node.getInstance().getNextNeighbour());
+			previousNode.setNextNeighbour(Node.getInstance().getNextNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -52,7 +52,7 @@ public class LifeCycleManager
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
 			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			//nextNode.setPreviousNeighbour(Node.getInstance().getPreviousNeighbour());
+			nextNode.setPreviousNeighbour(Node.getInstance().getPreviousNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -61,13 +61,13 @@ public class LifeCycleManager
 		}
 
 
-		/*try
+		try
 		{
 			Node.getInstance().getShutdownStub().requestShutdown(Node.getInstance().getId());
 		}
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-		}*/
+		}
 	}
 }
