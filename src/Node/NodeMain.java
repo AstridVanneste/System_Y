@@ -19,18 +19,23 @@ public class NodeMain
 {
     public static void main(String[] args)
     {
-        Node node = Node.getInstance();
+        Node.getInstance();
+        Node.getInstance().start();
+
+
         Scanner scanner = new Scanner(System.in);
         while(true){
             scanner.nextLine();
+
             try
             {
-                System.out.println(node.getNextNeighbour());
-                System.out.println(node.getNextNeighbour());
+                System.out.println(Node.getInstance().getNextNeighbour());
+                System.out.println(Node.getInstance().getPreviousNeighbour());
             } catch (RemoteException e)
             {
                 e.printStackTrace();
             }
+
         }
     }
 }
