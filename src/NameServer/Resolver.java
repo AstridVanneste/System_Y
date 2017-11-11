@@ -1,7 +1,6 @@
 package NameServer;
 
 
-import javax.print.attribute.standard.MediaSize;
 import java.rmi.RemoteException;
 import java.security.InvalidParameterException;
 
@@ -25,7 +24,7 @@ public class Resolver implements ResolverInterface
 		}
 		else
 		{
-			throw new InvalidParameterException("No node with that ID");
+			throw new InvalidParameterException("No node with ID " + nodeId);
 		}
 	}
 
@@ -38,7 +37,7 @@ public class Resolver implements ResolverInterface
 		}
 		else
 		{
-			throw new InvalidParameterException("No node with that ID");
+			throw new InvalidParameterException("No node with ID " + nodeId);
 		}
 	}
 
@@ -66,7 +65,6 @@ public class Resolver implements ResolverInterface
 		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
 		{
 			return NameServer.getInstance().map.lastKey();
-
 		}
 		else
 		{
