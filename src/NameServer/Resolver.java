@@ -24,7 +24,7 @@ public class Resolver implements ResolverInterface
 		}
 		else
 		{
-			throw new InvalidParameterException("No node with that ID");
+			throw new InvalidParameterException("No node with ID " + nodeId);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class Resolver implements ResolverInterface
 		}
 		else
 		{
-			throw new InvalidParameterException("No node with that ID");
+			throw new InvalidParameterException("No node with ID " + nodeId);
 		}
 	}
 
@@ -59,6 +59,8 @@ public class Resolver implements ResolverInterface
 	@Override
 	public short getPrevious(short ID)
 	{
+		System.out.println("FIRST: " + NameServer.getInstance().map.firstKey());
+		System.out.println("ID: " + ID);
 		if(NameServer.getInstance().map.firstKey() > ID)
 		{
 			return NameServer.getInstance().map.lastKey();

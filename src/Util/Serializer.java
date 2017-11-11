@@ -1,5 +1,8 @@
 package Util;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class Serializer
 {
 	public static byte[] ipStringToBytes (String ip)
@@ -48,18 +51,26 @@ public class Serializer
 	{
 		byte[] result = new byte [2];
 
-		result[0] = (byte) (s & 0x00FF);
-		result[1] = (byte) ((s >>> 8) & 0x00FF);
+		result[0] = (byte) ((s >>> 8) & 0x00FF);
+		result[1] = (byte) (s & 0x00FF);
 
 		return result;
 	}
 
 	public static short bytesToShort(byte[] data)
 	{
+		/*
 		for(int i = 0; i< data.length; i++)
 		{
-			//System.out.println("BYTE " + i + " VALUE " + data[i]);
+			System.out.println("BYTE " + i + " VALUE " + data[i]);
 		}
 		return (short) ((data[1]) | (data[0] << 8));
+		*/
+
+		ByteBuffer buffer = ByteBuffer.allocate(2);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		buffer.put(data[1]);
+		buffer.put(data[0]);
+		return buffer.getShort(0);
 	}
 }
