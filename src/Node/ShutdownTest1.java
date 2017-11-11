@@ -18,7 +18,7 @@ public class ShutdownTest1
 		System.out.println("Press enter to shutdown the node");
 		scanner.nextLine();
 
-		Node.getInstance().getLifeCycleManager().shutdown();
+		//Node.getInstance().getLifeCycleManager().shutdown();
 
 	}
 }

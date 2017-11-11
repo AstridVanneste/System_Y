@@ -25,7 +25,7 @@ public class FailureAgent
 	{
 		String IPprev = "";
 		String IPnext = "";
-		try
+		/*try
 		{
 			IPprev = Node.getInstance().getResolverStub().getIP(Node.getInstance().getResolverStub().getPrevious(ID));
 			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getResolverStub().getNext(ID));
@@ -34,13 +34,13 @@ public class FailureAgent
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-		}
+		}*/
 
 		try
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprev);
 			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			previousNode.setNextNeighbour(Node.getInstance().getNextNeighbour());
+			//previousNode.setNextNeighbour(Node.getInstance().getNextNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -53,7 +53,7 @@ public class FailureAgent
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
 			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbour(Node.getInstance().getPreviousNeighbour());
+			//nextNode.setPreviousNeighbour(Node.getInstance().getPreviousNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -61,14 +61,14 @@ public class FailureAgent
 			//CALL FAILURE
 		}
 
-		try
+		/*try
 		{
 			Node.getInstance().getShutdownStub().requestShutdown(ID);
 		}
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-		}
+		}*/
 
 	}
 }

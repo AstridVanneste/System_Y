@@ -83,7 +83,7 @@ public class Node implements Runnable, NodeInteractionInterface
 		{
 			subscribeOnMulticast();
 
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this);
 			Registry registry = LocateRegistry.createRegistry(1098);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
 		}
@@ -157,7 +157,7 @@ public class Node implements Runnable, NodeInteractionInterface
 	 *
 	 */
 	public void multicastListener()
-    {
+	{
 		if(subscriber.hasData())
 		{
 			System.out.println("data received!");
@@ -268,8 +268,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		// The node will change the previous and next id of the new node in following cases:
 		if (
 				(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
-				(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
-				(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
+						(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
+						(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
 
 				){
 			Registry reg = null;
@@ -302,8 +302,8 @@ public class Node implements Runnable, NodeInteractionInterface
 		// The node will change the previous and next id of the new node in following cases:
 		if (
 				(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id) ||
-				(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
-				(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
+						(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
+						(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
 				)
 		{
 			this.previousNeighbour = newID;

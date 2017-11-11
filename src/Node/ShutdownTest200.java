@@ -8,8 +8,8 @@ public class ShutdownTest200
 	{
 		Scanner scanner = new Scanner(System.in);
 
-		Node.getInstance().nameServerBind("10.0.0.2");
-		Node.getInstance().setId((short) 200);
+		//Node.getInstance().nameServerBind("10.0.0.2");
+		//Node.getInstance().setId((short) 200);
 		//Node.getInstance().setNextNeighbour((short) 1);
 		//Node.getInstance().setPreviousNeighbour((short) 1);
 
