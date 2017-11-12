@@ -28,12 +28,7 @@ public class Server implements Runnable
 		this.incomingConnections = new HashMap<String, ConnectionHandler> ();
 	}
 
-	/**
-	 * Starts the TCP server.
-	 * @throws IOException	An IOException can be thrown by the ServerSocket constructor
-	 */
-	public void start() throws
-			IOException
+	public void start() throws IOException
 	{
 		this.socket = new ServerSocket(this.portNum);
 
@@ -41,21 +36,11 @@ public class Server implements Runnable
 		ownThread.start();
 	}
 
-	/**
-	 * Sends a string. to the specified remote host.<br>
-	 * @param remoteHost	The remote host that the data should be sent to.<br>
-	 * @param data			The data to be sent.<br>
-	 */
 	public void send(String remoteHost, String data)
 	{
 		this.send(remoteHost, data.getBytes());
 	}
 
-	/**
-	 * Sends all bytes in the data array to the specified remote host.<br>
-	 * @param remoteHost	The remote host that the data should be sent to.<br>
-	 * @param data			The data to be sent.<br>
-	 */
 	public void send(String remoteHost, byte[] data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -66,21 +51,16 @@ public class Server implements Runnable
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("Networking.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
+				System.err.println("Networking.TCP.Server.send()\tAn Exception was thrown while trying to send data");
 				ioe.printStackTrace();
 			}
 		}
 		else
 		{
-			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
-	/**
-	 * Sends all bytes in the data list to specified the remote host.<br>
-	 * @param remoteHost	The remote host that the data should be sent to.<br>
-	 * @param data			The data to be sent.<br>
-	 */
 	public void send(String remoteHost, List<Byte> data)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -100,21 +80,16 @@ public class Server implements Runnable
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("IO.Network.TCP.Publisher.send()\tAn Exception was thrown while trying to send data");
+				System.err.println("IO.Network.TCP.Server.send()\tAn Exception was thrown while trying to send data");
 				ioe.printStackTrace();
 			}
 		}
 		else
 		{
-			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 		}
 	}
 
-	/**
-	 * Reads all bytes from the interal receive buffer.<br>
-	 * @param	remoteHost	The remote host from whose buffer we want to read.<br>
-	 * @return	All data in the buffer for the specified host.<br>
-	 */
 	public byte[] receive(String remoteHost)
 	{
 		if (this.incomingConnections.containsKey(remoteHost))
@@ -123,15 +98,11 @@ public class Server implements Runnable
 		}
 		else
 		{
-			System.err.println("IO.Network.TCP.Publisher.receive()\tRemote host " + remoteHost + " was not found in active connections.");
+			System.err.println("IO.Network.TCP.Server.receive()\tRemote host " + remoteHost + " was not found in active connections.");
 			return new byte[0];
 		}
 	}
 
-	/**
-	 * Stops the server.<br>
-	 * @throws IOException The close() method of the ServerSocket can throw an IOException
-	 */
 	public void stop() throws IOException
 	{
 		this.socket.close();
@@ -152,7 +123,7 @@ public class Server implements Runnable
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("IO.Network.TCP.Publisher.run()\tException was thrown in call to accept() or close()");
+			System.err.println("IO.Network.TCP.Server.run()\tException was thrown in call to accept() or close()");
 			ioe.printStackTrace();
 		}
 	}
@@ -167,10 +138,6 @@ public class Server implements Runnable
 		return this.incomingConnections.get(remoteHost).hasData();
 	}
 
-	/**
-	 * Returns easy to read format for Server
-	 * @return
-	 */
 	public String toString()
 	{
 		StringBuilder resBuilder = new StringBuilder();
@@ -200,13 +167,11 @@ public class Server implements Runnable
 		return resBuilder.toString();
 	}
 
-
 	public void sendFile(String remoteHost, String filename, ProtocolHeader header)
 	{
 		File file = new File(filename);
 		try
 		{
-
 			while(file.available() != 0)
 			{
 				int length;
@@ -251,8 +216,6 @@ public class Server implements Runnable
 
 					this.send(remoteHost, bytes);
 				}
-
-
 			}
 		}
 		catch(IOException ioe)
@@ -261,35 +224,33 @@ public class Server implements Runnable
 		}
 	}
 
-	public void receiveFile(String remoteHost,String filename,  int transactionID)
+	public void receiveFile(String remoteHost, String filename,  int transactionID)
 	{
 		File file = new File(filename);
-
 
 		try
 		{
 			//file.write("".getBytes());
 			while (this.hasData(remoteHost))
 			{
-
 				Datagram datagram = new Datagram(this.receive(remoteHost));
 
-				//if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE)
-				//{
-					System.out.println("TRANSACTION ID: " + datagram.getHeader().getTransactionID());
-					System.out.println("REPLY CODE: " + datagram.getHeader().getReplyCode());
-					System.out.println("RECEIVED");
-					//if (datagram.getHeader().getTransactionID() == transactionID)
-					//{
+				System.out.println("TRANSACTION ID: " + datagram.getHeader().getTransactionID());
+				System.out.println("REPLY CODE: " + datagram.getHeader().getReplyCode());
+				System.out.println("RECEIVED");
+
+				if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE)
+				{
+					if (datagram.getHeader().getTransactionID() == transactionID)
+					{
 						file.append(datagram.getData());
-					//}
-				//}
+					}
+				}
 			}
 		}
 		catch(IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
-
 	}
 }
