@@ -87,14 +87,14 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
 - [ ] Make Node-Discovery check for duplicate IP's
 - [ ] Test Discovery System when going from 2 nodes -> 3 nodes
-- [ ] Find a fix for failure-recursion
 - [ ] Update Serializer to use ByteBuffer's
 
-#### Shutdown (Thomas)
+#### Shutdown
 
 #### Failure
 - [ ] Provide centralized interface (Static/Singleton?) for handling exceptions
 - [ ] Add ping functionality
+- [ ] Find a fix for failure-recursion
 
 ## Design Decisions
 - Security?
