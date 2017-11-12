@@ -78,6 +78,9 @@ It continuously circulates through the network by all nodes calling RMI methods 
 `void update (List<String> fileList)`
 
 ## TO-DO
+- [ ] Write Unit Test for Hash function
+- [ ] Expand Unit Tests for Protocol Header
+- [ ] Check Unit Tests for Serializer
 
 ### Opdracht 4
 #### Discovery & Bootstrap
