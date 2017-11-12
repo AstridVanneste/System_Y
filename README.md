@@ -101,3 +101,4 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - Will the nameserver limit the amount of requests a node can make over a specified period of time?
 - Can downloaded files be reshared?
 - What happens when a file is changed? In an owner? In a local file? In a downloaded file?
+- How do we solve failure-recursion?
