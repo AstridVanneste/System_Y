@@ -78,29 +78,22 @@ It continuously circulates through the network by all nodes calling RMI methods 
 `void update (List<String> fileList)`
 
 ## TO-DO
-- [x] Implement UDP multicast
-- [x] Design protocol for non-RMI (TCP/UDP) communication
-- [x] Add file package and classes to repo
-- [ ] Add file methods to network system
 
 ### Opdracht 4
 #### Discovery & Bootstrap
-- [x] Write method/class to convert TreeMap to CSV-formatted String (Astrid)
-- [x] Write method/class to convert CSV-formatted String to TreeMap (Astrid)
-- [x] Discovery Agent needs to be updated to match new specs (Thomas)
-- [x] Create Node Class (Fergan & Axel)
-- [x] Set up Node startup (Fergan & Axel)
-- [ ] Make node listen and respond for/to join-network-multicasts (Fergan & Axel)
-- [ ] Make new node listen for reply to multicast (Fergan & Axel)
-- [x] Update discovery frame format to take into account multicast IP's (Thomas)
-- [x] Make sure Map rolls-over when calculating an ID lower than the lowest ID (Astrid)
+- [ ] Clean up Node code and move Discovery into LifeCycleManager
+- [ ] Remove unnecessary println()'s from all code
+- [ ] Fix concurrency issues in Network Classes
+- [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
+- [ ] Make Node-Discovery check for duplicate IP's
+- [ ] Test Discovery System when going from 2 nodes -> 3 nodes
+- [ ] Find a fix for failure-recursion
+- [ ] Update Serializer to use ByteBuffer's
 
 #### Shutdown (Thomas)
-- [ ] Add node shutdown component
 
 #### Failure
 - [ ] Provide centralized interface (Static/Singleton?) for handling exceptions
-- [ ] Add Failure component to nodes
 - [ ] Add ping functionality
 
 ## Design Decisions
