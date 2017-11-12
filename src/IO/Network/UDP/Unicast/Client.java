@@ -150,10 +150,12 @@ public class Client implements Runnable
 					//System.out.println("Received " + incomingPacket.getData().length + " Bytes");
 					this.packetBuffer.add(incomingPacket);
 					//System.out.println("Packetbuffer size " + this.packetBuffer.size());
-				} catch (SocketException se)
+				}
+				catch (SocketException se)
 				{
-					se.printStackTrace();
-				} catch (IOException e)
+					//se.printStackTrace();
+				}
+				catch (IOException e)
 				{
 					System.err.println("Error when trying to receive a packet");
 					e.printStackTrace();
