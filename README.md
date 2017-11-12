@@ -81,6 +81,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Write Unit Test for Hash function
 - [ ] Expand Unit Tests for Protocol Header
 - [ ] Check Unit Tests for Serializer
+- [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
 
 ### Opdracht 4
 #### Discovery & Bootstrap
@@ -90,7 +91,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
 - [ ] Make Node-Discovery check for duplicate IP's
 - [ ] Test Discovery System when going from 2 nodes -> 3 nodes
-- [ ] Update Serializer to use ByteBuffer's
+- [ ] Update Serializer to use ByteBuffers
 
 #### Shutdown
 
