@@ -10,6 +10,7 @@ import java.util.Arrays;
  */
 public class ProtocolHeader
 {
+	public static final byte CURRENT_VERSION = 1;
 	public static final int HEADER_LENGTH = 12;
 
 	private static final int VERSION_LENGTH = 1;
