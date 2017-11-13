@@ -25,12 +25,19 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node
+public class Node implements NodeInteractionInterface
 {
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
+	private String name;
+	private short id;
+	private short previousNeighbour;
+	private short nextNeighbour;
+
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
+
+	private ResolverInterface resolverStub;
 
 
 
@@ -39,8 +46,13 @@ public class Node
 
 	public Node()
 	{
+		this.name = "";
+		this.id = -1;
+		this.previousNeighbour = -1;
+		this.nextNeighbour = -1;
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
+		this.resolverStub = null;
 
 	}
 
@@ -65,7 +77,7 @@ public class Node
 		{
 			lifeCycleManager.subscribeOnMulticast();
 
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(lifeCycleManager,0);
+			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
 
@@ -82,6 +94,15 @@ public class Node
 	}
 
 
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 
 	public LifeCycleManager getLifeCycleManager()
 	{
@@ -93,5 +114,73 @@ public class Node
 		return this.failureAgent;
 	}
 
+
+
+	public short getId()
+	{
+		return this.id;
+	}
+
+	public void setId(short id)
+	{
+		this.id = id;
+	}
+
+	public short getPreviousNeighbour()
+	{
+		return this.previousNeighbour;
+	}
+
+	public void setPreviousNeighbour(short previousNeighbour)
+	{
+		this.previousNeighbour = previousNeighbour;
+	}
+
+	public short getNextNeighbour()
+	{
+		return this.nextNeighbour;
+	}
+
+	public void setNextNeighbour(short nextNeighbour)
+	{
+		this.nextNeighbour = nextNeighbour;
+	}
+
+	public ResolverInterface getResolverStub()
+	{
+		return this.resolverStub;
+	}
+
+	public void setResolverStub(ResolverInterface resolverStub)
+	{
+		this.resolverStub = resolverStub;
+	}
+
+
+	//REMOTE
+
+	@Override
+	public short getPreviousNeighbourRemote() throws RemoteException
+	{
+		return this.previousNeighbour;
+	}
+
+	@Override
+	public void setPreviousNeighbourRemote(short previousNeighbour) throws RemoteException
+	{
+		this.previousNeighbour = previousNeighbour;
+	}
+
+	@Override
+	public short getNextNeighbourRemote() throws RemoteException
+	{
+		return this.nextNeighbour;
+	}
+
+	@Override
+	public void setNextNeighbourRemote(short nextNeighbour) throws RemoteException
+	{
+		this.nextNeighbour = nextNeighbour;
+	}
 
 }

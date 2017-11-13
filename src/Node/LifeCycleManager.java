@@ -23,15 +23,9 @@ import java.util.Scanner;
 /**
  * Created by Astrid on 07/11/2017.
  */
-public class LifeCycleManager implements NodeInteractionInterface, Runnable
+public class LifeCycleManager implements Runnable
 {
-	private String name;
-	private String nsIp;
-	private short id;
-	private short previousNeighbour;
-	private short nextNeighbour;
 	private Subscriber subscriber;
-	private ResolverInterface resolverStub;
 	private ShutdownAgentInterface shutdownStub;
 	private int startupTransactionId;
 	private boolean newNode;
@@ -39,12 +33,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 	public LifeCycleManager()
 	{
 		this.newNode = true;
-		this.resolverStub = null;
 		this.shutdownStub = null;
-		this.id = -1;
-		this.name = "";
-		this.previousNeighbour = -1;
-		this.nextNeighbour = -1;
 	}
 
 	/**
@@ -57,8 +46,8 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 
 		try
 		{
-			IPprevious = resolverStub.getIP(previousNeighbour);
-			IPnext = resolverStub.getIP(nextNeighbour);
+			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
+			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
 		}
 		catch(RemoteException re)
 		{
@@ -70,7 +59,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
 			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			previousNode.setNextNeighbour(nextNeighbour);
+			previousNode.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -83,7 +72,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
 			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbour(previousNeighbour);
+			nextNode.setPreviousNeighbourRemote(Node.getInstance().getPreviousNeighbour());
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -94,7 +83,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 
 		try
 		{
-			shutdownStub.requestShutdown(id);
+			shutdownStub.requestShutdown(Node.getInstance().getId());
 		}
 		catch(RemoteException re)
 		{
@@ -105,7 +94,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 	{
 		System.out.println("give me a name");
 		Scanner scanner = new Scanner(System.in);
-		setName(scanner.nextLine());
+		Node.getInstance().setName(scanner.nextLine());
 
 
 		accessRequest();
@@ -137,7 +126,8 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 	/**
 	 * send a multicast message requezsting to be added to network
 	 */
-	public void accessRequest () {
+	public void accessRequest ()
+	{
 		System.out.println("Make accessrequest");
 
 		Client udpClient = new Client();
@@ -150,12 +140,12 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 
 		this.startupTransactionId = rand.nextInt()%127;
 
-		int dataLength = name.length() + 8;
+		int dataLength = Node.getInstance().getName().length() + 8;
 		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
 
-		byte[] data = new byte[name.length() + 8];
-		byte[] nameLengthInByte = Serializer.intToBytes(name.length());
-		byte[] nameInByte = name.getBytes();
+		byte[] data = new byte[Node.getInstance().getName().length() + 8];
+		byte[] nameLengthInByte = Serializer.intToBytes(Node.getInstance().getName().length());
+		byte[] nameInByte = Node.getInstance().getName().getBytes();
 
 		byte[] ipInByte = new byte[4];
 
@@ -235,14 +225,14 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 				if ((request.getHeader().getReplyCode() == (int)ProtocolHeader.REPLY_SUCCESSFULLY_ADDED) &&
 						(request.getHeader().getTransactionID() == this.startupTransactionId))
 				{
-					this.id = newNodeID;
-					this.nsIp = packet.getAddress().getHostAddress();
+					Node.getInstance().setId(newNodeID);
+					String nsIp = packet.getAddress().getHostAddress();
 					nameServerBind(nsIp);
 					//nameserver sends the amount of nodes in the tree
 					if(numberOfNodes == 0)
 					{
-						this.nextNeighbour = this.id;
-						this.previousNeighbour = this.id;
+						Node.getInstance().setNextNeighbour(Node.getInstance().getId());
+						Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
 					}
 					newNode = false;
 					System.out.println("toegevoegd");
@@ -260,7 +250,7 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 		try
 		{
 			reg = LocateRegistry.getRegistry(nsIp);
-			this.resolverStub = (ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME);
+			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		} catch (RemoteException e)
 		{
@@ -278,18 +268,18 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 	private synchronized void changeNeighbours(short newID)
 	{
 		// You'r the first node so edit both neighbours of the new node
-		if(this.id == this.nextNeighbour && this.id == this.previousNeighbour)
+		if(Node.getInstance().getId() == Node.getInstance().getNextNeighbour() && Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour())
 		{
-			this.nextNeighbour = newID;
-			this.previousNeighbour = newID;
+			Node.getInstance().setPreviousNeighbour(newID);
+			Node.getInstance().setNextNeighbour(newID);
 			Registry reg = null;
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
-				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
+				reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newID));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-				neighbourInterface.setNextNeighbour(id);
-				neighbourInterface.setPreviousNeighbour(id);
+				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getId());
+				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -302,9 +292,9 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 		// The node will change the previous and next id of the new node in following cases:
 		//you are the previous of the new node and need to change the neighbours of the new node and your old next neighbour
 		if (
-				(		(newID > this.id && newID > this.nextNeighbour && this.nextNeighbour < this.id) ||
-						(newID > this.id && newID < this.nextNeighbour && this.nextNeighbour > this.id) ||
-						(newID < this.id && newID < this.nextNeighbour && this.nextNeighbour < this.id)
+				(		(newID > Node.getInstance().getId() && newID > Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() < Node.getInstance().getId()) ||
+						(newID > Node.getInstance().getId() && newID < Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() > Node.getInstance().getId()) ||
+						(newID < Node.getInstance().getId() && newID < Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() < Node.getInstance().getId())
 
 				))
 		{
@@ -312,15 +302,15 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
-				reg = LocateRegistry.getRegistry(this.resolverStub.getIP(newID));
+				reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newID));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-				neighbourInterface.setNextNeighbour(this.nextNeighbour);
-				neighbourInterface.setPreviousNeighbour(this.id);
+				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
+				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
 
-				reg = LocateRegistry.getRegistry(this.resolverStub.getIP(this.nextNeighbour));
+				reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour()));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
-				neighbourInterface.setPreviousNeighbour(newID);
-				this.nextNeighbour = newID;
+				neighbourInterface.setPreviousNeighbourRemote(newID);
+				Node.getInstance().setNextNeighbour(newID);
 
 			} catch (RemoteException e)
 			{
@@ -351,71 +341,18 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 	}
 
 
-	/**
-	 * at startup, set the neighbours as your own
-	 */
-	private void setNeighbours()
-	{
-		this.previousNeighbour = this.id;
-		this.nextNeighbour = this.id;
-	}
-
 	private void askNewName ()
 	{
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
-		this.name = scanner.nextLine();
-		this.id = NameServer.getHash(name);
+		Node.getInstance().setName(scanner.nextLine());
+		Node.getInstance().setId(NameServer.getHash(Node.getInstance().getName())); //todo: dit mag hier absoluut niet gebeuren. Een id wordt enkel toegekend bij discovery door de nameserver!!!
 	}
 
-	public String getName()
-	{
-		return this.name;
-	}
-
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public short getPreviousNeighbour() throws RemoteException
-	{
-		return this.previousNeighbour;
-	}
-
-	public void setPreviousNeighbour(short previousNeighbour) throws RemoteException
-	{
-		this.previousNeighbour = previousNeighbour;
-	}
-
-	public short getNextNeighbour() throws RemoteException
-	{
-		return this.nextNeighbour;
-	}
-
-	public void setNextNeighbour(short nextNeighbour) throws RemoteException
-	{
-		this.nextNeighbour = nextNeighbour;
-	}
-
-	public ResolverInterface getResolverStub()
-	{
-		return this.resolverStub;
-	}
 
 	public ShutdownAgentInterface getShutdownStub()
 	{
 		return this.shutdownStub;
 	}
 
-	public short getId()
-	{
-		return this.id;
-	}
-
-	public void setId(short id)
-	{
-		this.id = id;
-	}
 }
