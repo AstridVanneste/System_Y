@@ -33,8 +33,8 @@ public class NodeMain
 
             try
             {
-                System.out.println(Node.getInstance().getNextNeighbour());
-                System.out.println(Node.getInstance().getPreviousNeighbour());
+                System.out.println(Node.getInstance().getLifeCycleManager().getNextNeighbour());
+                System.out.println(Node.getInstance().getLifeCycleManager().getPreviousNeighbour());
             } catch (RemoteException e)
             {
                 e.printStackTrace();
@@ -52,9 +52,9 @@ public class NodeMain
 			try
 			{
 				System.out.println("DOOOD");
-				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
-				System.out.println("NEXT: " + Node.getInstance().getNextNeighbour());
-				System.out.println("PREVIOUS: " + Node.getInstance().getPreviousNeighbour());
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getLifeCycleManager().getNextNeighbour());
+				System.out.println("NEXT: " + Node.getInstance().getLifeCycleManager().getNextNeighbour());
+				System.out.println("PREVIOUS: " + Node.getInstance().getLifeCycleManager().getPreviousNeighbour());
 			}
 			catch(RemoteException re)
 			{

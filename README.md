@@ -100,6 +100,34 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Add ping functionality
 - [ ] Find a fix for failure-recursion
 
+### Opdracht 5
+#### Replicatie (Sessie 1)
+- [ ] Node moet start methodes door-callen
+- [ ] `FileLedger` klasse:
+```
+  private short ownerID;
+  private short localID;
+  private List<Short> copies; 
+```
+
+- [ ] `FileType enum {OWNER, LOCAL, DOWNLOAD}`
+
+- [ ] `FileManagerInterface` interface:
+```
+  public void refresh()
+  public void pushFile(String filename, int fileSize, FileType type)
+  public void pullFile(short dst, String filename) (Push doorcallen)
+```
+- [ ] `FileManager` klasse:
+```
+  implements FileManagerInterface
+  TCPSocket, continu luisteren op vaste poort (Zie Network.Constants)
+  start() methode (TCP starten)
+  stop() methode
+  RMIServer draaien (binden op Node poort)
+  
+```
+
 ## Design Decisions
 - Security?
 - Will the nameserver limit the amount of requests a node can make over a specified period of time?
