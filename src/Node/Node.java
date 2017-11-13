@@ -27,6 +27,7 @@ import java.util.Scanner;
 
 public class Node implements NodeInteractionInterface
 {
+	public static final int DEFAULT_ID = -1;
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String name;
@@ -45,9 +46,9 @@ public class Node implements NodeInteractionInterface
 	public Node()
 	{
 		this.name = "";
-		this.id = -1;
-		this.previousNeighbour = -1;
-		this.nextNeighbour = -1;
+		this.id = DEFAULT_ID;
+		this.previousNeighbour = DEFAULT_ID;
+		this.nextNeighbour = DEFAULT_ID;
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
 		this.fileManager = new FileManager();

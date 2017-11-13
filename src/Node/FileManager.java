@@ -78,7 +78,8 @@ public class FileManager implements FileManagerInterface, Runnable
 				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
 		}
 
-		int bytesWritten = this.tcpServer.receiveFile(remoteHost, filename, fileSize);
+		//int bytesWritten = this.tcpServer.receiveFile(remoteHost, filename, fileSize);
+		int bytesWritten = 0;
 
 		if (bytesWritten != fileSize)
 		{

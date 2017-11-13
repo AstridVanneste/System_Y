@@ -31,16 +31,11 @@ public class NodeMain
 				break;
 			}
 
-            try
-            {
-                System.out.println(Node.getInstance().getLifeCycleManager().getNextNeighbour());
-                System.out.println(Node.getInstance().getLifeCycleManager().getPreviousNeighbour());
-            } catch (RemoteException e)
-            {
-                e.printStackTrace();
-            }
+            System.out.println(Node.getInstance().getNextNeighbour());
+            System.out.println(Node.getInstance().getPreviousNeighbour());
         }
 
+        /*
         try
 		{
 			Registry reg = LocateRegistry.getRegistry("10.0.0.3");
@@ -62,8 +57,6 @@ public class NodeMain
 			}
 		}
 		System.out.println("kleir");
-
-
-
+		*/
     }
 }
