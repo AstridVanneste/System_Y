@@ -85,7 +85,6 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Update Serializer to use ByteBuffers
 - [ ] Remove unnecessary println()'s from all code
 - [ ] Fix concurrency issues in Network Classes
-- [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
 
 ### Opdracht 4
 #### Discovery & Bootstrap
