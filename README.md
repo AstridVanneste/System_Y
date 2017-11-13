@@ -82,16 +82,16 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Expand Unit Tests for Protocol Header
 - [ ] Check Unit Tests for Serializer
 - [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
+- [ ] Update Serializer to use ByteBuffers
+- [ ] Remove unnecessary println()'s from all code
+- [ ] Fix concurrency issues in Network Classes
+- [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
 
 ### Opdracht 4
 #### Discovery & Bootstrap
 - [ ] Clean up Node code and move Discovery into LifeCycleManager
-- [ ] Remove unnecessary println()'s from all code
-- [ ] Fix concurrency issues in Network Classes
-- [ ] Create a few Subclasses of the datagram class for (1. Discovery (request & reply), 2. Sending files (request & reply))
 - [ ] Make Node-Discovery check for duplicate IP's
 - [ ] Test Discovery System when going from 2 nodes -> 3 nodes
-- [ ] Update Serializer to use ByteBuffers
 
 #### Shutdown
 
