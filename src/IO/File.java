@@ -118,7 +118,7 @@ public class File
 	 */
 	public void append (byte[] data) throws IOException
 	{
-		System.out.println("APPENDING FILE");
+		//System.out.println("APPENDING FILE");
 
 		FileOutputStream outputStream = new FileOutputStream(this.filename, true);
 
@@ -237,7 +237,6 @@ public class File
 			String[] KV = s.split(";");
 			map.put(Short.parseShort(KV[0]),KV[1]);
 		}
-
 
 		return map;
 	}
