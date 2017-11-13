@@ -56,30 +56,37 @@ public class Node implements NodeInteractionInterface
 
 	public void start()
 	{
-		if(System.getSecurityManager()==null)
+		if (!this.lifeCycleManager.isRunning())
 		{
-			System.setSecurityManager(new SecurityManager());
-		}
+			if (System.getSecurityManager() == null)
+			{
+				System.setSecurityManager(new SecurityManager());
+			}
 
-		try
-		{
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
-			Registry registry = LocateRegistry.createRegistry(1099);
-			registry.bind(Node.NODE_INTERACTION_NAME, stub);
+			try
+			{
+				NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
+				Registry registry = LocateRegistry.createRegistry(1099);
+				registry.bind(Node.NODE_INTERACTION_NAME, stub);
 
-		}
-		catch(RemoteException re)
-		{
-			System.err.println("Exception when creating stub");
-			re.printStackTrace();
-		}
-		catch (AlreadyBoundException e)
-		{
-			e.printStackTrace();
-		}
+			}
+			catch (RemoteException re)
+			{
+				System.err.println("Exception when creating stub");
+				re.printStackTrace();
+			}
+			catch (AlreadyBoundException e)
+			{
+				e.printStackTrace();
+			}
 
-		this.fileManager.start();
-		this.lifeCycleManager.start();
+			this.fileManager.start();
+			this.lifeCycleManager.start();
+		}
+		else
+		{
+			System.err.println("[ERROR]\tTried to start Node that was already running.");
+		}
 	}
 
 	public void stop ()
@@ -95,14 +102,12 @@ public class Node implements NodeInteractionInterface
 
 	/**
 	 * Set new name for the node.
-	 * @warning THIS METHOD STOPS AND STARTS THE NODE
+	 * @warning NODE PARAMETERS ARE INVALID AFTER A RESTART<br>PLEASE RESTART THE NODE AFTER CHANGING ITS NAME
 	 * @param name the node's new name
 	 */
 	public void setName(String name)
 	{
 		this.name = name;
-		this.stop();
-		this.start();
 	}
 
 	public LifeCycleManager getLifeCycleManager()
