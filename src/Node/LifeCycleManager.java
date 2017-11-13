@@ -241,27 +241,25 @@ public class LifeCycleManager implements Runnable
 		}
 	}
 
-	public void nameServerBind(String nsIp){
+	public void nameServerBind(String nsIp)
+	{
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
 		}
+
 		Registry reg = null;
+
 		try
 		{
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		}
-		catch (RemoteException e)
+		catch (RemoteException | NotBoundException e)
 		{
 			e.printStackTrace();
 		}
-		catch (NotBoundException e)
-		{
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
@@ -282,10 +280,12 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getId());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
-			} catch (RemoteException e)
+			}
+			catch (RemoteException e)
 			{
 				e.printStackTrace();
-			}catch (NotBoundException e)
+			}
+			catch (NotBoundException e)
 			{
 				e.printStackTrace();
 			}
@@ -314,10 +314,8 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface.setPreviousNeighbourRemote(newID);
 				Node.getInstance().setNextNeighbour(newID);
 
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
-			} catch (NotBoundException e)
+			}
+			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace();
 			}
@@ -351,10 +349,8 @@ public class LifeCycleManager implements Runnable
 		Node.getInstance().setId(NameServer.getHash(Node.getInstance().getName())); //todo: dit mag hier absoluut niet gebeuren. Een id wordt enkel toegekend bij discovery door de nameserver!!!
 	}
 
-
 	public ShutdownAgentInterface getShutdownStub()
 	{
 		return this.shutdownStub;
 	}
-
 }
