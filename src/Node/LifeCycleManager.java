@@ -286,14 +286,6 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
-				/*try
-				{
-					//neighbourInterface = (NodeInteractionInterface) Naming.lookup("//"+ resolverStub.getIP(newID) + "/" + Node.NODE_INTERACTION_NAME);
-
-				} catch (MalformedURLException e)
-				{
-					e.printStackTrace();
-				}*/
 				reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbour(id);
@@ -330,8 +322,6 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 				neighbourInterface.setPreviousNeighbour(newID);
 				this.nextNeighbour = newID;
 
-				//reg = LocateRegistry.getRegistry(resolverStub.getIP(newID));
-				//NodeInteractionInterface neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 			} catch (RemoteException e)
 			{
 				e.printStackTrace();
@@ -341,18 +331,6 @@ public class LifeCycleManager implements NodeInteractionInterface, Runnable
 			}
 
 		}
-	/*
-		// The node will change the previous and next id of the new node in following cases:
-		// nothing needs to be done
-		if (
-				(		(newID < this.id && newID > this.previousNeighbour && this.previousNeighbour < this.id)||
-						(newID < this.id && newID < this.previousNeighbour && this.previousNeighbour > this.id) ||
-						(newID > this.id && newID > this.previousNeighbour && this.previousNeighbour > this.id)
-				))
-		{
-			//this.previousNeighbour = newID;
-		}
-		*/
 	}
 
 	/**
