@@ -89,7 +89,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 
 ### Opdracht 4
 #### Discovery & Bootstrap
-- [ ] Clean up Node code and move Discovery into LifeCycleManager
+- [x] Clean up Node code and move Discovery into LifeCycleManager
 - [ ] Make Node-Discovery check for duplicate IP's
 - [ ] Test Discovery System when going from 2 nodes -> 3 nodes
 
