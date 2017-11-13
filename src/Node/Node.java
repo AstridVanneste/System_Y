@@ -39,10 +39,7 @@ public class Node implements NodeInteractionInterface
 
 	private ResolverInterface resolverStub;
 
-
-
 	private static Node instance;
-
 
 	public Node()
 	{
@@ -86,13 +83,13 @@ public class Node implements NodeInteractionInterface
 		{
 			System.err.println("Exception when creating stub");
 			re.printStackTrace();
-		} catch (AlreadyBoundException e)
+		}
+		catch (AlreadyBoundException e)
 		{
 			e.printStackTrace();
 		}
 		lifeCycleManager.start();
 	}
-
 
 	public String getName()
 	{
@@ -113,8 +110,6 @@ public class Node implements NodeInteractionInterface
 	{
 		return this.failureAgent;
 	}
-
-
 
 	public short getId()
 	{
@@ -155,7 +150,6 @@ public class Node implements NodeInteractionInterface
 	{
 		this.resolverStub = resolverStub;
 	}
-
 
 	//REMOTE
 

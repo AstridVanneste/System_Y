@@ -19,6 +19,8 @@ public class Constants
 
 	public static final int DISCOVERY_CLIENT_PORT = 2001;
 
+	public static final int FILE_RECEIVE_PORT = 2002;
+
 	/**
 	 * Default Encoding
 	 * When a set of bytes is decoded to a String, an encoding needs to be specified.
