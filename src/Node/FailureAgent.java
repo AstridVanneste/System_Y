@@ -49,7 +49,7 @@ public class FailureAgent
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprev);
 			prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			prevNode.setNextNeighbour(nextID);
+			prevNode.setNextNeighbourRemote(nextID);
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -63,7 +63,7 @@ public class FailureAgent
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
 			nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbour(prevID);
+			nextNode.setPreviousNeighbourRemote(prevID);
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -101,12 +101,12 @@ public class FailureAgent
 
 				while (tmpID != nextID)
 				{
-					Node.getInstance().getShutdownStub().requestShutdown(tmpID);
+					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 				}
 
-				prevNode.setNextNeighbour(nextID);
-				nextNode.setPreviousNeighbour(prevID);
+				prevNode.setNextNeighbourRemote(nextID);
+				nextNode.setPreviousNeighbourRemote(prevID);
 			}
 		}
 		catch (RemoteException re)
@@ -115,7 +115,29 @@ public class FailureAgent
 		}
 		catch (NullPointerException npe)
 		{
-			System.err.println("[ERROR]\tNext (" + nextNode.toString() + ") or Previous (" + prevNode.toString() + ") stub was NULL when trying to set neighbours from FailureAgent");
+			String nextNodeStr = "";
+			String prevNodeStr = "";
+
+			if (nextNode == null)
+			{
+				nextNodeStr = "NULL";
+			}
+			else
+			{
+				nextNodeStr = nextNode.toString();
+			}
+
+			if (prevNode == null)
+			{
+				prevNodeStr = "NULL";
+			}
+			else
+			{
+				prevNodeStr = prevNode.toString();
+			}
+
+
+			System.err.println("[ERROR]\tNext (" + nextNodeStr + ") or Previous (" + prevNodeStr + ") stub was NULL when trying to set neighbours from FailureAgent");
 			npe.printStackTrace();
 		}
 	}
