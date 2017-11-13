@@ -25,87 +25,31 @@ import java.util.Scanner;
  */
 public class LifeCycleManager implements Runnable
 {
+	private boolean running;
+	private int bootstrapTransactionID;
 	private Subscriber subscriber;
 	private ShutdownAgentInterface shutdownStub;
-	private int bootstrapTransactionID;
+
 
 	public LifeCycleManager()
 	{
+		this.running = false;
 		this.bootstrapTransactionID = -1;
 		this.subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
 		this.shutdownStub = null;
 	}
 
-	/**
-	 * Gracefully removes the node from the system.
-	 */
-	public void shutdown()
-	{
-		String IPprevious = "";
-		String IPnext = "";
-
-		// Get IP's of next and prev. node
-		try
-		{
-			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
-			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
-		}
-		catch(RemoteException re)
-		{
-			re.printStackTrace();
-		}
-
-		// Set Previous node's next neighbour
-		try
-		{
-			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
-			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			previousNode.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
-		}
-		catch(RemoteException | NotBoundException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
-		}
-
-		// Set Next node's previous neighbour
-		try
-		{
-			Registry registryNext = LocateRegistry.getRegistry(IPnext);
-			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbourRemote(Node.getInstance().getPreviousNeighbour());
-		}
-		catch(RemoteException | NotBoundException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
-		}
-
-		// Tell the NameServer we're done
-		try
-		{
-			shutdownStub.requestShutdown(Node.getInstance().getId());
-		}
-		catch(RemoteException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
-		}
-	}
-
 	public void start()
 	{
-		System.out.println("Please enter a name for this node:");
-		Scanner scanner = new Scanner(System.in);
-		Node.getInstance().setName(scanner.nextLine());
-
 		this.subscriber.start();
+
+		this.running = true;
 
 		Thread thread = new Thread(this);
 		thread.start();
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
-		this.accessRequest();
+		this.sendAccessRequest();
 	}
 
 	/**
@@ -116,9 +60,7 @@ public class LifeCycleManager implements Runnable
 	@Override
 	public void run()
 	{
-		boolean quit = false;
-
-		while(!quit)
+		while(this.running)
 		{
 			if(this.subscriber.hasData())
 			{
@@ -141,7 +83,7 @@ public class LifeCycleManager implements Runnable
 						// We're not a new node, check and if needed update neighbours
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
-							this.changeNeighbours(newNodeID);
+							this.updateNeighbours(newNodeID);
 						}
 					}
 					else if (Node.getInstance().getId() == Node.DEFAULT_ID)
@@ -152,7 +94,7 @@ public class LifeCycleManager implements Runnable
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
 						{
 							System.err.println("[ERROR]\tNameserver detected ID as being a duplicate, please restart the Node and set a unique name.");
-							quit = true; // Exit the 'inifinite' while loop
+							this.running = true; // Exit the 'inifinite' while loop
 							continue;
 						}
 
@@ -160,7 +102,7 @@ public class LifeCycleManager implements Runnable
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_IP)
 						{
 							System.err.println("[ERROR]\tNameserver detected IP as being a duplicate, please fix your DHCP config or change your static IP.");
-							quit = true;
+							this.running = true;
 							continue;
 						}
 
@@ -186,14 +128,12 @@ public class LifeCycleManager implements Runnable
 				}
 			}
 		}
-
-		this.stop(); // Clean up...
 	}
 
 	/**
 	 * send a multicast message requesting to be added to network
 	 */
-	private void accessRequest ()
+	private void sendAccessRequest ()
 	{
 		Client udpClient = new Client();
 		udpClient.start();
@@ -257,8 +197,9 @@ public class LifeCycleManager implements Runnable
 
 	/**
 	 * Check which neighbour the new incoming neighbour becomes
+	 * @param newID The ID of the node that just joined.
 	 */
-	private void changeNeighbours(short newID)
+	private void updateNeighbours (short newID)
 	{
 		/* You're the first node so edit both neighbours of the new node
 		 * OWN ID == NEXT ID && OWN ID == PREVIOUS ID
@@ -327,17 +268,73 @@ public class LifeCycleManager implements Runnable
 		}
 	}
 
-	private void stop ()
+	public boolean isRunning ()
 	{
+		return this.running;
+	}
+
+	public void stop ()
+	{
+		this.running = false;
 		this.subscriber.stop();
 		// shut ourselves down
 		this.shutdown();
 	}
 
-	private void askNewName ()  //todo: onderscheid maken tussen herstarten en opstarten
+	/**
+	 * Gracefully removes the node from the system.
+	 */
+	public void shutdown()
 	{
-		System.out.println("Please enter a new name: ");
-		Scanner scanner = new Scanner(System.in);
-		Node.getInstance().setName(scanner.nextLine());
+		String IPprevious = "";
+		String IPnext = "";
+
+		// Get IP's of next and prev. node
+		try
+		{
+			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
+			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
+		}
+		catch(RemoteException re)
+		{
+			re.printStackTrace();
+		}
+
+		// Set Previous node's next neighbour
+		try
+		{
+			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
+			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
+			previousNode.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
+		}
+		catch(RemoteException | NotBoundException re)
+		{
+			re.printStackTrace();
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
+		}
+
+		// Set Next node's previous neighbour
+		try
+		{
+			Registry registryNext = LocateRegistry.getRegistry(IPnext);
+			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
+			nextNode.setPreviousNeighbourRemote(Node.getInstance().getPreviousNeighbour());
+		}
+		catch(RemoteException | NotBoundException re)
+		{
+			re.printStackTrace();
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
+		}
+
+		// Tell the NameServer we're done
+		try
+		{
+			shutdownStub.requestShutdown(Node.getInstance().getId());
+		}
+		catch(RemoteException re)
+		{
+			re.printStackTrace();
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
+		}
 	}
 }

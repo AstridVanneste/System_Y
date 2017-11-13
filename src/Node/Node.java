@@ -37,15 +37,18 @@ public class Node implements NodeInteractionInterface
 		this.failureAgent = new FailureAgent();
 		this.fileManager = new FileManager();
 		this.resolverStub = null;
-
 	}
 
+	/**
+	 * Returns the singleton instance of the Node.
+	 * @warning THE NODE STILL NEEDS TO BE STARTED SEPARATELY
+	 * @return
+	 */
 	public static Node getInstance()
 	{
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
-			Node.instance.start();
 		}
 		return Node.instance;
 	}
@@ -60,10 +63,6 @@ public class Node implements NodeInteractionInterface
 
 		try
 		{
-			this.fileManager.start();
-			this.lifeCycleManager.start();
-			//this.lifeCycleManager.subscribeOnMulticast();
-
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1099);
 			registry.bind(Node.NODE_INTERACTION_NAME, stub);
@@ -78,7 +77,15 @@ public class Node implements NodeInteractionInterface
 		{
 			e.printStackTrace();
 		}
-		lifeCycleManager.start();
+
+		this.fileManager.start();
+		this.lifeCycleManager.start();
+	}
+
+	public void stop ()
+	{
+		this.fileManager.stop();
+		this.lifeCycleManager.stop();
 	}
 
 	public String getName()
@@ -86,9 +93,16 @@ public class Node implements NodeInteractionInterface
 		return this.name;
 	}
 
+	/**
+	 * Set new name for the node.
+	 * @warning THIS METHOD STOPS AND STARTS THE NODE
+	 * @param name the node's new name
+	 */
 	public void setName(String name)
 	{
 		this.name = name;
+		this.stop();
+		this.start();
 	}
 
 	public LifeCycleManager getLifeCycleManager()
@@ -165,5 +179,11 @@ public class Node implements NodeInteractionInterface
 	public void setNextNeighbourRemote(short nextNeighbour) throws RemoteException
 	{
 		this.nextNeighbour = nextNeighbour;
+	}
+
+	@Override
+	public boolean isRunning() throws RemoteException
+	{
+		return this.lifeCycleManager.isRunning();
 	}
 }

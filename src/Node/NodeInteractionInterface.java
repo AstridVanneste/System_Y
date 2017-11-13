@@ -12,4 +12,6 @@ public interface NodeInteractionInterface extends Remote
 	public void setPreviousNeighbourRemote (short id) throws RemoteException;
 
 	public short getPreviousNeighbourRemote () throws RemoteException;
+
+	public boolean isRunning () throws RemoteException;
 }
