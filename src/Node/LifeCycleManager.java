@@ -23,7 +23,7 @@ import java.util.Scanner;
 /**
  * Created by Astrid on 07/11/2017.
  */
-public class LifeCycleManager implements NodeInteractionInterface
+public class LifeCycleManager implements NodeInteractionInterface, Runnable
 {
 	private String name;
 	private String nsIp;
@@ -101,6 +101,38 @@ public class LifeCycleManager implements NodeInteractionInterface
 			re.printStackTrace();
 		}
 	}
+	public void start()
+	{
+		System.out.println("give me a name");
+		Scanner scanner = new Scanner(System.in);
+		setName(scanner.nextLine());
+
+
+		accessRequest();
+
+		Thread thread = new Thread(this);
+		thread.start();
+	}
+
+	/**
+	 * Multicast for NS
+	 * NS will process this message and has to confirm that the node may access the network
+	 */
+	public void run()
+	{
+		while(true)
+		{
+			multicastListener();
+			try
+			{
+				Thread.sleep(1);
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
 
 	/**
 	 * send a multicast message requezsting to be added to network
@@ -191,7 +223,7 @@ public class LifeCycleManager implements NodeInteractionInterface
 					askNewName();
 					accessRequest();
 				}
-				
+
 				//check if message contains error message duplicate id from NS
 				if ((request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_IP) &&
 						(request.getHeader().getTransactionID() == this.startupTransactionId))

@@ -25,7 +25,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-public class Node implements Runnable
+public class Node
 {
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
@@ -49,16 +49,13 @@ public class Node implements Runnable
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
-			Node.instance.start();
+			Node.instance.init();
 		}
 		return Node.instance;
 	}
 
-	public void start()
-	{
-		System.out.println("give me a name");
-		Scanner scanner = new Scanner(System.in);
-		lifeCycleManager.setName(scanner.nextLine());
+
+	public void init(){
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -81,33 +78,9 @@ public class Node implements Runnable
 		{
 			e.printStackTrace();
 		}
-
-		lifeCycleManager.accessRequest();
-
-		Thread thread = new Thread(this);
-		thread.start();
+		lifeCycleManager.start();
 	}
 
-	/**
-	 * Multicast for NS
-	 * NS will process this message and has to confirm that the node may access the network
-	 */
-
-
-	public void run()
-	{
-		while(true)
-		{
-			lifeCycleManager.multicastListener();
-			try
-			{
-				Thread.sleep(1);
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
 
 
 	public LifeCycleManager getLifeCycleManager()
