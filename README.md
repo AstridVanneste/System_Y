@@ -78,26 +78,26 @@ It continuously circulates through the network by all nodes calling RMI methods 
 `void update (List<String> fileList)`
 
 ## TO-DO
-- [ ] Write Unit Test for Hash function
+- [x] Write Unit Test for Hash function
 - [ ] Expand Unit Tests for Protocol Header
-- [ ] Check Unit Tests for Serializer
+- [x] Check Unit Tests for Serializer
 - [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
 - [ ] Update Serializer to use ByteBuffers
-- [ ] Remove unnecessary println()'s from all code
+- [x] Remove unnecessary println()'s from all code
 - [ ] Fix concurrency issues in Network Classes
 
 ### Opdracht 4
 #### Discovery & Bootstrap
 - [x] Clean up Node code and move Discovery into LifeCycleManager
-- [ ] Make Node-Discovery check for duplicate IP's
+- [x] Make Node-Discovery check for duplicate IP's
 - [ ] Test Discovery System when going from 2 nodes -> 3 nodes
 
 #### Shutdown
 
 #### Failure
 - [ ] Provide centralized interface (Static/Singleton?) for handling exceptions
-- [ ] Add ping functionality
-- [ ] Find a fix for failure-recursion
+- [x] Add ping functionality
+- [x] Find a fix for failure-recursion
 
 ### Opdracht 5
 #### Replicatie (Sessie 1)
@@ -132,4 +132,3 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - Will the nameserver limit the amount of requests a node can make over a specified period of time?
 - Can downloaded files be reshared?
 - What happens when a file is changed? In an owner? In a local file? In a downloaded file?
-- How do we solve failure-recursion?
