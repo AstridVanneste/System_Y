@@ -115,13 +115,13 @@ public class LifeCycleManager implements Runnable
 			try
 			{
 				Thread.sleep(1);
-			} catch (InterruptedException e)
+			}
+			catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
 		}
 	}
-
 
 	/**
 	 * send a multicast message requezsting to be added to network
@@ -252,10 +252,12 @@ public class LifeCycleManager implements Runnable
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
-		} catch (RemoteException e)
+		}
+		catch (RemoteException e)
 		{
 			e.printStackTrace();
-		} catch (NotBoundException e)
+		}
+		catch (NotBoundException e)
 		{
 			e.printStackTrace();
 		}

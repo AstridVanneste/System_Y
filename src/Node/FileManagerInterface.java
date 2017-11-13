@@ -1,5 +1,6 @@
 package Node;
 
+import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -16,7 +17,7 @@ public interface FileManagerInterface extends Remote
 	 * @param type          The type of file (local, owner or download)
 	 * @param remoteHost    The port that the caller will use to send the file.
 	 */
-	public void pushFile(String filename, int fileSize, FileType type, String remoteHost) throws RemoteException;
+	public void pushFile(String filename, int fileSize, FileType type, String remoteHost) throws IOException;
 
 	public void pullFile (short dstID, String filename) throws RemoteException;
 }

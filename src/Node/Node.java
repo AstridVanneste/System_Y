@@ -36,6 +36,7 @@ public class Node implements NodeInteractionInterface
 
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
+	private FileManager fileManager;
 
 	private ResolverInterface resolverStub;
 
@@ -49,6 +50,7 @@ public class Node implements NodeInteractionInterface
 		this.nextNeighbour = -1;
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
+		this.fileManager = new FileManager();
 		this.resolverStub = null;
 
 	}
@@ -72,7 +74,8 @@ public class Node implements NodeInteractionInterface
 
 		try
 		{
-			lifeCycleManager.subscribeOnMulticast();
+			this.fileManager.start();
+			this.lifeCycleManager.subscribeOnMulticast();
 
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1099);

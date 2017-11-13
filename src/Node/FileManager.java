@@ -58,7 +58,7 @@ public class FileManager implements FileManagerInterface, Runnable
 	}
 
 	@Override
-	public void pushFile(String filename, int fileSize, FileType type, String remoteHost) throws RemoteException
+	public void pushFile(String filename, int fileSize, FileType type, String remoteHost) throws IOException
 	{
 		switch (type)
 		{
@@ -78,7 +78,12 @@ public class FileManager implements FileManagerInterface, Runnable
 				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
 		}
 
-		this.tcpServer.receiveFile(remoteHost, filename, );
+		int bytesWritten = this.tcpServer.receiveFile(remoteHost, filename, fileSize);
+
+		if (bytesWritten != fileSize)
+		{
+			throw new IOException ("[ERROR]\tDid not receive all (" + Integer.toString(fileSize) + ") Bytes, only got " + Integer.toString(bytesWritten) + " Bytes.");
+		}
 	}
 
 	@Override
