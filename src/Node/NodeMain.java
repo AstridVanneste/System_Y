@@ -1,15 +1,5 @@
 package Node;
 
-import NameServer.ShutdownAgent;
-import NameServer.ResolverInterface;
-//import NameServer.DiscoveryAgentInterface;
-import NameServer.ShutdownAgentInterface;
-
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-        import java.rmi.registry.LocateRegistry;
-        import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 /**
@@ -17,53 +7,82 @@ import java.util.Scanner;
  */
 public class NodeMain
 {
+	private static final int LINE_SEP_LENGTH = 128;
+
     public static void main(String[] args)
     {
-        Node.getInstance().start();
-
-		Scanner scanner = new Scanner(System.in);
-
-        while(true){
-
-            System.out.println("press enter to see neighbours");
-            if(scanner.nextLine().equals("p"))
-			{
-				break;
-			}
-
-            try
-            {
-                System.out.println(Node.getInstance().getLifeCycleManager().getNextNeighbour());
-                System.out.println(Node.getInstance().getLifeCycleManager().getPreviousNeighbour());
-            } catch (RemoteException e)
-            {
-                e.printStackTrace();
-            }
+        if (args.length != 1)
+        {
+        	System.err.println("[ERROR]\tInvalid number of command line arguments: " + Integer.toString(args.length) + ", should be 1");
+        	return;
         }
+        else
+        {
+	        Scanner scanner = new Scanner(System.in);
+	        printLineSep();
 
-        try
-		{
-			Registry reg = LocateRegistry.getRegistry("10.0.0.3");
-			NodeInteractionInterface stub = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+        	System.out.println("INSTRUCTIONS:\n1.) DO TESTING\n2.) STOP NODE (Can be done via quit, which causes an ungraceful end, or via shutdown, which is a graceful stop)");
+        	System.out.println("Press any key to continue...");
+        	scanner.nextLine();
 
-		}
-		catch (Exception e)
-		{
-			try
-			{
-				System.out.println("DOOOD");
-				Node.getInstance().getFailureAgent().failure(Node.getInstance().getLifeCycleManager().getNextNeighbour());
-				System.out.println("NEXT: " + Node.getInstance().getLifeCycleManager().getNextNeighbour());
-				System.out.println("PREVIOUS: " + Node.getInstance().getLifeCycleManager().getPreviousNeighbour());
-			}
-			catch(RemoteException re)
-			{
-				re.printStackTrace();
-			}
-		}
-		System.out.println("kleir");
+	        printLineSep();
+
+        	Node.getInstance().setName(args[0]);
+        	System.out.println("Set name '" + args[0] + "'");
+        	Node.getInstance().start();
+        	System.out.println("Started Node...");
+
+        	boolean quit = false;
 
 
 
+        	while (!quit)
+	        {
+	        	System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt");
+	        	System.out.print(">");
+				String next = scanner.nextLine();
+
+				if (next.equals("Q") || next.equals("q"))
+				{
+					System.out.println("Quitting...");
+					quit = true;
+					continue;
+				}
+		        else if (next.equals("S") || next.equals("s"))
+				{
+					System.out.println("Checking Next and Previous Nodes...");
+					System.out.println("Next: " + Integer.toString(Node.getInstance().getNextNeighbour()));
+					System.out.println("Previous: " + Integer.toString(Node.getInstance().getPreviousNeighbour()));
+				}
+				else if (next.equals("T") || next.equals("t"))
+				{
+					System.out.println("Stopping Node...");
+					Node.getInstance().stop();
+				}
+				else if (next.equals("A") || next.equals("a"))
+				{
+					System.out.println("StartingNode...");
+					Node.getInstance().start();
+				}
+				else
+				{
+					System.err.println("[ERROR]\tInvalid input: '" + next + "'");
+					continue;
+				}
+
+				printLineSep();
+	        }
+
+	        System.exit(-1);
+        }
+    }
+
+    public static void printLineSep ()
+    {
+	    for (int i = 0; i < LINE_SEP_LENGTH; i++)
+	    {
+		    System.out.print('=');
+	    }
+	    System.out.print('\n');
     }
 }

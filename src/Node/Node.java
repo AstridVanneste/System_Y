@@ -1,32 +1,17 @@
 package Node;
 
-import IO.Network.Constants;
-import IO.Network.Datagrams.Datagram;
-import IO.Network.UDP.Multicast.*;
-import IO.Network.Datagrams.ProtocolHeader;
-import IO.Network.UDP.Unicast.Client;
-import IO.Network.UDP.Unicast.Server;
 import NameServer.*;
-import Util.Arrays;
-import NameServer.ShutdownAgent;
-import NameServer.ShutdownAgentInterface;
-import Util.Serializer;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
-import java.util.Scanner;
 
 
 public class Node implements NodeInteractionInterface
 {
+	public static final int DEFAULT_ID = -1;
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String name;
@@ -36,6 +21,7 @@ public class Node implements NodeInteractionInterface
 
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
+	private FileManager fileManager;
 
 	private ResolverInterface resolverStub;
 
@@ -44,51 +30,69 @@ public class Node implements NodeInteractionInterface
 	public Node()
 	{
 		this.name = "";
-		this.id = -1;
-		this.previousNeighbour = -1;
-		this.nextNeighbour = -1;
+		this.id = DEFAULT_ID;
+		this.previousNeighbour = DEFAULT_ID;
+		this.nextNeighbour = DEFAULT_ID;
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
+		this.fileManager = new FileManager();
 		this.resolverStub = null;
-
 	}
 
+	/**
+	 * Returns the singleton instance of the Node.
+	 * @warning THE NODE STILL NEEDS TO BE STARTED SEPARATELY
+	 * @return
+	 */
 	public static Node getInstance()
 	{
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
-			Node.instance.init();
 		}
 		return Node.instance;
 	}
 
 
-	public void init(){
-		if(System.getSecurityManager()==null)
+	public void start()
+	{
+		if (!this.lifeCycleManager.isRunning())
 		{
-			System.setSecurityManager(new SecurityManager());
-		}
+			if (System.getSecurityManager() == null)
+			{
+				System.setSecurityManager(new SecurityManager());
+			}
 
-		try
-		{
-			lifeCycleManager.subscribeOnMulticast();
+			try
+			{
+				NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
+				Registry registry = LocateRegistry.createRegistry(1099);
+				registry.bind(Node.NODE_INTERACTION_NAME, stub);
 
-			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
-			Registry registry = LocateRegistry.createRegistry(1099);
-			registry.bind(Node.NODE_INTERACTION_NAME, stub);
+			}
+			catch (RemoteException re)
+			{
+				System.err.println("Exception when creating stub");
+				re.printStackTrace();
+			}
+			catch (AlreadyBoundException e)
+			{
+				e.printStackTrace();
+			}
 
+			this.fileManager.start();
+			this.lifeCycleManager.start();
 		}
-		catch(RemoteException re)
+		else
 		{
-			System.err.println("Exception when creating stub");
-			re.printStackTrace();
+			System.err.println("[ERROR]\tTried to start Node that was already running.");
 		}
-		catch (AlreadyBoundException e)
-		{
-			e.printStackTrace();
-		}
-		lifeCycleManager.start();
+	}
+
+	public void stop ()
+	{
+		this.fileManager.stop();
+		this.lifeCycleManager.stop();
 	}
 
 	public String getName()
@@ -96,6 +100,11 @@ public class Node implements NodeInteractionInterface
 		return this.name;
 	}
 
+	/**
+	 * Set new name for the node.
+	 * @warning NODE PARAMETERS ARE INVALID AFTER A RESTART<br>PLEASE RESTART THE NODE AFTER CHANGING ITS NAME
+	 * @param name the node's new name
+	 */
 	public void setName(String name)
 	{
 		this.name = name;
@@ -116,7 +125,8 @@ public class Node implements NodeInteractionInterface
 		return this.id;
 	}
 
-	public void setId(short id)
+	// Package Private so no modifier
+	void setId(short id)
 	{
 		this.id = id;
 	}
@@ -152,7 +162,6 @@ public class Node implements NodeInteractionInterface
 	}
 
 	//REMOTE
-
 	@Override
 	public short getPreviousNeighbourRemote() throws RemoteException
 	{
@@ -177,4 +186,9 @@ public class Node implements NodeInteractionInterface
 		this.nextNeighbour = nextNeighbour;
 	}
 
+	@Override
+	public boolean isRunning() throws RemoteException
+	{
+		return this.lifeCycleManager.isRunning();
+	}
 }

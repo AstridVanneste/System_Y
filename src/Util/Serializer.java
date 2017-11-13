@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 
 public class Serializer
 {
-	public static byte[] ipStringToBytes (String ip)
+	public static short[] ipStringToBytes (String ip)
 	{
 		String[] sepBytes = ip.split("\\.");
 
@@ -14,21 +14,21 @@ public class Serializer
 			throw new RuntimeException("IP address '" + ip + "' wasn't formatted properly, expected IPv4 Address: 'www.xxx.yyy.zzz'");
 		}
 
-		byte[] data = new byte [4];
+		short[] data = new short [4];
 		for (int i = 0; i < 4; i++)
 		{
-			data[i] = (byte) Short.parseShort(sepBytes[i]);
+			data[i] = Short.parseShort(sepBytes[i]);
 		}
 		return data;
 	}
 
-	public static String bytesToIPString (byte[] ipBytes)
+	public static String bytesToIPString (short[] ipBytes)
 	{
 		if (ipBytes.length != 4)
 		{
 			throw new RuntimeException("Only IPv4 Addresses are supported, the given address had a length of " + Integer.toString(ipBytes.length) + " instead of 4.");
 		}
-		return Integer.toString(ipBytes[0]) + "." + Integer.toString(ipBytes[1]) + "." + Integer.toString(ipBytes[2]) + "." + Integer.toString(ipBytes[3]);
+		return Short.toString(ipBytes[0]) + "." + Short.toString(ipBytes[1]) + "." + Short.toString(ipBytes[2]) + "." + Short.toString(ipBytes[3]);
 	}
 
 	public static byte[] intToBytes (int value)
@@ -44,7 +44,13 @@ public class Serializer
 
 	public static int bytesToInt(byte[] data)
 	{
-		return (data[3]) | (data[2] << 8) | (data[1] << 16) | (data[0] << 24);
+		ByteBuffer buffer = ByteBuffer.allocate(4);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		buffer.put(data[3]);
+		buffer.put(data[2]);
+		buffer.put(data[1]);
+		buffer.put(data[0]);
+		return buffer.getInt(0);
 	}
 
 	public static byte[] shortToBytes (short s)
@@ -59,14 +65,6 @@ public class Serializer
 
 	public static short bytesToShort(byte[] data)
 	{
-		/*
-		for(int i = 0; i< data.length; i++)
-		{
-			System.out.println("BYTE " + i + " VALUE " + data[i]);
-		}
-		return (short) ((data[1]) | (data[0] << 8));
-		*/
-
 		ByteBuffer buffer = ByteBuffer.allocate(2);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.put(data[1]);
