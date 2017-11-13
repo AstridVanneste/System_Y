@@ -16,23 +16,26 @@ public class FailureAgent
 
 	}
 
-
 	/**
 	 * Called every time a Remote Exception is called in the node. It removes a node with a given ID from the system.
-	 * @param ID
 	 */
-	public void failure(short ID)
+	public void failure(short firstID, short lastID)
 	{
 		String IPprev = "";
 		String IPnext = "";
-		short next = -1;
-		short prev = -1;
+		short nextID = -1;
+		short prevID = -1;
+		boolean prevFailed = false;
+		boolean nextFailed = false;
+		NodeInteractionInterface prevNode = null;
+		NodeInteractionInterface nextNode = null;
+
 		try
 		{
-			prev = Node.getInstance().getLifeCycleManager().getResolverStub().getPrevious(ID);
-			next = Node.getInstance().getLifeCycleManager().getResolverStub().getNext(ID);
-			IPprev = Node.getInstance().getLifeCycleManager().getResolverStub().getIP(prev);
-			IPnext = Node.getInstance().getLifeCycleManager().getResolverStub().getIP(next);
+			prevID = Node.getInstance().getResolverStub().getPrevious(firstID);
+			nextID = Node.getInstance().getResolverStub().getNext(lastID);
+			IPprev = Node.getInstance().getResolverStub().getIP(prevID);
+			IPnext = Node.getInstance().getResolverStub().getIP(nextID);
 			System.out.println("PREV " + IPprev);
 			System.out.println("NEXT " + IPnext);
 
@@ -45,36 +48,75 @@ public class FailureAgent
 		try
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprev);
-			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			previousNode.setNextNeighbour(next);
+			prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
+			prevNode.setNextNeighbour(nextID);
 		}
 		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
 			//CALL FAILURE
+			prevFailed = true;
 		}
 
 
 		try
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
-			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbour(prev);
+			nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
+			nextNode.setPreviousNeighbour(prevID);
 		}
 		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
 			//CALL FAILURE
+			nextFailed = true;
 		}
 
+		// Handling Recursion
+		if (prevFailed && nextFailed)
+		{
+			this.failure(prevID, nextID);
+		}
+		else if (prevFailed)
+		{
+			this.failure(prevID, lastID);
+		}
+		else if (nextFailed)
+		{
+			this.failure(firstID, nextID);
+		}
+
+		// No recursion occurred or we're the last level of recursion
+		// first and last become eachothers neighbours
 		try
 		{
-			Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(ID);
+			if ((nextID == prevID) && (nextID == Node.getInstance().getId()))
+			{
+				Node.getInstance().getLifeCycleManager().shutdown();
+				System.err.println("[ERROR]\tEvery single node in the network failed, shutting down, please restart node manually");
+			}
+			else
+			{
+				short tmpID = prevID;
+
+				while (tmpID != nextID)
+				{
+					Node.getInstance().getShutdownStub().requestShutdown(tmpID);
+					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
+				}
+
+				prevNode.setNextNeighbour(nextID);
+				nextNode.setPreviousNeighbour(prevID);
+			}
 		}
-		catch(RemoteException re)
+		catch (RemoteException re)
 		{
 			re.printStackTrace();
 		}
-
+		catch (NullPointerException npe)
+		{
+			System.err.println("[ERROR]\tNext (" + nextNode.toString() + ") or Previous (" + prevNode.toString() + ") stub was NULL when trying to set neighbours from FailureAgent");
+			npe.printStackTrace();
+		}
 	}
 }
