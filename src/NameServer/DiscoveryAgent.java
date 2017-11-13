@@ -77,8 +77,14 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
-						byte[] unicastIPBytes = new byte[4];
-						System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
+						short[] unicastIPBytes = new short[4];
+						//System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
+
+						for (int i = 4 + nameLen; i < 8 + nameLen; i++)
+						{
+							unicastIPBytes[i - (4 + nameLen)] = data[i];
+						}
+
 						String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
 
 						System.out.println("Name: " + nodeName + " , IP: " + unicastIp );
