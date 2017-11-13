@@ -37,7 +37,14 @@ public class FileManager implements FileManagerInterface, Runnable
 	{
 		try
 		{
-			this.tcpServer.stop();
+			if (this.tcpServer != null)
+			{
+				this.tcpServer.stop();
+			}
+			else
+			{
+				System.err.println("[ERROR]\tTried to stop FileManager when TCP server was NULL");
+			}
 		}
 		catch (IOException ioe)
 		{
