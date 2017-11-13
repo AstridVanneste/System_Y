@@ -27,10 +27,11 @@ public class LifeCycleManager implements Runnable
 {
 	private Subscriber subscriber;
 	private ShutdownAgentInterface shutdownStub;
-	//private int startupTransactionId;
+	private int bootstrapTransactionID;
 
 	public LifeCycleManager()
 	{
+		this.bootstrapTransactionID = -1;
 		this.subscriber = new Subscriber(Constants.DISCOVERY_MULTICAST_IP,Constants.DISCOVERY_CLIENT_PORT);
 		this.shutdownStub = null;
 	}
@@ -43,6 +44,7 @@ public class LifeCycleManager implements Runnable
 		String IPprevious = "";
 		String IPnext = "";
 
+		// Get IP's of next and prev. node
 		try
 		{
 			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
@@ -53,7 +55,7 @@ public class LifeCycleManager implements Runnable
 			re.printStackTrace();
 		}
 
-
+		// Set Previous node's next neighbour
 		try
 		{
 			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
@@ -66,7 +68,7 @@ public class LifeCycleManager implements Runnable
 			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
 		}
 
-
+		// Set Next node's previous neighbour
 		try
 		{
 			Registry registryNext = LocateRegistry.getRegistry(IPnext);
@@ -79,6 +81,7 @@ public class LifeCycleManager implements Runnable
 			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
 		}
 
+		// Tell the NameServer we're done
 		try
 		{
 			shutdownStub.requestShutdown(Node.getInstance().getId());
@@ -89,6 +92,7 @@ public class LifeCycleManager implements Runnable
 			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
 		}
 	}
+
 	public void start()
 	{
 		System.out.println("Please enter a name for this node:");
@@ -100,6 +104,7 @@ public class LifeCycleManager implements Runnable
 		Thread thread = new Thread(this);
 		thread.start();
 
+		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
 		this.accessRequest();
 	}
 
@@ -107,7 +112,6 @@ public class LifeCycleManager implements Runnable
 	 * Old nodes and new nodes listen on multicast for the acceptance of a new node
 	 * Old nodes will set their new neighbour (new node) with RMI
 	 * New node will update his number of nodes and wait until his neighbours has called his rmi-methods
-	 *
 	 */
 	@Override
 	public void run()
@@ -123,19 +127,11 @@ public class LifeCycleManager implements Runnable
 				DatagramPacket packet = this.subscriber.receivePacket();
 
 				Datagram request = new Datagram(packet.getData());
-				//System.out.println(request.getHeader().toString());
 
-				if (request.getHeader().getTransactionID() == this.startupTransactionId)
+				if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 				{
 					// If the transaction is not ours, we don't care
 					byte[] data = request.getData();
-
-					/*
-					for(byte b: data)
-					{
-						System.out.print(b + " ");
-					}
-					*/
 
 					short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
 					short numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
@@ -152,21 +148,20 @@ public class LifeCycleManager implements Runnable
 					{
 						// We are a new node, let's start setting neighbours
 
-
 						//check if message contains error message duplicate id from NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
 						{
-							//this.askNewName();
-							//this.accessRequest();
-							quit = true; // Exit the 'inifinite" while loop
-							// todo: Shouldn't we shut the node down first before restarting the whole damn thing?
+							System.err.println("[ERROR]\tNameserver detected ID as being a duplicate, please restart the Node and set a unique name.");
+							quit = true; // Exit the 'inifinite' while loop
+							continue;
 						}
 
 						//check if message contains error message duplicate id from NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_IP)
 						{
-							//System.out.println("ip already exists!");
-							// todo: Properly handle failure
+							System.err.println("[ERROR]\tNameserver detected IP as being a duplicate, please fix your DHCP config or change your static IP.");
+							quit = true;
+							continue;
 						}
 
 						//check if successfully added to NS
@@ -184,8 +179,8 @@ public class LifeCycleManager implements Runnable
 								Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 								Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
 							}
-							//this.newNode = false;
-							//System.out.println("toegevoegd");
+
+							this.bootstrapTransactionID = -1;
 						}
 					}
 				}
@@ -200,19 +195,15 @@ public class LifeCycleManager implements Runnable
 	 */
 	private void accessRequest ()
 	{
-		//System.out.println("Make accessrequest");
 		Client udpClient = new Client();
 		udpClient.start();
 
 		byte version = (byte) 0;
 		short replyCode = (short) 0;
 		short requestCode = ProtocolHeader.REQUEST_DISCOVERY_CODE;
-		Random rand = new Random();
-
-		//this.startupTransactionId = rand.nextInt() % 127;
 
 		int dataLength = Node.getInstance().getName().length() + 8;
-		ProtocolHeader header = new ProtocolHeader(version, dataLength, startupTransactionId, requestCode, replyCode);
+		ProtocolHeader header = new ProtocolHeader(version, dataLength, this.bootstrapTransactionID, requestCode, replyCode);
 
 		byte[] data = new byte[Node.getInstance().getName().length() + 8];
 		byte[] nameLengthInByte = Serializer.intToBytes(Node.getInstance().getName().length());
@@ -229,19 +220,20 @@ public class LifeCycleManager implements Runnable
 			e.printStackTrace();
 		}
 
-
 		System.arraycopy(nameLengthInByte, 0, data, 0, nameLengthInByte.length);
 		System.arraycopy(nameInByte, 0, data, 4, nameInByte.length);
-		System.arraycopy(ipInByte, 0, data, nameInByte.length + 4, ipInByte.length);    // todo: Fix IP
+
+		for (int i = nameInByte.length + 4; i < nameInByte.length + 8; i++)
+		{
+			data[i] = (byte) (ipInByte[i - (nameInByte.length + 4)] & 0x00FF);
+		}
 
 		Datagram datagram = new Datagram(header, data);
 		udpClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_NAMESERVER_PORT, datagram.serialize());
 		udpClient.stop();
-
-		//System.out.println("sent accessrequest");
 	}
 
-	private void bindNameserverStubs(String nsIp)
+	private void bindNameserverStubs (String nsIp)
 	{
 		if(System.getSecurityManager()==null)
 		{
@@ -291,6 +283,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace(); //todo: failure
+				Node.getInstance().getFailureAgent().failure(newID, newID); // New node has already failed us, what a fucking loser
 			}
 		}
 
@@ -311,25 +304,34 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
+			}
+			catch (RemoteException | NotBoundException e)
+			{
+				e.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(newID, newID);
+			}
 
+			try
+			{
+				NodeInteractionInterface neighbourInterface = null;
 				reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour()));
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setPreviousNeighbourRemote(newID);
 				Node.getInstance().setNextNeighbour(newID);
-
 			}
 			catch (RemoteException | NotBoundException e)
 			{
-				e.printStackTrace();    // todo: Failure
+				e.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
 			}
-
 		}
 	}
 
 	private void stop ()
 	{
 		this.subscriber.stop();
-		this.shutdown(); // shut ourselves down
+		// shut ourselves down
+		this.shutdown();
 	}
 
 	private void askNewName ()  //todo: onderscheid maken tussen herstarten en opstarten
@@ -337,13 +339,5 @@ public class LifeCycleManager implements Runnable
 		System.out.println("Please enter a new name: ");
 		Scanner scanner = new Scanner(System.in);
 		Node.getInstance().setName(scanner.nextLine());
-		//Node.getInstance().setId(NameServer.getHash(Node.getInstance().getName())); //todo: dit mag hier absoluut niet gebeuren. Een id wordt enkel toegekend bij discovery door de nameserver!!!
 	}
-
-	/*
-	public ShutdownAgentInterface getShutdownStub()
-	{
-		return this.shutdownStub;
-	}
-	*/
 }

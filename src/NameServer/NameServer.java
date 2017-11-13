@@ -60,7 +60,7 @@ public class NameServer
         }
         catch (RemoteException re)
 	    {
-	    	System.out.println("Exception in init()");
+	    	System.out.println("Exception in start()");
 	    	re.printStackTrace();
         }
 	}

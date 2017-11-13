@@ -101,7 +101,7 @@ public class FailureAgent
 
 				while (tmpID != nextID)
 				{
-					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
+					Node.getInstance().getLifeCycleManager().shutdown();
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 				}
 

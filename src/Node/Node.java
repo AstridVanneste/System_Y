@@ -1,28 +1,12 @@
 package Node;
 
-import IO.Network.Constants;
-import IO.Network.Datagrams.Datagram;
-import IO.Network.UDP.Multicast.*;
-import IO.Network.Datagrams.ProtocolHeader;
-import IO.Network.UDP.Unicast.Client;
-import IO.Network.UDP.Unicast.Server;
 import NameServer.*;
-import Util.Arrays;
-import NameServer.ShutdownAgent;
-import NameServer.ShutdownAgentInterface;
-import Util.Serializer;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.*;
 import java.rmi.AlreadyBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
-import java.util.Scanner;
 
 
 public class Node implements NodeInteractionInterface
@@ -61,13 +45,14 @@ public class Node implements NodeInteractionInterface
 		if(Node.instance == null)
 		{
 			Node.instance = new Node();
-			Node.instance.init();
+			Node.instance.start();
 		}
 		return Node.instance;
 	}
 
 
-	public void init(){
+	public void start()
+	{
 		if(System.getSecurityManager()==null)
 		{
 			System.setSecurityManager(new SecurityManager());
@@ -76,7 +61,8 @@ public class Node implements NodeInteractionInterface
 		try
 		{
 			this.fileManager.start();
-			this.lifeCycleManager.subscribeOnMulticast();
+			this.lifeCycleManager.start();
+			//this.lifeCycleManager.subscribeOnMulticast();
 
 			NodeInteractionInterface stub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this,0);
 			Registry registry = LocateRegistry.createRegistry(1099);
@@ -120,7 +106,8 @@ public class Node implements NodeInteractionInterface
 		return this.id;
 	}
 
-	public void setId(short id)
+	// Package Private so no modifier
+	void setId(short id)
 	{
 		this.id = id;
 	}
@@ -156,7 +143,6 @@ public class Node implements NodeInteractionInterface
 	}
 
 	//REMOTE
-
 	@Override
 	public short getPreviousNeighbourRemote() throws RemoteException
 	{
@@ -180,5 +166,4 @@ public class Node implements NodeInteractionInterface
 	{
 		this.nextNeighbour = nextNeighbour;
 	}
-
 }
