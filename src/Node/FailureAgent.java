@@ -29,10 +29,10 @@ public class FailureAgent
 		short prev = -1;
 		try
 		{
-			prev = Node.getInstance().getResolverStub().getPrevious(ID);
-			next = Node.getInstance().getResolverStub().getNext(ID);
-			IPprev = Node.getInstance().getResolverStub().getIP(prev);
-			IPnext = Node.getInstance().getResolverStub().getIP(next);
+			prev = Node.getInstance().getLifeCycleManager().getResolverStub().getPrevious(ID);
+			next = Node.getInstance().getLifeCycleManager().getResolverStub().getNext(ID);
+			IPprev = Node.getInstance().getLifeCycleManager().getResolverStub().getIP(prev);
+			IPnext = Node.getInstance().getLifeCycleManager().getResolverStub().getIP(next);
 			System.out.println("PREV " + IPprev);
 			System.out.println("NEXT " + IPnext);
 
@@ -69,7 +69,7 @@ public class FailureAgent
 
 		try
 		{
-			Node.getInstance().getShutdownStub().requestShutdown(ID);
+			Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(ID);
 		}
 		catch(RemoteException re)
 		{

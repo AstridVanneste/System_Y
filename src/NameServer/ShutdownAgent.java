@@ -51,8 +51,6 @@ public class ShutdownAgent implements ShutdownAgentInterface
             e.printStackTrace();
         }
         return false;
-
-
     }
 
 	/**
