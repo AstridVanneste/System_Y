@@ -73,8 +73,8 @@ public class LifeCycleManager implements Runnable
 
 					Datagram request = new Datagram(packet.getData());
 
-					if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
-					{
+
+
 						System.out.println("Transaction ID was ours");
 						// If the transaction is not ours, we don't care
 						byte[] data = request.getData();
@@ -90,7 +90,7 @@ public class LifeCycleManager implements Runnable
 							{
 								this.updateNeighbours(newNodeID);
 							}
-						} else if (Node.getInstance().getId() == Node.DEFAULT_ID)
+						} else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 						{
 							System.out.println("We are a new node");
 							// We are a new node, let's start setting neighbours
@@ -132,7 +132,7 @@ public class LifeCycleManager implements Runnable
 						}
 					}
 				}
-			}
+
 		}
 	}
 
