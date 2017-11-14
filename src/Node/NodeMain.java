@@ -38,7 +38,7 @@ public class NodeMain
 
         	while (!quit)
 	        {
-	        	System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt");
+	        	System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt | [F]ailure");
 	        	System.out.print(">");
 				String next = scanner.nextLine();
 
@@ -61,8 +61,15 @@ public class NodeMain
 				}
 				else if (next.equals("A") || next.equals("a"))
 				{
-					System.out.println("StartingNode...");
+					System.out.println("Starting Node...");
 					Node.getInstance().start();
+				}
+				else if (next.equals("F") || next.equals("f"))
+				{
+					System.out.println("Please enter the ID of the node you wish to indicate for failure: ");
+					short failID = scanner.nextShort();
+					System.out.println("Starting failure for node " + Short.toString(failID));
+					Node.getInstance().getFailureAgent().failure(failID, failID);
 				}
 				else
 				{
