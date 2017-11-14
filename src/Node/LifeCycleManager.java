@@ -30,7 +30,6 @@ public class LifeCycleManager implements Runnable
 	private Subscriber subscriber;
 	private ShutdownAgentInterface shutdownStub;
 
-
 	public LifeCycleManager()
 	{
 		this.running = false;
@@ -62,67 +61,74 @@ public class LifeCycleManager implements Runnable
 	{
 		while(this.running)
 		{
-			if(this.subscriber.hasData())
+			synchronized (this.subscriber)
 			{
-				// Subscriber got some data
-				// Start parsing bytes
-				DatagramPacket packet = this.subscriber.receivePacket();
-
-				Datagram request = new Datagram(packet.getData());
-
-				if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
+				//System.out.println("Loop");
+				if (this.subscriber.hasData())
 				{
-					// If the transaction is not ours, we don't care
-					byte[] data = request.getData();
+					System.out.println("Got answer form nameserver");
+					// Subscriber got some data
+					// Start parsing bytes
+					DatagramPacket packet = this.subscriber.receivePacket();
 
-					short newNodeID = Serializer.bytesToShort(new byte [] {data[0],data[1]});
-					short numberOfNodes = Serializer.bytesToShort(new byte[] {data[2],data[3]});
+					Datagram request = new Datagram(packet.getData());
 
-					if (Node.getInstance().getId() != Node.DEFAULT_ID)
+					if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
-						// We're not a new node, check and if needed update neighbours
-						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
+						System.out.println("Transaction ID was ours");
+						// If the transaction is not ours, we don't care
+						byte[] data = request.getData();
+
+						short newNodeID = Serializer.bytesToShort(new byte[]{data[0], data[1]});
+						short numberOfNodes = Serializer.bytesToShort(new byte[]{data[2], data[3]});
+
+						if (Node.getInstance().getId() != Node.DEFAULT_ID)
 						{
-							this.updateNeighbours(newNodeID);
-						}
-					}
-					else if (Node.getInstance().getId() == Node.DEFAULT_ID)
-					{
-						// We are a new node, let's start setting neighbours
-
-						//check if message contains error message duplicate id from NS
-						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
-						{
-							System.err.println("[ERROR]\tNameserver detected ID as being a duplicate, please restart the Node and set a unique name.");
-							this.running = true; // Exit the 'inifinite' while loop
-							continue;
-						}
-
-						//check if message contains error message duplicate id from NS
-						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_IP)
-						{
-							System.err.println("[ERROR]\tNameserver detected IP as being a duplicate, please fix your DHCP config or change your static IP.");
-							this.running = true;
-							continue;
-						}
-
-						//check if successfully added to NS
-						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
-						{
-							Node.getInstance().setId(newNodeID);
-							String nsIp = packet.getAddress().getHostAddress();
-
-							// Set up connection(s) to NameServer
-							this.bindNameserverStubs(nsIp);
-
-							//nameserver sends the amount of nodes in the tree
-							if (numberOfNodes == 0)
+							System.out.println("We're not a new node");
+							// We're not a new node, check and if needed update neighbours
+							if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 							{
-								Node.getInstance().setNextNeighbour(Node.getInstance().getId());
-								Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
+								this.updateNeighbours(newNodeID);
+							}
+						} else if (Node.getInstance().getId() == Node.DEFAULT_ID)
+						{
+							System.out.println("We are a new node");
+							// We are a new node, let's start setting neighbours
+
+							//check if message contains error message duplicate id from NS
+							if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
+							{
+								System.err.println("[ERROR]\tNameserver detected ID as being a duplicate, please restart the Node and set a unique name.");
+								this.running = true; // Exit the 'inifinite' while loop
+								continue;
 							}
 
-							this.bootstrapTransactionID = -1;
+							//check if message contains error message duplicate id from NS
+							if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_IP)
+							{
+								System.err.println("[ERROR]\tNameserver detected IP as being a duplicate, please fix your DHCP config or change your static IP.");
+								this.running = true;
+								continue;
+							}
+
+							//check if successfully added to NS
+							if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
+							{
+								Node.getInstance().setId(newNodeID);
+								String nsIp = packet.getAddress().getHostAddress();
+
+								// Set up connection(s) to NameServer
+								this.bindNameserverStubs(nsIp);
+
+								//nameserver sends the amount of nodes in the tree
+								if (numberOfNodes == 0)
+								{
+									Node.getInstance().setNextNeighbour(Node.getInstance().getId());
+									Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
+								}
+
+								this.bootstrapTransactionID = -1;
+							}
 						}
 					}
 				}
