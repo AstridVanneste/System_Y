@@ -12,17 +12,6 @@ import java.util.*;
  * Created by Axel on 22/10/2017.
  */
 
-/*
- * 1) Neighbours suspect that their node between them is dead
- * 2) One of neighbours sends a requestDeadNode-request to NameServer (NS)
- * 3) NS pings to dead node
- * 4a) If no answer: NS deletes node from Map
- * 4b) If answer: leave the case
- * 5) NS sends the both neighbours that they are now eachothers neighbour
- *      REMARK: how does NS knows the other neighbour?
- * 6) NS sends broadcast to erase all links with local documents of dead node
- */
-
 public class ShutdownAgent implements ShutdownAgentInterface
 {
     public ShutdownAgent()
