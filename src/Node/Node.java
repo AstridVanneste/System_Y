@@ -11,7 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Node implements NodeInteractionInterface
 {
-	public static final int DEFAULT_ID = -1;
+	public static final short DEFAULT_ID = -1;
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 
 	private String name;

@@ -343,5 +343,9 @@ public class LifeCycleManager implements Runnable
 			re.printStackTrace();
 			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
 		}
+
+		Node.getInstance().setPreviousNeighbour(Node.DEFAULT_ID);
+		Node.getInstance().setNextNeighbour(Node.DEFAULT_ID);
+		Node.getInstance().setId(Node.DEFAULT_ID);
 	}
 }
