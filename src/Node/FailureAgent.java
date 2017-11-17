@@ -92,8 +92,17 @@ public class FailureAgent
 		{
 			if ((nextID == prevID) && (nextID == Node.getInstance().getId()))
 			{
-				Node.getInstance().getLifeCycleManager().shutdown();
-				System.err.println("[ERROR]\tEvery single node in the network failed, shutting down, please restart node manually");
+				try
+				{
+					Node.getInstance().getResolverStub().getIP(Node.getInstance().getId());
+				}
+				catch (RemoteException re)
+				{
+					System.err.println("[ERROR]\tEvery single node and the nameserver in the network failed, shutting down, please restart node manually");
+					Node.getInstance().getLifeCycleManager().shutdown();
+					re.printStackTrace();
+				}
+
 			}
 			else
 			{

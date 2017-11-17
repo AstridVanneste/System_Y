@@ -29,7 +29,7 @@ public class FileLedger
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		this.copies = new List<Short>();	// which datastructure? (unique downloaders!)
+		//this.copies = new List<Short>();	// which datastructure? (unique downloaders!)
 	}
 
 	public void addDownloader (short ID) {

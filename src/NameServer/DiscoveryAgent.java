@@ -47,6 +47,10 @@ public class DiscoveryAgent implements Runnable
 					System.out.println(request.getHeader().getTransactionID());
 					if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 					{
+						Util.General.printLineSep();
+						System.out.println("DiscoveryAgent.run()");
+
+
 						byte[] data = request.getData();
 						byte[] nameLenBytes = new byte[4];
 						System.arraycopy(data, 0, nameLenBytes, 0, 4);
@@ -87,8 +91,6 @@ public class DiscoveryAgent implements Runnable
 
 						String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
 
-						System.out.println("Name: " + nodeName + " , IP: " + unicastIp );
-
 						if (NameServer.getInstance().map.containsValue(unicastIp))
 						{
 							// Return failure
@@ -107,10 +109,10 @@ public class DiscoveryAgent implements Runnable
 
 						// Return succes
 
-						short nodeId = (short) NameServer.getHash(nodeName);
+						short nodeId = NameServer.getHash(nodeName);
 						short numNodes = (short) NameServer.getInstance().map.size();
 
-						System.out.println("Name: " + nodeName + " , IP: " + unicastIp + " , ID: " + nodeId);
+						System.out.println("Name: " + nodeName + ", IP: " + unicastIp + ", ID: " + Short.toString(nodeId));
 
 						NameServer.getInstance().map.put(nodeId, unicastIp);
 						NameServer.getInstance().writeMapToFile();
@@ -140,6 +142,7 @@ public class DiscoveryAgent implements Runnable
 					{
 						System.err.println("[" + Thread.currentThread().getName() + "] Received multicast packet did not have correct request code, needs to be " + Integer.toHexString(ProtocolHeader.REQUEST_DISCOVERY_CODE) + ", got " + request.getHeader().getRequestCode());
 					}
+					Util.General.printLineSep();
 				}
 			}
 		}
