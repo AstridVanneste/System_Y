@@ -50,6 +50,8 @@ public class ShutdownAgent implements ShutdownAgentInterface
     {
     	if(NameServer.getInstance().map.containsKey(id))
 		{
+			Util.General.printLineSep();
+			System.out.println("ShutdownAgent.requestShutdown(" + id + ")");
 			NameServer.getInstance().map.remove(id);
 			NameServer.getInstance().writeMapToFile();
 		}

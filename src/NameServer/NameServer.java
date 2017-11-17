@@ -4,6 +4,7 @@ import IO.File;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,7 +18,7 @@ public class NameServer
 {
 	public static final String SHUTDOWN_AGENT_NAME = "SHUTDOWN_INTERFACE";
 	public static final String RESOLVER_NAME = "RESOLVER_INTERFACE";
-	public static final String MAP_FILE_NAME = "TreeMap.csv";
+	public static final String MAP_FILE_NAME = "TreeMap.csv"; //todo: treemap file leegmaken bij start programma
 
 	private static NameServer instance;	//singleton instance of nameserver
 
@@ -135,6 +136,27 @@ public class NameServer
 		}
 
 		return s.toString();
+	}
+
+	public void stop()
+	{
+		discoveryAgent.stop();
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry();
+			reg.unbind(RESOLVER_NAME);
+			reg.unbind(SHUTDOWN_AGENT_NAME);
+
+		}
+		catch(RemoteException re)
+		{
+			re.printStackTrace();
+		}
+		catch (NotBoundException nbe)
+		{
+			nbe.printStackTrace();
+		}
+
 	}
 
 	@Deprecated

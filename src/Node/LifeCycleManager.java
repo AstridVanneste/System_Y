@@ -61,12 +61,14 @@ public class LifeCycleManager implements Runnable
 	{
 		while(this.running)
 		{
-			if(this.subscriber.hasData())
+			synchronized (this.subscriber)
 			{
-				System.out.println("Got Data");
 
-				synchronized (this.subscriber)
+				if (this.subscriber.hasData())
 				{
+					System.out.println("Got Data");
+
+
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
@@ -87,8 +89,7 @@ public class LifeCycleManager implements Runnable
 						{
 							this.updateNeighbours(newNodeID);
 						}
-					}
-					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
+					} else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
 						// We are a new node, let's start setting neighbours
 						System.out.println("Transaction ID was ours");
@@ -129,6 +130,7 @@ public class LifeCycleManager implements Runnable
 							this.bootstrapTransactionID = -1;
 						}
 					}
+
 				}
 			}
 		}
@@ -207,6 +209,7 @@ public class LifeCycleManager implements Runnable
 	{
 		/* You're the first node so edit both neighbours of the new node
 		 * OWN ID == NEXT ID && OWN ID == PREVIOUS ID
+		 * 
 		 */
 		if(Node.getInstance().getId() == Node.getInstance().getNextNeighbour() && Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour())
 		{
