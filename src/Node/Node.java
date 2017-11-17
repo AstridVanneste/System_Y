@@ -53,7 +53,6 @@ public class Node implements NodeInteractionInterface
 		return Node.instance;
 	}
 
-
 	public void start()
 	{
 		if (!this.lifeCycleManager.isRunning())

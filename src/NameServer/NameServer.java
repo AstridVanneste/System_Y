@@ -95,7 +95,7 @@ public class NameServer
 
 	public void writeMapToFile()
 	{
-		System.out.println("WRITING TO FILE");
+		//System.out.println("WRITING TO FILE");
 		File file = new File(MAP_FILE_NAME);
 
 		try
@@ -127,14 +127,14 @@ public class NameServer
 
 	public String toString()
 	{
-		String s = "";
+		StringBuilder s = new StringBuilder();
 
 		for(int n: this.map.keySet())
 		{
-			s += "KEY:	" + n + "	VALUE:	" + this.map.get(n) + "\n";
+			s.append("KEY:	").append(n).append("	VALUE:	").append(this.map.get(n)).append("\n");
 		}
 
-		return s;
+		return s.toString();
 	}
 
 	@Deprecated

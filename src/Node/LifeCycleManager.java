@@ -61,15 +61,16 @@ public class LifeCycleManager implements Runnable
 	{
 		while(this.running)
 		{
-			synchronized (this.subscriber)
+			if(this.subscriber.hasData())
 			{
-				if (this.subscriber.hasData())
-				{
-					System.out.println("Got a message");
+				System.out.println("Got Data");
 
+				synchronized (this.subscriber)
+				{
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
+
 					Datagram request = new Datagram(packet.getData());
 
 					byte[] data = request.getData();
