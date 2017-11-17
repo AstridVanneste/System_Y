@@ -29,6 +29,7 @@ public class Main
 			if(input.equals("Q") || input.equals("q"))
 			{
 				quit = true;
+				System.out.println("Quitting...");
 				NameServer.getInstance().stop();
 
 			}
