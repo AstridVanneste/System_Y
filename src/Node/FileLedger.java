@@ -1,6 +1,8 @@
 package Node;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class FileLedger
 {
@@ -23,26 +25,40 @@ public class FileLedger
 	private String fileName;
 	private short ownerID;
 	private short localID;
-	private List<Short> copies;
+	private Set<Short> copies;
 
+	/**
+	 * Each file has a ledger-object
+	 * @param fileName name of file of this logging-object
+	 * @param localID ID of node that has the file locally
+	 */
 	public FileLedger (String fileName, short localID) {
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		//this.copies = new List<Short>();	// which datastructure? (unique downloaders!)
+		this.copies = Collections.synchronizedSortedSet(new TreeSet ());			//multiple nodes can ask at the same moment to download the file..
 	}
 
-	public void addDownloader (short ID) {
-		copies.add(ID);
+	/**
+	 * Add a downloader of this file
+	 * @param ID
+	 * @return  true if successfully added
+	 * 			false if ID was already in the list
+	 */
+	public boolean addDownloader (short ID)
+	{
+		return copies.add(ID);
 	}
 
-	public void removeDownloader (short ID) {
-		if (copies.contains(ID))
-		{
-			copies.remove(ID);
-		}
-		else
-			System.out.println("This ID has not downloaded the file");
+	/**
+	 * Remove the downloader of this file
+	 * @param ID
+	 * @return  true if successfully removed
+	 * 			false if ID was not in the list
+	 */
+	public boolean removeDownloader (short ID)
+	{
+		return copies.remove(ID);
 	}
 
 	public short getOwnerID()
