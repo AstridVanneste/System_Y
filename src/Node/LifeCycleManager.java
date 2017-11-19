@@ -292,52 +292,63 @@ public class LifeCycleManager implements Runnable
 		String IPprevious = "";
 		String IPnext = "";
 
-		// Get IP's of next and prev. node
-		try
-		{
-			IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
-			IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
+		if((Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour()) && (Node.getInstance().getId() == Node.getInstance().getNextNeighbour())){
+			try
+			{
+				shutdownStub.requestShutdown(Node.getInstance().getId());
+			} catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch(RemoteException re)
-		{
-			re.printStackTrace();
-		}
+		else{
+			// Get IP's of next and prev. node
+			try
+			{
+				IPprevious = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
+				IPnext = Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour());
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+			}
 
-		// Set Previous node's next neighbour
-		try
-		{
-			Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
-			NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			previousNode.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
-		}
-		catch(RemoteException | NotBoundException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
-		}
+			// Set Previous node's next neighbour
+			try
+			{
+				Registry registryPrev = LocateRegistry.getRegistry(IPprevious);
+				NodeInteractionInterface previousNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
+				previousNode.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
+			}
+			catch(RemoteException | NotBoundException re)
+			{
+				re.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
+			}
 
-		// Set Next node's previous neighbour
-		try
-		{
-			Registry registryNext = LocateRegistry.getRegistry(IPnext);
-			NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbourRemote(Node.getInstance().getPreviousNeighbour());
-		}
-		catch(RemoteException | NotBoundException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
-		}
+			// Set Next node's previous neighbour
+			try
+			{
+				Registry registryNext = LocateRegistry.getRegistry(IPnext);
+				NodeInteractionInterface nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
+				nextNode.setPreviousNeighbourRemote(Node.getInstance().getPreviousNeighbour());
+			}
+			catch(RemoteException | NotBoundException re)
+			{
+				re.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
+			}
 
-		// Tell the NameServer we're done
-		try
-		{
-			shutdownStub.requestShutdown(Node.getInstance().getId());
-		}
-		catch(RemoteException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
+			// Tell the NameServer we're done
+			try
+			{
+				shutdownStub.requestShutdown(Node.getInstance().getId());
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
+			}
 		}
 	}
 }

@@ -45,7 +45,7 @@ public class Client implements Runnable
 	 * @param port			The port to send to
 	 * @param data			The data to be sent.
 	 */
-	public void send(String remoteHost, int port, byte[] data)
+	public synchronized void send(String remoteHost, int port, byte[] data)
 	{
 		try
 		{
@@ -127,7 +127,7 @@ public class Client implements Runnable
 	 * Stops the server
 	 * @throws IOException
 	 */
-	public void stop()
+	public synchronized void stop()
 	{
 		if(this.socket != null)
 		{

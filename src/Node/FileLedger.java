@@ -1,5 +1,6 @@
 package Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileLedger
@@ -23,13 +24,13 @@ public class FileLedger
 	private String fileName;
 	private short ownerID;
 	private short localID;
-	private List<Short> copies;
+	private ArrayList<Short> copies;
 
 	public FileLedger (String fileName, short localID) {
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		this.copies = new List<Short>();	// which datastructure? (unique downloaders!)
+		this.copies = new ArrayList<Short>();	// which datastructure? (unique downloaders!)
 	}
 
 	public void addDownloader (short ID) {

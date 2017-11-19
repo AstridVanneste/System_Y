@@ -103,7 +103,7 @@ public class Server implements Runnable
 		}
 	}
 
-	public void stop() throws IOException
+	public synchronized void stop() throws IOException
 	{
 		this.socket.close();
 	}
