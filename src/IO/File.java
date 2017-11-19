@@ -154,11 +154,11 @@ public class File
 	 *	@return The amount of bytes that can still be read from the file.
 	 *	@throws IOException
 	 */
-	public int available () throws IOException
+	public long available () throws IOException
 	{
 		FileInputStream inputStream = new FileInputStream(this.filename);
 		FileChannel channel = inputStream.getChannel();
-		int avail =  (int) min(Integer.MAX_VALUE,channel.size()) - (int) this.filePos;
+		long avail =  min(Integer.MAX_VALUE,channel.size()) - this.filePos;
 		channel.close();
 		inputStream.close();
 		return avail;
@@ -202,7 +202,7 @@ public class File
 	{
 		try
 		{
-			return "File: " + this.filename + "\n" + "Position: " + Long.toString(this.filePos) + "\n" + "Available: " + Integer.toString(this.available());
+			return "File: " + this.filename + "\n" + "Position: " + Long.toString(this.filePos) + "\n" + "Available: " + Integer.toString((int) this.available());
 		}
 		catch (IOException ioe)
 		{

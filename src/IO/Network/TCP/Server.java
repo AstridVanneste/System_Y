@@ -13,8 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.StrictMath.abs;
+
 public class Server implements Runnable
 {
+	private static long TIMEOUT = 50000; //TIMEOUT IN MS (50 seconds)
+
 	private boolean stop;
 	private int portNum;
 	private ServerSocket socket;
@@ -198,7 +202,7 @@ public class Server implements Runnable
 				}
 				else
 				{
-					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + file.available()];
+					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + (int) file.available()];
 
 					int i = 0;
 
@@ -208,7 +212,7 @@ public class Server implements Runnable
 						i++;
 					}
 
-					for(byte b: file.read(file.available()))
+					for(byte b: file.read((int) file.available()))
 					{
 						bytes[i] = b;
 						i++;
@@ -224,33 +228,66 @@ public class Server implements Runnable
 		}
 	}
 
-	public void receiveFile(String remoteHost, String filename,  int transactionID)
+	public long receiveFile(String remoteHost, String filename, long fileLength)
 	{
 		File file = new File(filename);
+		boolean firstSegment = true;
+		boolean timeout = false;
+		int transactionID = -1;
+		long timer = 0;
+		long offset = 0;
 
 		try
 		{
-			//file.write("".getBytes());
-			while (this.hasData(remoteHost))
+			while (!(offset >= fileLength) && !timeout)
 			{
-				Datagram datagram = new Datagram(this.receive(remoteHost));
-
-				System.out.println("TRANSACTION ID: " + datagram.getHeader().getTransactionID());
-				System.out.println("REPLY CODE: " + datagram.getHeader().getReplyCode());
-				System.out.println("RECEIVED");
-
-				if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE)
+				if (this.hasData(remoteHost))
 				{
-					if (datagram.getHeader().getTransactionID() == transactionID)
+					Datagram datagram = new Datagram(this.receive(remoteHost));
+					if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE && datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
 					{
-						file.append(datagram.getData());
+
+
+						if (firstSegment)
+						{
+							transactionID = datagram.getHeader().getTransactionID();
+							firstSegment = false;
+							file.write(datagram.getData()); //write first bytes to empty previous values at the same time
+						} else if (transactionID != datagram.getHeader().getTransactionID())
+						{
+							throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
+						} else
+						{
+							file.append(datagram.getData());
+						}
+						offset += datagram.getData().length;
+						timer = 0;
+					}
+					else
+					{
+						throw new IOException("Invalid reply code (= " + datagram.getHeader().getReplyCode() + "should be " + ProtocolHeader.REPLY_FILE+ ") or request code (= " + datagram.getHeader().getRequestCode() + " should be " + ProtocolHeader.REQUEST_FILE + ")");
+					}
+				}
+				else
+				{
+					if(timer == 0)
+					{
+						timer = System.nanoTime();
+					}
+					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
+					{
+						timeout = true;
 					}
 				}
 			}
+
+			this.incomingConnections.remove(remoteHost);
 		}
-		catch(IOException ioe)
+		catch (IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
+
+		return offset;
 	}
 }
