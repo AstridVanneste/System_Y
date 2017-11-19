@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 public interface FileManagerInterface extends Remote
 {
-	public void checkFiles () throws RemoteException;
+	public void checkFiles (FileType type) throws RemoteException;
 
 	/**
 	 * Remote method.
@@ -17,7 +17,15 @@ public interface FileManagerInterface extends Remote
 	 * @param type          The type of file (local, owner or download)
 	 * @param remoteHost    The port that the caller will use to send the file.
 	 */
-	public void pushFile(String filename, int fileSize, FileType type, String remoteHost) throws IOException;
+	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException;
 
-	public void pullFile (short dstID, String filename) throws RemoteException;
+	/**
+	 * Remote method.
+	 * Caller = Node that's about to receive a file.
+	 * Callee = Node that's about to send a file.
+	 * @param dstID			The ID of the node that wants to receive the file.
+	 * @param filename		The filename used to retrieve and store the file.
+	 * @throws IOException
+	 */
+	public void pullFile (short dstID, String filename) throws IOException;
 }

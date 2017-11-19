@@ -79,7 +79,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 
 ## TO-DO
 - [x] Write Unit Test for Hash function
-- [ ] Expand Unit Tests for Protocol Header
+- [x] Expand Unit Tests for Protocol Header
 - [x] Check Unit Tests for Serializer
 - [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
 - [ ] Update Serializer to use ByteBuffers

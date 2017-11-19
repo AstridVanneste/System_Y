@@ -11,15 +11,17 @@ import java.security.InvalidParameterException;
 public class Resolver implements ResolverInterface
 {
 	public Resolver()
-{
-}
-
+	{
+	}
 
 	@Override
 	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
 	{
+		Util.General.printLineSep();
+		System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")");
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
+			Util.General.printLineSep();
 			return NameServer.getInstance().map.get(nodeId);
 		}
 		else
@@ -31,9 +33,12 @@ public class Resolver implements ResolverInterface
 	@Deprecated
 	public void removeFromTree(short nodeId) throws RemoteException
 	{
+		Util.General.printLineSep();
+		System.out.println("Resolver.removeFromTree(" + Short.toString(nodeId) + ")");
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
 			NameServer.getInstance().map.remove(nodeId);
+			Util.General.printLineSep();
 		}
 		else
 		{
@@ -42,49 +47,54 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Override
-	public String getOwnerIP(String filename)
+	public short getOwnerID(String filename) throws RemoteException
 	{
+		Util.General.printLineSep();
+		System.out.println("Resolver.getOwnerIP(" + filename + ")");
 		short hash = NameServer.getHash(filename);
 
 		if(hash < NameServer.getInstance().map.firstKey())
 		{
-			return NameServer.getInstance().map.get(NameServer.getInstance().map.lastKey());
-		}
-		else
-		{
-			return NameServer.getInstance().map.get(NameServer.getInstance().map.lowerKey(hash));
-		}
-	}
-
-	@Override
-	public short getPrevious(short ID)
-	{
-		System.out.println("FIRST: " + NameServer.getInstance().map.firstKey());
-		System.out.println("ID: " + ID);
-		//if(NameServer.getInstance().map.firstKey() >= ID)
-		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
-		{
+			Util.General.printLineSep();
 			return NameServer.getInstance().map.lastKey();
 		}
 		else
 		{
+			Util.General.printLineSep();
+			return NameServer.getInstance().map.lowerKey(hash);
+		}
+	}
+
+	@Override
+	public short getPrevious(short ID) throws RemoteException
+	{
+		Util.General.printLineSep();
+		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ")");
+		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
+		{
+			Util.General.printLineSep();
+			return NameServer.getInstance().map.lastKey();
+		}
+		else
+		{
+			Util.General.printLineSep();
 			return NameServer.getInstance().map.lowerKey(ID);
 		}
 	}
 
 	@Override
-	public short getNext(short ID)
+	public short getNext(short ID) throws RemoteException
 	{
-		System.out.println("LAST: " + NameServer.getInstance().map.lastKey());
-		System.out.println("ID: " + ID);
-		System.out.println("EQUALS: " + Boolean.toString((NameServer.getInstance().map.lastKey().equals(ID))));
+		Util.General.printLineSep();
+		System.out.println("Resolver.getNext(" + Short.toString(ID) + ")");
 		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals( ID))
 		{
-
+			Util.General.printLineSep();
 			return NameServer.getInstance().map.firstKey();
 		}
 		else
 		{
+			Util.General.printLineSep();
 			return NameServer.getInstance().map.higherKey(ID);
 		}
 	}
@@ -93,7 +103,9 @@ public class Resolver implements ResolverInterface
 	@Deprecated
 	public void addToTree(short ID, String IP) throws RemoteException
 	{
+		Util.General.printLineSep();
+		System.out.println("Resolver.addToTree(" + Short.toString(ID) + "," + IP + ")");
 		NameServer.getInstance().map.put(ID,IP);
+		Util.General.printLineSep();
 	}
-
 }

@@ -63,13 +63,16 @@ public class LifeCycleManager implements Runnable
 		{
 			synchronized (this.subscriber)
 			{
+
 				if (this.subscriber.hasData())
 				{
-					System.out.println("Got a message");
+					System.out.println("Got Data");
+
 
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
+
 					Datagram request = new Datagram(packet.getData());
 
 					byte[] data = request.getData();
@@ -86,8 +89,7 @@ public class LifeCycleManager implements Runnable
 						{
 							this.updateNeighbours(newNodeID);
 						}
-					}
-					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
+					} else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
 						// We are a new node, let's start setting neighbours
 						System.out.println("Transaction ID was ours");
@@ -128,6 +130,7 @@ public class LifeCycleManager implements Runnable
 							this.bootstrapTransactionID = -1;
 						}
 					}
+
 				}
 			}
 		}
@@ -206,6 +209,7 @@ public class LifeCycleManager implements Runnable
 	{
 		/* You're the first node so edit both neighbours of the new node
 		 * OWN ID == NEXT ID && OWN ID == PREVIOUS ID
+		 * 
 		 */
 		if(Node.getInstance().getId() == Node.getInstance().getNextNeighbour() && Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour())
 		{
@@ -227,7 +231,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace(); //todo: failure
-				Node.getInstance().getFailureAgent().failure(newID, newID); // New node has already failed us, what a fucking loser
+				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
 		}
 
@@ -252,7 +256,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace();
-				Node.getInstance().getFailureAgent().failure(newID, newID);
+				Node.getInstance().getFailureAgent().failure(newID);
 			}
 
 			try
@@ -266,7 +270,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace();
-				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
 		}
 	}
@@ -350,5 +354,9 @@ public class LifeCycleManager implements Runnable
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
 			}
 		}
+
+		Node.getInstance().setPreviousNeighbour(Node.DEFAULT_ID);
+		Node.getInstance().setNextNeighbour(Node.DEFAULT_ID);
+		Node.getInstance().setId(Node.DEFAULT_ID);
 	}
 }

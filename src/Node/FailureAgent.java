@@ -16,10 +16,11 @@ public class FailureAgent
 
 	}
 
+
 	/**
 	 * Called every time a Remote Exception is called in the node. It removes a node with a given ID from the system.
 	 */
-	public void failure(short firstID, short lastID)
+	private void failure(short firstID, short lastID)
 	{
 		String IPprev = "";
 		String IPnext = "";
@@ -47,9 +48,12 @@ public class FailureAgent
 
 		try
 		{
-			Registry registryPrev = LocateRegistry.getRegistry(IPprev);
-			prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			prevNode.setNextNeighbourRemote(nextID);
+			if(prevID != Node.getInstance().getId()) //No RMI to yourself
+			{
+				Registry registryPrev = LocateRegistry.getRegistry(IPprev);
+				prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
+				prevNode.setNextNeighbourRemote(nextID);
+			}
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -61,9 +65,12 @@ public class FailureAgent
 
 		try
 		{
-			Registry registryNext = LocateRegistry.getRegistry(IPnext);
-			nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbourRemote(prevID);
+			if(nextID != Node.getInstance().getId()) //No RMI to yourself
+			{
+				Registry registryNext = LocateRegistry.getRegistry(IPnext);
+				nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
+				nextNode.setPreviousNeighbourRemote(prevID);
+			}
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -92,8 +99,17 @@ public class FailureAgent
 		{
 			if ((nextID == prevID) && (nextID == Node.getInstance().getId()))
 			{
-				Node.getInstance().getLifeCycleManager().shutdown();
-				System.err.println("[ERROR]\tEvery single node in the network failed, shutting down, please restart node manually");
+				try
+				{
+					Node.getInstance().getResolverStub().getIP(Node.getInstance().getId());
+				}
+				catch (RemoteException re)
+				{
+					System.err.println("[ERROR]\tEvery single node and the nameserver in the network failed, shutting down, please restart node manually");
+					Node.getInstance().getLifeCycleManager().shutdown();
+					re.printStackTrace();
+				}
+
 			}
 			else
 			{
@@ -140,5 +156,10 @@ public class FailureAgent
 			System.err.println("[ERROR]\tNext (" + nextNodeStr + ") or Previous (" + prevNodeStr + ") stub was NULL when trying to set neighbours from FailureAgent");
 			npe.printStackTrace();
 		}
+	}
+
+	public void failure(short ID)
+	{
+		this.failure(ID,ID);
 	}
 }
