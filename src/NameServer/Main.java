@@ -18,7 +18,7 @@ public class Main
 		Util.General.printLineSep();
 
 		Util.General.printLineSep();
-		System.out.println("Possible commands: \nShow Tree[M]ap, [Q]uit");
+		System.out.println("Possible commands: \nShow Tree[M]ap | [Q]uit");
 
 		while(!quit)
 		{

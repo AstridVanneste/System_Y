@@ -231,7 +231,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace(); //todo: failure
-				Node.getInstance().getFailureAgent().failure(newID, newID); // New node has already failed us, what a fucking loser
+				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
 		}
 
@@ -256,7 +256,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace();
-				Node.getInstance().getFailureAgent().failure(newID, newID);
+				Node.getInstance().getFailureAgent().failure(newID);
 			}
 
 			try
@@ -270,7 +270,7 @@ public class LifeCycleManager implements Runnable
 			catch (RemoteException | NotBoundException e)
 			{
 				e.printStackTrace();
-				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
+				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
 		}
 	}
@@ -317,7 +317,7 @@ public class LifeCycleManager implements Runnable
 		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour(), Node.getInstance().getPreviousNeighbour());
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getPreviousNeighbour());
 		}
 
 		// Set Next node's previous neighbour
@@ -330,7 +330,7 @@ public class LifeCycleManager implements Runnable
 		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour(), Node.getInstance().getNextNeighbour());
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 		}
 
 		// Tell the NameServer we're done
@@ -341,7 +341,7 @@ public class LifeCycleManager implements Runnable
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId(), Node.getInstance().getId());
+			Node.getInstance().getFailureAgent().failure(Node.getInstance().getId());
 		}
 
 		Node.getInstance().setPreviousNeighbour(Node.DEFAULT_ID);

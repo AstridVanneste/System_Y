@@ -36,7 +36,7 @@ public class NodeMain
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt | [F]ailure | [P]rint ID");
+			    System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt | [F]ailure | [P]rint ID | [L]ist Files");
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
@@ -67,12 +67,16 @@ public class NodeMain
 				    System.out.println("Please enter the ID of the node you wish to indicate for failure: ");
 				    short failID = scanner.nextShort();
 				    System.out.println("Starting failure for node " + Short.toString(failID));
-				    Node.getInstance().getFailureAgent().failure(failID, failID);
+				    Node.getInstance().getFailureAgent().failure(failID);
 			    }
 			    else if (next.equals("P") || next.equals("p"))
 			    {
 				    System.out.println("ID: " + Short.toString(Node.getInstance().getId()));
 			    }
+			    else if (next.equals("L") || next.equals("l"))
+				{
+					System.out.println(Node.getInstance().getFileManager().toString());
+				}
 			    else
 			    {
 				    System.err.println("[ERROR]\tInvalid input: '" + next + "'");

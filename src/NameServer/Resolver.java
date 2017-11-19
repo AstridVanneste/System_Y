@@ -47,7 +47,7 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Override
-	public String getOwnerIP(String filename)
+	public short getOwnerID(String filename) throws RemoteException
 	{
 		Util.General.printLineSep();
 		System.out.println("Resolver.getOwnerIP(" + filename + ")");
@@ -56,17 +56,17 @@ public class Resolver implements ResolverInterface
 		if(hash < NameServer.getInstance().map.firstKey())
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.get(NameServer.getInstance().map.lastKey());
+			return NameServer.getInstance().map.lastKey();
 		}
 		else
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.get(NameServer.getInstance().map.lowerKey(hash));
+			return NameServer.getInstance().map.lowerKey(hash);
 		}
 	}
 
 	@Override
-	public short getPrevious(short ID)
+	public short getPrevious(short ID) throws RemoteException
 	{
 		Util.General.printLineSep();
 		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ")");
@@ -83,7 +83,7 @@ public class Resolver implements ResolverInterface
 	}
 
 	@Override
-	public short getNext(short ID)
+	public short getNext(short ID) throws RemoteException
 	{
 		Util.General.printLineSep();
 		System.out.println("Resolver.getNext(" + Short.toString(ID) + ")");
