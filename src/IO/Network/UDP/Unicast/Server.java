@@ -55,7 +55,7 @@ public class Server implements Runnable
 	 * <b>WARNING:</b> After the port is changed, the server needs to be restarted.<br>
 	 * @param	port	The new port the server should listen on.<br>
 	 */
-	public void setPort(int port)
+	public synchronized void setPort(int port)
 	{
 		if (!this.socket.isBound())
 		{
@@ -72,7 +72,7 @@ public class Server implements Runnable
 	 * @param remoteHost	The remote host that the data should be sent to.
 	 * @param data			The data to be sent.
 	 */
-	public void send(String remoteHost, int port, byte[] data)
+	public synchronized void send(String remoteHost, int port, byte[] data)
 	{
 		try
 		{
@@ -141,7 +141,7 @@ public class Server implements Runnable
 	 * read packet from internal receive buffer.
 	 * @return	The first packet in the internal receive buffer.
 	 */
-	public DatagramPacket receivePacket()
+	public synchronized DatagramPacket receivePacket()
 	{
 		if(!packetBuffer.isEmpty())
 		{
@@ -159,7 +159,7 @@ public class Server implements Runnable
 	 * Stops the server
 	 * @throws IOException
 	 */
-	public void stop()
+	public synchronized void stop()
 	{
 		if (this.socket != null)
 		{

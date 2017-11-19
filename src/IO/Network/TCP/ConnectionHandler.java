@@ -41,7 +41,7 @@ public class ConnectionHandler implements Runnable
 		}
 	}
 
-	public byte[] readBytes()
+	public synchronized byte[] readBytes()
 	{
 		byte[] data = this.inputBuffer.getFirst();
 		this.inputBuffer.removeFirst();

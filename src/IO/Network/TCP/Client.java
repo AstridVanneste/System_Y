@@ -97,7 +97,7 @@ public class Client implements Runnable
 	 * reads all bytes from the interal receive buffer
 	 * @return
 	 */
-	public byte[] receive()
+	public synchronized byte[] receive()
 	{
 		byte[] data = this.buffer.getFirst();
 		this.buffer.removeFirst();

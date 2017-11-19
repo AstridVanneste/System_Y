@@ -57,7 +57,7 @@ public class Subscriber implements Runnable
 	 * read packet from internal receive buffer.
 	 * @return				The first packet in the internal receive buffer.
 	 */
-	public DatagramPacket receivePacket()
+	public synchronized DatagramPacket receivePacket()
 	{
 		if(!this.packetBuffer.isEmpty())
 		{
@@ -74,7 +74,7 @@ public class Subscriber implements Runnable
 	/**
 	 * Stops the Multicast Subscriber.
 	 */
-	public void stop()
+	public synchronized void stop()
 	{
 		if(this.socket != null)
 		{
