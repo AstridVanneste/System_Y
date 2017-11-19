@@ -24,7 +24,7 @@ public interface ResolverInterface extends Remote
 	 * @return
 	 * @throws RemoteException, InvalidParameterException
 	 */
-	public String getOwnerIP(String filename) throws RemoteException, InvalidParameterException;
+	public short getOwnerID(String filename) throws RemoteException, InvalidParameterException;
 
 	/**
 	 *returns previous neighbour of node with given ID
