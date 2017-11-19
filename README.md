@@ -84,7 +84,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
 - [ ] Update Serializer to use ByteBuffers
 - [x] Remove unnecessary println()'s from all code
-- [ ] Fix concurrency issues in Network Classes
+- [ ] Fix concurrency issues in Network Classes MOET GETEST WORDEN, Fergan
 
 ### Opdracht 4
 #### Discovery & Bootstrap
