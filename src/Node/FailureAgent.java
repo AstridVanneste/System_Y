@@ -48,9 +48,12 @@ public class FailureAgent
 
 		try
 		{
-			Registry registryPrev = LocateRegistry.getRegistry(IPprev);
-			prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-			prevNode.setNextNeighbourRemote(nextID);
+			if(prevID != Node.getInstance().getId()) //No RMI to yourself
+			{
+				Registry registryPrev = LocateRegistry.getRegistry(IPprev);
+				prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
+				prevNode.setNextNeighbourRemote(nextID);
+			}
 		}
 		catch(RemoteException | NotBoundException re)
 		{
@@ -62,9 +65,12 @@ public class FailureAgent
 
 		try
 		{
-			Registry registryNext = LocateRegistry.getRegistry(IPnext);
-			nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-			nextNode.setPreviousNeighbourRemote(prevID);
+			if(nextID != Node.getInstance().getId()) //No RMI to yourself
+			{
+				Registry registryNext = LocateRegistry.getRegistry(IPnext);
+				nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
+				nextNode.setPreviousNeighbourRemote(prevID);
+			}
 		}
 		catch(RemoteException | NotBoundException re)
 		{
