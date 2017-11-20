@@ -18,11 +18,13 @@ public class Resolver implements ResolverInterface
 	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
 	{
 		Util.General.printLineSep();
-		System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")");
+
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.get(nodeId);
+			String IP=  NameServer.getInstance().map.get(nodeId);
+			System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")" + " = " + IP);
+			return IP;
 		}
 		else
 		{
@@ -49,54 +51,70 @@ public class Resolver implements ResolverInterface
 	@Override
 	public short getOwnerID(String filename) throws RemoteException
 	{
-		Util.General.printLineSep();
-		System.out.println("Resolver.getOwnerIP(" + filename + ")");
+
 		short hash = NameServer.getHash(filename);
+		short id;
 
 		if(hash < NameServer.getInstance().map.firstKey())
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.lastKey();
+			id = NameServer.getInstance().map.lastKey();
 		}
 		else
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.lowerKey(hash);
+			id =  NameServer.getInstance().map.lowerKey(hash);
 		}
+
+		Util.General.printLineSep();
+		System.out.println("Resolver.getOwnerIP(" + filename + ") = " + id);
+
+		return id;
 	}
 
 	@Override
 	public short getPrevious(short ID) throws RemoteException
 	{
-		Util.General.printLineSep();
-		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ")");
+
+		short id;
+
 		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.lastKey();
+			id = NameServer.getInstance().map.lastKey();
 		}
 		else
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.lowerKey(ID);
+			id =  NameServer.getInstance().map.lowerKey(ID);
 		}
+
+		Util.General.printLineSep();
+		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ") = " + id);
+
+		return id;
 	}
 
 	@Override
 	public short getNext(short ID) throws RemoteException
 	{
-		Util.General.printLineSep();
-		System.out.println("Resolver.getNext(" + Short.toString(ID) + ")");
+		short id;
+
 		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals( ID))
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.firstKey();
+			id =  NameServer.getInstance().map.firstKey();
 		}
 		else
 		{
 			Util.General.printLineSep();
-			return NameServer.getInstance().map.higherKey(ID);
+			id =  NameServer.getInstance().map.higherKey(ID);
 		}
+
+		Util.General.printLineSep();
+		System.out.println("Resolver.getNext(" + Short.toString(ID) + ") = " + id);
+
+		return id;
 	}
 
 
