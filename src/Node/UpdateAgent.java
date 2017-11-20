@@ -21,7 +21,7 @@ public class UpdateAgent implements Runnable
 			keyMap= new HashMap<WatchKey, Path>();
 
 			//directory of files
-			path = Paths.get("files");
+			path = Paths.get("Files");
 
 			Thread thread = new Thread(this);
 			thread.start();
