@@ -2,6 +2,7 @@ package Node;
 
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -37,7 +38,7 @@ public class FileLedger
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		this.copies = Collections.synchronizedSortedSet(new TreeSet ());			//multiple nodes can ask at the same moment to download the file..
+		this.copies = Collections.synchronizedSet(new HashSet());			//multiple nodes can ask at the same moment to download the file..
 	}
 
 	/**
