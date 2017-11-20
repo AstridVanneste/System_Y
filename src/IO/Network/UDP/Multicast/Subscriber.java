@@ -94,7 +94,7 @@ public class Subscriber implements Runnable
 	@Override
 	public void run()
 	{
-		while(!this.socket.isClosed())
+		while (!this.socket.isClosed())
 		{
 			//System.out.println("Socket isn't closed, packetbuffer size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 			byte[] buffer = new byte[500];
@@ -106,11 +106,13 @@ public class Subscriber implements Runnable
 				//this.packetBuffer.add(incomingPacket);
 				//System.out.println("Added to buffer, size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
 
-				byte[] actualData = new byte [incomingPacket.getLength()];
+				byte[] actualData = new byte[incomingPacket.getLength()];
 				System.arraycopy(incomingPacket.getData(), 0, actualData, 0, incomingPacket.getLength());
 
 				DatagramPacket trimmedPacket = incomingPacket;
 				trimmedPacket.setData(actualData);
+
+				//System.out.println("Received UDP pakcet with a size of " + Integer.toString(actualData.length));
 
 				this.packetBuffer.add(trimmedPacket);
 			}
@@ -118,11 +120,11 @@ public class Subscriber implements Runnable
 			{
 				se.printStackTrace();
 			}
-			catch(IOException e)
+			catch (IOException e)
 			{
 				System.err.println("Error when trying to receive a packet");
 				e.printStackTrace();
-		}
+			}
 		}
 	}
 

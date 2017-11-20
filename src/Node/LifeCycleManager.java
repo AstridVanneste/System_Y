@@ -64,10 +64,9 @@ public class LifeCycleManager implements Runnable
 		{
 			synchronized (this.subscriber)
 			{
-
-				if (this.subscriber.hasData())
+				if(this.subscriber.hasData())
 				{
-					System.out.println("Got Data");
+					//System.out.println("Got Data");
 
 
 					// Subscriber got some data
@@ -84,17 +83,18 @@ public class LifeCycleManager implements Runnable
 					if (Node.getInstance().getId() != Node.DEFAULT_ID)
 					{
 						// We're not a new node, check and if needed update neighbours
-						System.out.println("We're not a new node");
+						//System.out.println("We're not a new node");
 
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
 							this.updateNeighbours(newNodeID);
 						}
-					} else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
+					}
+					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
 						// We are a new node, let's start setting neighbours
-						System.out.println("Transaction ID was ours");
-						System.out.println("We are a new node");
+						//System.out.println("Transaction ID was ours");
+						//System.out.println("We are a new node");
 
 						//check if message contains error message duplicate id from NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
@@ -131,7 +131,6 @@ public class LifeCycleManager implements Runnable
 							this.bootstrapTransactionID = -1;
 						}
 					}
-
 				}
 			}
 		}
@@ -210,7 +209,6 @@ public class LifeCycleManager implements Runnable
 	{
 		/* You're the first node so edit both neighbours of the new node
 		 * OWN ID == NEXT ID && OWN ID == PREVIOUS ID
-		 * 
 		 */
 		if(Node.getInstance().getId() == Node.getInstance().getNextNeighbour() && Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour())
 		{
@@ -359,5 +357,10 @@ public class LifeCycleManager implements Runnable
 		Node.getInstance().setPreviousNeighbour(Node.DEFAULT_ID);
 		Node.getInstance().setNextNeighbour(Node.DEFAULT_ID);
 		Node.getInstance().setId(Node.DEFAULT_ID);
+	}
+
+	public ShutdownAgentInterface getShutdownStub()
+	{
+		return this.shutdownStub;
 	}
 }
