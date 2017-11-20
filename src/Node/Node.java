@@ -108,6 +108,18 @@ public class Node implements NodeInteractionInterface
 		{
 			e.printStackTrace();
 		}
+
+		this.resolverStub = null;
+
+		try
+		{
+			UnicastRemoteObject.unexportObject(this,false);
+		}
+		catch (NoSuchObjectException e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 
 	public String getName()

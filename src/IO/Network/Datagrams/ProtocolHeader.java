@@ -26,8 +26,6 @@ public class ProtocolHeader
 
 	//REQUEST CODES
 	public static final int REQUEST_DISCOVERY_CODE = 0x00000001;
-	public static final int REQUEST_CLUSTER_HEALTH_REPORT = 0x00000002;
-	public static final int REQUEST_NEW_NEIGHBOUR = 0x00000003;
 	public static final int REQUEST_FILE = 0x00004001;
 
 
@@ -36,8 +34,6 @@ public class ProtocolHeader
 	public static final int REPLY_SUCCESSFULLY_ADDED = 0x00000001;
 	public static final int REPLY_DUPLICATE_ID = 0x00000002;
 	public static final int REPLY_DUPLICATE_IP = 0x00000003;
-	public static final int REPLY_NODE_UP = 0x00000004;
-	public static final int REPLY_NODE_DOWN = 0x00000005;
 	public static final int REPLY_FILE = 0x00004001;
 
 	private byte version;
