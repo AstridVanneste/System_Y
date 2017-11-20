@@ -22,6 +22,7 @@ public class FailureAgent
 	 */
 	private void failure(short firstID, short lastID)
 	{
+		System.out.println("failure(" + Short.toString(firstID) + "," + Short.toString(lastID) + ")");
 		String IPprev = "";
 		String IPnext = "";
 		short nextID = -1;
@@ -82,19 +83,25 @@ public class FailureAgent
 		// Handling Recursion
 		if (prevFailed && nextFailed)
 		{
+			System.out.println("Next and previous failed");
 			this.failure(prevID, nextID);
 		}
 		else if (prevFailed)
 		{
+			System.out.println("Previous failed");
 			this.failure(prevID, lastID);
 		}
 		else if (nextFailed)
 		{
+			System.out.println("Next failed");
 			this.failure(firstID, nextID);
 		}
 
+		System.out.println("No Recursion");
+
 		// No recursion occurred or we're the last level of recursion
 		// first and last become eachothers neighbours
+		
 		try
 		{
 			if ((nextID == prevID) && (nextID == Node.getInstance().getId()))

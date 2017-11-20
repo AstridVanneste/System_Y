@@ -213,6 +213,7 @@ public class FileManager implements FileManagerInterface, Runnable
 
 			remoteHost = socket.toString();
 		}
+
 		catch (UnknownHostException uhe)
 		{
 			uhe.printStackTrace();

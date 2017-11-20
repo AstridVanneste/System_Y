@@ -13,6 +13,7 @@ import Util.Serializer;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -339,7 +340,7 @@ public class LifeCycleManager implements Runnable
 			}
 			catch(RemoteException | NotBoundException re)
 			{
-				re.printStackTrace();
+				//re.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
 
