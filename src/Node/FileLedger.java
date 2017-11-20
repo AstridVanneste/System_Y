@@ -39,7 +39,7 @@ public class FileLedger
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		this.copies = new HashSet();			//multiple nodes can ask at the same moment to download the file..
+		this.copies = new HashSet();
 	}
 
 	/**
