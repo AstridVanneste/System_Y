@@ -20,6 +20,7 @@ public class UpdateAgent implements Runnable
 		{
 			this.service = FileSystems.getDefault().newWatchService();
 
+			// Specifying the type of events we want to monitor -> creature of a file
 			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
@@ -38,10 +39,14 @@ public class UpdateAgent implements Runnable
 		watcher();
 	}
 
-	public void watcher()
+	/**
+	 * Processing events in the local-map
+	 */
+	private void watcher()
 	{
 		for (;;)
 		{
+
 			// wait for key to be signalled
 			try
 			{
@@ -60,18 +65,26 @@ public class UpdateAgent implements Runnable
 				continue;
 			}
 
+			// Process the pending events for the key
 			for (WatchEvent<?> event : watchKey.pollEvents())
 			{
+				// Retrieve the type of event
 				WatchEvent.Kind<?> kind = event.kind();
+
+				// The file name is stored as the context of the event
 				Path eventPath = (Path) event.context();
+
 				System.out.println(eventDir + " :" + kind + " : " + eventPath);
 
-				// this check is necessary just in case
-				if (kind == StandardWatchEventKinds.OVERFLOW) {
+				// This check is necessary just in case
+				if (kind == StandardWatchEventKinds.OVERFLOW)
+				{
 					continue;
 				}
 
-				if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+				// File is created
+				if (kind == StandardWatchEventKinds.ENTRY_CREATE)
+				{
 					System.out.println("File created");
 					//handle...
 					continue;
@@ -79,12 +92,19 @@ public class UpdateAgent implements Runnable
 
 			}
 
-			watchKey.reset();
+			// Put the key back into a ready state by invoking reset. If the key is no longer valid,
+			// the directory is inaccessible so exit the loop.
+			if (!watchKey.reset())
+			{
+				System.out.println("Watch key reset is failed. No listening anymore");
+				break;
+			}
 
 		}
 	}
 
-	public void stop(){
+	public void stop()
+	{
 		try
 		{
 			service.close();
