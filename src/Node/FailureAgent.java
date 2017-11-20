@@ -38,9 +38,8 @@ public class FailureAgent
 			nextID = Node.getInstance().getResolverStub().getNext(lastID);
 			IPprev = Node.getInstance().getResolverStub().getIP(prevID);
 			IPnext = Node.getInstance().getResolverStub().getIP(nextID);
-			System.out.println("PREV " + IPprev);
-			System.out.println("NEXT " + IPnext);
-
+			System.out.println("PREV: " + Short.toString(prevID));
+			System.out.println("NEXT: " + Short.toString(nextID));
 		}
 		catch(RemoteException re)
 		{
@@ -53,7 +52,6 @@ public class FailureAgent
 			{
 				Registry registryPrev = LocateRegistry.getRegistry(IPprev);
 				prevNode = (NodeInteractionInterface) registryPrev.lookup(Node.NODE_INTERACTION_NAME);
-				prevNode.setNextNeighbourRemote(nextID);
 			}
 		}
 		catch(RemoteException | NotBoundException re)
@@ -70,7 +68,6 @@ public class FailureAgent
 			{
 				Registry registryNext = LocateRegistry.getRegistry(IPnext);
 				nextNode = (NodeInteractionInterface) registryNext.lookup(Node.NODE_INTERACTION_NAME);
-				nextNode.setPreviousNeighbourRemote(prevID);
 			}
 		}
 		catch(RemoteException | NotBoundException re)
@@ -109,6 +106,9 @@ public class FailureAgent
 				try
 				{
 					Node.getInstance().getResolverStub().getIP(Node.getInstance().getId());
+					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(Node.getInstance().getResolverStub().getNext(prevID));
+					Node.getInstance().setNextNeighbour(Node.getInstance().getId());
+					Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
 				}
 				catch (RemoteException re)
 				{
@@ -120,13 +120,19 @@ public class FailureAgent
 			}
 			else
 			{
-				short tmpID = prevID;
+				short tmpID = Node.getInstance().getResolverStub().getNext(prevID);
 
 				while (tmpID != nextID)
 				{
+					Util.General.printLineSep();
+					System.out.println("Tmp: " + Short.toString(tmpID));
+					System.out.println("PrevID: " + Short.toString(prevID));
+					System.out.println("NextID: " + Short.toString(nextID));
+					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
-					//Node.getInstance().getFailureAgent().failure(tmp);
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
+
+					//Node.getInstance().getFailureAgent().failure(tmp);
 				}
 
 				if(prevNode != null)
