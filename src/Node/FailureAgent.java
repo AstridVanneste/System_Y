@@ -129,8 +129,24 @@ public class FailureAgent
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 				}
 
-				prevNode.setNextNeighbourRemote(nextID);
-				nextNode.setPreviousNeighbourRemote(prevID);
+				if(prevNode != null)
+				{
+					prevNode.setNextNeighbourRemote(nextID);
+				}
+				else
+				{
+					Node.getInstance().setNextNeighbour(nextID);
+				}
+
+				if(nextNode != null)
+				{
+					nextNode.setPreviousNeighbourRemote(prevID);
+				}
+				else
+				{
+					Node.getInstance().setPreviousNeighbour(prevID);
+				}
+
 			}
 		}
 		catch (RemoteException re)
