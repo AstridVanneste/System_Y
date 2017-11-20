@@ -87,17 +87,8 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Fix concurrency issues in Network Classes MOET GETEST WORDEN, Fergan
 
 ### Opdracht 4
-#### Discovery & Bootstrap
-- [x] Clean up Node code and move Discovery into LifeCycleManager
-- [x] Make Node-Discovery check for duplicate IP's
-- [ ] Test Discovery System when going from 2 nodes -> 3 nodes
-
-#### Shutdown
-
 #### Failure
 - [ ] Provide centralized interface (Static/Singleton?) for handling exceptions
-- [x] Add ping functionality
-- [x] Find a fix for failure-recursion
 
 ### Opdracht 5
 #### Replicatie (Sessie 1)
