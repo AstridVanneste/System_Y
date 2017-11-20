@@ -101,6 +101,7 @@ public class FailureAgent
 
 		// No recursion occurred or we're the last level of recursion
 		// first and last become eachothers neighbours
+		
 		try
 		{
 			if ((nextID == prevID) && (nextID == Node.getInstance().getId()))
