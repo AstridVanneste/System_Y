@@ -34,11 +34,12 @@ public class FileLedger
 	 * @param fileName name of file of this logging-object
 	 * @param localID ID of node that has the file locally
 	 */
-	public FileLedger (String fileName, short localID) {
+	public FileLedger (String fileName, short localID)
+	{
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = -1;
-		this.copies = Collections.synchronizedSet(new HashSet());			//multiple nodes can ask at the same moment to download the file..
+		this.copies = new HashSet();			//multiple nodes can ask at the same moment to download the file..
 	}
 
 	/**
@@ -47,7 +48,7 @@ public class FileLedger
 	 * @return  true if successfully added
 	 * 			false if ID was already in the list
 	 */
-	public boolean addDownloader (short ID)
+	public synchronized boolean addDownloader (short ID)
 	{
 		return copies.add(ID);
 	}
@@ -58,7 +59,7 @@ public class FileLedger
 	 * @return  true if successfully removed
 	 * 			false if ID was not in the list
 	 */
-	public boolean removeDownloader (short ID)
+	public synchronized boolean removeDownloader (short ID)
 	{
 		return copies.remove(ID);
 	}
@@ -82,4 +83,5 @@ public class FileLedger
 	{
 		this.localID = localID;
 	}
+
 }
