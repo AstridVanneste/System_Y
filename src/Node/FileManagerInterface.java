@@ -28,4 +28,13 @@ public interface FileManagerInterface extends Remote
 	 * @throws IOException
 	 */
 	public void pullFile (short dstID, String filename) throws IOException;
+
+	/**
+	 * Remote method: Used to pass on a fileLedger from one node to another.
+	 * Caller = Node that sends the fileLedger
+	 * Callee = Node that has to receive the fileLedger
+	 * @param fileLedger
+	 * @throws IOException
+	 */
+	public void addFileLedger(FileLedger fileLedger) throws IOException;
 }

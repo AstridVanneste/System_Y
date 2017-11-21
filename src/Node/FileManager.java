@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 /**
- * This class will handle everything concerning the files. To get a functional filemanager you need to call the start()
- * method and set the root folder of the files.
+ * This class will handle everything concerning the files. To get a functional filemanager you need to set the root directory and then call the start() method.
  */
 public class FileManager implements FileManagerInterface, Runnable
 {
@@ -38,10 +37,16 @@ public class FileManager implements FileManagerInterface, Runnable
 	public FileManager ()
 	{
 		this.tcpServer = null;
-		this.rootDirectory = "";
-		this.files = new HashMap<>();	//todo: figure out how to pass on existing fileLedgers
+		this.rootDirectory = System.getProperty("user.home");
+		this.files = new HashMap<>();
 	}
 
+	/**
+	 * Starts the filemanager:
+	 * - starts TCP server
+	 * - creates all necessary folders for the filemanager functions (/LOCAL, /OWNED and /DOWNLOADS
+	 *
+	 */
 	public void start ()
 	{
 		try
@@ -53,10 +58,30 @@ public class FileManager implements FileManagerInterface, Runnable
 		{
 			ioe.printStackTrace();
 		}
+
+		File folder = new File(getFullPath("",FileType.LOCAL_FILE));
+		if(!folder.exists())
+		{
+			folder.mkdir();
+		}
+
+		folder = new File(getFullPath("",FileType.OWNED_FILE));
+		if(!folder.exists())
+		{
+			folder.mkdir();
+		}
+
+		folder = new File(getFullPath("",FileType.DOWNLOADED_FILE));
+		if(!folder.exists())
+		{
+			folder.mkdir();
+		}
 	}
 
 	/**
-	 * Stop the filemanager
+	 * Stop the filemanager:
+	 * - stops TCP server
+	 * - deletes all owned files.
 	 */
 	public void stop ()
 	{
@@ -75,6 +100,24 @@ public class FileManager implements FileManagerInterface, Runnable
 		{
 			ioe.printStackTrace();
 		}
+
+		File folder = new File(getFullPath("",FileType.OWNED_FILE));
+
+		for(File file: folder.listFiles())
+		{
+			file.delete();
+		}
+		folder.delete();
+
+
+		/*folder = new File(getFullPath("",FileType.DOWNLOADED_FILE));
+
+		for(File file: folder.listFiles())
+		{
+			file.delete();
+		}
+		folder.delete();
+		*/
 	}
 
 	/**
@@ -97,6 +140,19 @@ public class FileManager implements FileManagerInterface, Runnable
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
 
+	}
+
+	@Override
+	public void addFileLedger(FileLedger fileLedger) throws IOException
+	{
+		if(this.files.containsKey(fileLedger.getFileName()))
+		{
+			throw new IOException("Already have a fileLedger with filename " + fileLedger.getFileName());
+		}
+		else
+		{
+			this.files.put(fileLedger.getFileName(), fileLedger);
+		}
 	}
 
 	/**
@@ -131,16 +187,33 @@ public class FileManager implements FileManagerInterface, Runnable
 				if(type == FileType.LOCAL_FILE && ownerId == Node.getInstance().getId())
 				{
 					//you become the new owner of the file...
-					//send replication to your previous neighbour
-					Registry registry = LocateRegistry.getRegistry(ownerIP);
+					//send replication to your previous neighbour. this node becomes the owner of the file
+
+					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
+					Registry registry = LocateRegistry.getRegistry(localIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
-					fileManager.pushFile(file.getName(),file.length(),FileType.LOCAL_FILE, Node.getInstance().getResolverStub().getIP(ownerId));
+					fileManager.pushFile(file.getName(),file.length(),FileType.LOCAL_FILE, localIP);
+					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
+					fileManager.addFileLedger(fileLedger);
 				}
 				else if(ownerId != Node.getInstance().getId())
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
 					fileManager.pushFile(file.getName(),file.length(),type,  Node.getInstance().getResolverStub().getIP(ownerId));
+
+					if(type == FileType.LOCAL_FILE)
+					{
+						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId);
+						fileManager.addFileLedger(fileLedger);
+					}
+					else if(type == FileType.OWNED_FILE)
+					{
+						FileLedger fileLedger = this.files.get(file.getName());
+						fileLedger.setOwnerID(ownerId);
+						fileManager.addFileLedger(fileLedger);
+					}
+
 				}
 			}
 			catch (RemoteException re)
@@ -311,7 +384,7 @@ public class FileManager implements FileManagerInterface, Runnable
 				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
 		}
 
-		filename += this.rootDirectory;
+		filename = this.rootDirectory + filename;
 
 		return filename;
 	}

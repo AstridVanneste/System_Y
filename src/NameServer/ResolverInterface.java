@@ -39,9 +39,4 @@ public interface ResolverInterface extends Remote
 	 */
 	public short getNext(short ID) throws RemoteException;
 
-
-	public void addToTree(short ID, String IP) throws RemoteException;   // todo: Remove when testing is complete
-
-	public void removeFromTree(short nodeId) throws RemoteException; //todo: Remove when testing complete
-
 }
