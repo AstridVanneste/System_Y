@@ -32,22 +32,6 @@ public class Resolver implements ResolverInterface
 		}
 	}
 
-	@Deprecated
-	public void removeFromTree(short nodeId) throws RemoteException
-	{
-		Util.General.printLineSep();
-		System.out.println("Resolver.removeFromTree(" + Short.toString(nodeId) + ")");
-		if(NameServer.getInstance().map.containsKey(nodeId))
-		{
-			NameServer.getInstance().map.remove(nodeId);
-			Util.General.printLineSep();
-		}
-		else
-		{
-			throw new InvalidParameterException("No node with ID " + nodeId);
-		}
-	}
-
 	@Override
 	public short getOwnerID(String filename) throws RemoteException
 	{
@@ -77,6 +61,11 @@ public class Resolver implements ResolverInterface
 	{
 
 		short id;
+
+		System.out.println("RESOLVER: ID: " + ID + " FIRST: " + NameServer.getInstance().map.firstKey());
+		System.out.println("EQUALS = " + NameServer.getInstance().map.firstKey().equals(ID));
+
+		System.out.println(NameServer.getInstance().toString());
 
 		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
 		{
@@ -115,15 +104,5 @@ public class Resolver implements ResolverInterface
 		System.out.println("Resolver.getNext(" + Short.toString(ID) + ") = " + id);
 
 		return id;
-	}
-
-
-	@Deprecated
-	public void addToTree(short ID, String IP) throws RemoteException
-	{
-		Util.General.printLineSep();
-		System.out.println("Resolver.addToTree(" + Short.toString(ID) + "," + IP + ")");
-		NameServer.getInstance().map.put(ID,IP);
-		Util.General.printLineSep();
 	}
 }

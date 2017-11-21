@@ -10,13 +10,15 @@ public class UpdateAgent implements Runnable
 	private final Path LOCAL_DIR;
 
 	public UpdateAgent(){
-		this.LOCAL_DIR = Paths.get("Files");
+		//this.LOCAL_DIR = Paths.get("Files");
+		this.LOCAL_DIR = null;
 	}
 
 	/**
 	 * startup of the directorywatcher
 	 */
-	public void start(){
+	public void start()
+	{
 		try{
 			this.service = FileSystems.getDefault().newWatchService();
 
@@ -34,7 +36,8 @@ public class UpdateAgent implements Runnable
 
 	}
 
-	public void run(){
+	public void run()
+	{
 		while(true){
 			watcher();
 			try

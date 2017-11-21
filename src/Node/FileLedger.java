@@ -42,6 +42,14 @@ public class FileLedger
 		this.copies = new HashSet();
 	}
 
+	public FileLedger (String fileName, short localID, short ownerID)
+	{
+		this.fileName = fileName;
+		this.localID = localID;
+		this.ownerID = ownerID;
+		this.copies = new HashSet<>();
+	}
+
 	/**
 	 * Add a downloader of this file
 	 * @param ID
@@ -84,4 +92,8 @@ public class FileLedger
 		this.localID = localID;
 	}
 
+	public String getFileName()
+	{
+		return this.fileName;
+	}
 }

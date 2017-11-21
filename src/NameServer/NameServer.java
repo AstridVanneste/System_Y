@@ -130,7 +130,7 @@ public class NameServer
 	{
 		StringBuilder s = new StringBuilder();
 
-		for(int n: this.map.keySet())
+		for(short n: this.map.keySet())
 		{
 			s.append("KEY:	").append(n).append("	VALUE:	").append(this.map.get(n)).append("\n");
 		}
@@ -157,17 +157,5 @@ public class NameServer
 			nbe.printStackTrace();
 		}
 
-	}
-
-	@Deprecated
-	public void addToTree(short ID, String IP)
-	{
-		this.map.put(ID,IP);
-	}
-
-	@Deprecated
-	public void removeFromTree(int ID)
-	{
-		this.map.remove(ID);
 	}
 }

@@ -11,7 +11,7 @@ public class NodeMain
 {
     public static void main(String[] args)
     {
-	    if (args.length != 1)
+	    if ((args.length < 1) ||  (args.length > 2))
 	    {
 		    System.err.println("[ERROR]\tInvalid number of command line arguments: " + Integer.toString(args.length) + ", should be 1");
 		    return;
@@ -29,9 +29,14 @@ public class NodeMain
 
 		    Node.getInstance().setName(args[0]);
 		    System.out.println("Set name '" + args[0] + "'");
+			if(args.length == 2)
+			{
+				Node.getInstance().getFileManager().setRootDirectory(args[1]);
+			}
 		    Node.getInstance().start();
 		    System.out.println("Started Node...");
 
+			
 		    boolean quit = false;
 
 		    while (!quit)
