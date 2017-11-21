@@ -26,7 +26,7 @@ public class UpdateAgent implements Runnable
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
 
-			localDir.register(service, StandardWatchEventKinds.ENTRY_CREATE);
+			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
 			thread.start();
