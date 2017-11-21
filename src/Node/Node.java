@@ -39,7 +39,7 @@ public class Node implements NodeInteractionInterface
 		this.failureAgent = new FailureAgent();
 		this.fileManager = new FileManager();
 		this.resolverStub = null;
-		updateAgent = new UpdateAgent();
+		this.updateAgent = new UpdateAgent();
 	}
 
 	/**
@@ -98,6 +98,7 @@ public class Node implements NodeInteractionInterface
 	{
 		this.fileManager.stop();
 		this.lifeCycleManager.stop();
+		this.updateAgent.stop();
 
 		try
 		{

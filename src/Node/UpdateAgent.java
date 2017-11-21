@@ -2,8 +2,6 @@ package Node;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class UpdateAgent implements Runnable
 {
@@ -20,14 +18,14 @@ public class UpdateAgent implements Runnable
 	 */
 	public void start(){
 		try{
-			service = FileSystems.getDefault().newWatchService();
+			this.service = FileSystems.getDefault().newWatchService();
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
+
 			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
 			thread.start();
-
 
 		} catch (IOException e)
 		{
@@ -35,7 +33,6 @@ public class UpdateAgent implements Runnable
 		}
 
 	}
-
 
 	public void run(){
 		while(true){
@@ -77,14 +74,13 @@ public class UpdateAgent implements Runnable
 		}
 	}
 
-
-
-
-	public void stop(){
+	public void stop()
+	{
 		try
 		{
 			service.close();
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
