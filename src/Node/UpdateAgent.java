@@ -6,100 +6,71 @@ import java.nio.file.*;
 public class UpdateAgent implements Runnable
 {
 	private WatchService service;
+	private WatchKey watchkey;
 	private final Path LOCAL_DIR;
-	private WatchKey watchKey;
 
-	public UpdateAgent()
-	{
-		this.LOCAL_DIR = Paths.get("Local/");
+	public UpdateAgent(){
+		this.LOCAL_DIR = Paths.get("Files");
 	}
 
-	public void start()
-	{
-		try
-		{
+	/**
+	 * startup of the directorywatcher
+	 */
+	public void start(){
+		try{
 			this.service = FileSystems.getDefault().newWatchService();
 
-			// Specifying the type of events we want to monitor -> creature of a file
+			//specify which entries should be watched. in this case only the creation of  a file will be watched.
+
 			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
 			thread.start();
 
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 
 	}
 
-	public void run()
-	{
-		watcher();
+	public void run(){
+		while(true){
+			watcher();
+			try
+			{
+				Thread.sleep(100);
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
-	 * Processing events in the local-map
+	 * If a file is added, watcher will be notified.
+	 * Then it will handle a new file using the correct procedure
 	 */
-	private void watcher()
-	{
-		for (;;)
+	public void watcher(){
+		try
 		{
 
-			// wait for key to be signalled
-			try
-			{
-				watchKey = service.take();
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-				return;
-			}
+			watchkey = service.take();
 
-			Path eventDir = (Path) watchKey.watchable();
-			if (eventDir == null)
-			{
-				System.err.println("WatchKey not recognized!");
-				continue;
-			}
-
-			// Process the pending events for the key
-			for (WatchEvent<?> event : watchKey.pollEvents())
-			{
-				// Retrieve the type of event
+			//events will in THIS case always return a path, so it can be cast as one
+			Path eventDir = (Path)watchkey.watchable();
+			//iterate over all possible events
+			for(WatchEvent<?> event : watchkey.pollEvents()){
 				WatchEvent.Kind<?> kind = event.kind();
-
-				// The file name is stored as the context of the event
-				Path eventPath = (Path) event.context();
-
-				System.out.println(eventDir + " :" + kind + " : " + eventPath);
-
-				// This check is necessary just in case
-				if (kind == StandardWatchEventKinds.OVERFLOW)
-				{
-					continue;
-				}
-
-				// File is created
-				if (kind == StandardWatchEventKinds.ENTRY_CREATE)
-				{
-					System.out.println("File created");
-					//handle...
-					continue;
-				}
-
+				Path eventPath = (Path)event.context();
+				System.out.println(eventDir +  " :" + kind + " : " + eventPath);
 			}
 
-			// Put the key back into a ready state by invoking reset. If the key is no longer valid,
-			// the directory is inaccessible so exit the loop.
-			if (!watchKey.reset())
-			{
-				System.out.println("Watch key reset is failed. No listening anymore");
-				break;
-			}
+			watchkey.reset();
 
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
