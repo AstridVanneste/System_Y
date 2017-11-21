@@ -149,7 +149,7 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				ownerInterface.notifyLeaving();
+				//ownerInterface.notifyLeaving();
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -183,6 +183,8 @@ public class FileManager implements FileManagerInterface
 		{
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
+
+		this.files.get(filename).addDownloader(dstID); //add person who requests to downloaders
 	}
 
 	@Override
@@ -234,7 +236,7 @@ public class FileManager implements FileManagerInterface
 
 					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(localIP);
-					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					fileManager.pushFile(file.getName(),file.length(),FileType.LOCAL_FILE, localIP);
 					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
 					fileManager.addFileLedger(fileLedger);
@@ -242,7 +244,7 @@ public class FileManager implements FileManagerInterface
 				else if(ownerId != Node.getInstance().getId())
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
-					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					fileManager.pushFile(file.getName(),file.length(),type,  Node.getInstance().getResolverStub().getIP(ownerId));
 
 					if(type == FileType.LOCAL_FILE)
@@ -332,7 +334,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_INTERACTION_NAME);
+			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
 			IO.File file = new IO.File(this.getFullPath(filename,type));
 			fileManager.pushFile(filename,file.size(),type,remoteHost);
 		}
@@ -373,7 +375,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
-			FileManagerInterface fileManager =(FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+			FileManagerInterface fileManager =(FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 			fileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
 			the owner will later call a push() method on this node to actually receive the file.
