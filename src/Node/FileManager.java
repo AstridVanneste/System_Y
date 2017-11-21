@@ -433,6 +433,11 @@ public class FileManager implements FileManagerInterface
 		this.rootDirectory = rootDirectory;
 	}
 
+	public String getRootDirectory()
+	{
+		return rootDirectory;
+	}
+
 	/**
 	 * Returns a clear readable list of all the files of the node.
 	 * @return
