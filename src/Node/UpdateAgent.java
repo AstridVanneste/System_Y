@@ -12,8 +12,7 @@ public class UpdateAgent implements Runnable
 	public boolean running;
 
 	public UpdateAgent(){
-		//this.LOCAL_DIR = Paths.get("Files");
-		this.LOCAL_DIR = null;
+		this.localDir = null;
 	}
 
 	/**
@@ -27,7 +26,7 @@ public class UpdateAgent implements Runnable
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
 
-			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
+			localDir.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
 			thread.start();
