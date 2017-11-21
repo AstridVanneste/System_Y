@@ -17,12 +17,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.InvalidParameterException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * This class will handle everything concerning the files. To get a functional filemanager you need to set the root directory and then call the start() method.
  */
-public class FileManager implements FileManagerInterface, Runnable
+public class FileManager implements FileManagerInterface
 {
 	// Please leave the trailing '/' at the end of these constants, it denotes that they are directories
 	private static final String LOCAL_FILE_PREFIX = "Local/";
@@ -31,7 +32,7 @@ public class FileManager implements FileManagerInterface, Runnable
 
 	private Server tcpServer;
 	private String rootDirectory;
-	private HashMap<String,FileLedger> files;
+	private HashMap <String, FileLedger> files;
 
 
 	public FileManager ()
@@ -120,6 +121,49 @@ public class FileManager implements FileManagerInterface, Runnable
 		*/
 	}
 
+	public void shutdown ()
+	{
+		for (Map.Entry<String, FileLedger> pair : this.files.entrySet())
+		{
+			if (pair.getValue().getOwnerID() == Node.getInstance().getId())
+			{
+				// I'm the owner
+				// Copy the file to my previous
+				// Tell him he's the new owner
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE);
+			}
+		}
+
+		String localFolder = this.getFolder(FileType.LOCAL_FILE);
+
+		for (File localFile : (new File(localFolder)).listFiles())
+		{
+			// The file is local to my system
+			// Find the owner
+			// Notify the owner that I'm leaving
+
+			short ownerID = -1;
+
+			try
+			{
+				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
+				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
+				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+				ownerInterface.notifyLeaving();
+			}
+			catch (RemoteException | NotBoundException e)
+			{
+				Node.getInstance().getFailureAgent().failure(ownerID);
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void notifyLeaving (String filename)
+	{
+
+	}
+
 	/**
 	 * Request to download file. The file will be pushed (push()) to the node requesting it.
 	 * @param dstID
@@ -139,7 +183,6 @@ public class FileManager implements FileManagerInterface, Runnable
 		{
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
-
 	}
 
 	@Override
@@ -248,12 +291,6 @@ public class FileManager implements FileManagerInterface, Runnable
 		}
 	}
 
-	@Override
-	public void run()
-	{
-
-	}
-
 	/**
 	 * Sends a file to a certain node.
 	 * @param dstID
@@ -354,7 +391,6 @@ public class FileManager implements FileManagerInterface, Runnable
 		{
 			ioe.printStackTrace();
 		}
-
 	}
 
 
@@ -364,29 +400,32 @@ public class FileManager implements FileManagerInterface, Runnable
 	 * @param type
 	 * @return
 	 */
-	public String getFullPath(String filename, FileType type)
+	private String getFullPath(String filename, FileType type)
+	{
+		return this.getFolder(type) + filename;
+	}
+
+	/**
+	 * Return the folder for the specified file type
+	 * @param type
+	 * @return
+	 */
+	public String getFolder (FileType type)
 	{
 		switch (type)
 		{
 			case LOCAL_FILE:
-				filename = LOCAL_FILE_PREFIX + filename;
-				break;
+				return this.rootDirectory + LOCAL_FILE_PREFIX;
 
 			case OWNED_FILE:
-				filename = OWNED_FILE_PREFIX + filename;
-				break;
+				return this.rootDirectory + OWNED_FILE_PREFIX;
 
 			case DOWNLOADED_FILE:
-				filename = DOWNLOADED_FILE_PREFIX + filename;
-				break;
+				return this.rootDirectory + DOWNLOADED_FILE_PREFIX;
 
 			default:
 				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
 		}
-
-		filename = this.rootDirectory + filename;
-
-		return filename;
 	}
 
 	public void setRootDirectory(String rootDirectory)

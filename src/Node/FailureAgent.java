@@ -116,7 +116,6 @@ public class FailureAgent
 					Node.getInstance().getLifeCycleManager().shutdown();
 					re.printStackTrace();
 				}
-
 			}
 			else
 			{

@@ -13,7 +13,7 @@ public class Node implements NodeInteractionInterface
 {
 	public static final short DEFAULT_ID = -1;
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
-	public static final String FILE_INTERACTION_NAME = "FILE_INTERACTION";
+	public static final String FILE_MANAGER_NAME = "FILE_MANAGER";
 
 	private String name;
 	private short id;
@@ -71,7 +71,7 @@ public class Node implements NodeInteractionInterface
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
 				Registry registry = LocateRegistry.createRegistry(1099);
 				registry.bind(Node.NODE_INTERACTION_NAME, nodeInteractionStub);
-				registry.bind(Node.FILE_INTERACTION_NAME, fileInteractionStub);
+				registry.bind(Node.FILE_MANAGER_NAME, fileInteractionStub);
 
 			}
 			catch (RemoteException re)
@@ -108,7 +108,8 @@ public class Node implements NodeInteractionInterface
 		catch(RemoteException re)
 		{
 			re.printStackTrace();
-		} catch (NotBoundException e)
+		}
+		catch (NotBoundException e)
 		{
 			e.printStackTrace();
 		}
@@ -123,7 +124,6 @@ public class Node implements NodeInteractionInterface
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	public String getName()
