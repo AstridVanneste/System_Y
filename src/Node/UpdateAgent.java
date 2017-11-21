@@ -9,8 +9,7 @@ public class UpdateAgent implements Runnable
 	private WatchService service;
 	private WatchKey watchkey;
 	private final Path LOCAL_DIR;
-	private short idFileOwner;
-	private String ipFileOwner;
+	public boolean running;
 
 	public UpdateAgent(){
 		//this.LOCAL_DIR = Paths.get("Files");
@@ -23,6 +22,7 @@ public class UpdateAgent implements Runnable
 	public void start()
 	{
 		try{
+			this.running = true;
 			this.service = FileSystems.getDefault().newWatchService();
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
@@ -41,7 +41,7 @@ public class UpdateAgent implements Runnable
 
 	public void run()
 	{
-		while(true){
+		while(this.running){
 			watcher();
 			try
 			{
@@ -69,25 +69,25 @@ public class UpdateAgent implements Runnable
 			for(WatchEvent<?> event : watchkey.pollEvents()){
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
+
+
 				try
 				{
+					short idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
 					//when owner is different from own id, no changes need to be made
 					if(idFileOwner != Node.getInstance().getId()){
-						ipFileOwner = Node.getInstance().getResolverStub().getIP(idFileOwner);
-						Node.getInstance().getFileManager().pullFile(idFileOwner,eventPath.toString());
+						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.OWNED_FILE);
 					}
-
 					//when owner is the same as your own id,
 					if(idFileOwner == Node.getInstance().getId()){
-						//change owner
+						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE);
 					}
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
-				} catch (IOException e)
-				{
-					e.printStackTrace();
 				}
+
+
 				System.out.println(eventDir +  " :" + kind + " : " + eventPath);
 			}
 
@@ -103,6 +103,7 @@ public class UpdateAgent implements Runnable
 	{
 		try
 		{
+			this.running =false;
 			service.close();
 		}
 		catch (IOException e)

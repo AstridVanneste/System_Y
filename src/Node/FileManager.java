@@ -297,7 +297,7 @@ public class FileManager implements FileManagerInterface
 	 * @param filename
 	 * @param type
 	 */
-	private void sendFile(short dstID, String filename, FileType type)
+	public void sendFile(short dstID, String filename, FileType type)
 	{
 		String dstIP = "";
 
