@@ -7,12 +7,11 @@ import java.rmi.RemoteException;
 public class UpdateAgent implements Runnable
 {
 	private WatchService service;
-	private WatchKey watchkey;
-	private final Path LOCAL_DIR;
+	private Path LOCAL_DIR;
 	public boolean running;
 
 	public UpdateAgent(){
-		this.localDir = null;
+		this.LOCAL_DIR = null;
 	}
 
 	/**
@@ -20,6 +19,7 @@ public class UpdateAgent implements Runnable
 	 */
 	public void start()
 	{
+		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getRootDirectory());
 		try{
 			this.running = true;
 			this.service = FileSystems.getDefault().newWatchService();
@@ -60,7 +60,7 @@ public class UpdateAgent implements Runnable
 		try
 		{
 
-			watchkey = service.take();
+			WatchKey watchkey = service.take();
 
 			//events will in THIS case always return a path, so it can be cast as one
 			Path eventDir = (Path)watchkey.watchable();
@@ -69,25 +69,28 @@ public class UpdateAgent implements Runnable
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
 
-
 				try
 				{
 					short idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
+
 					//when owner is different from own id, no changes need to be made
 					if(idFileOwner != Node.getInstance().getId()){
 						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.OWNED_FILE);
 					}
-					//when owner is the same as your own id,
+					/*	when owner is the same as your own id
+						You are the owner, but the local file should be held by the previous neighbour
+					 */
 					if(idFileOwner == Node.getInstance().getId()){
-						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE);
+						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE);
+						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId()));
 					}
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
+				} catch (IOException e)
+				{
+					e.printStackTrace();
 				}
-
-
-				System.out.println(eventDir +  " :" + kind + " : " + eventPath);
 			}
 
 			watchkey.reset();
