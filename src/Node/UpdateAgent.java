@@ -2,12 +2,15 @@ package Node;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.rmi.RemoteException;
 
 public class UpdateAgent implements Runnable
 {
 	private WatchService service;
 	private WatchKey watchkey;
 	private final Path LOCAL_DIR;
+	private short idFileOwner;
+	private String ipFileOwner;
 
 	public UpdateAgent(){
 		this.LOCAL_DIR = Paths.get("Files");
@@ -63,6 +66,25 @@ public class UpdateAgent implements Runnable
 			for(WatchEvent<?> event : watchkey.pollEvents()){
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
+				try
+				{
+					//when owner is different from own id, no changes need to be made
+					if(idFileOwner != Node.getInstance().getId()){
+						ipFileOwner = Node.getInstance().getResolverStub().getIP(idFileOwner);
+						Node.getInstance().getFileManager().pullFile(idFileOwner,eventPath.toString());
+					}
+
+					//when owner is the same as your own id,
+					if(idFileOwner == Node.getInstance().getId()){
+						//change owner
+					}
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
+				} catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 				System.out.println(eventDir +  " :" + kind + " : " + eventPath);
 			}
 
