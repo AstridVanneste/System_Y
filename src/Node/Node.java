@@ -69,7 +69,7 @@ public class Node implements NodeInteractionInterface
 			{
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
-				Registry registry = LocateRegistry.getRegistry(1099);
+				Registry registry = LocateRegistry.createRegistry(1099);
 				registry.bind(Node.NODE_INTERACTION_NAME, nodeInteractionStub);
 				registry.bind(Node.FILE_INTERACTION_NAME, fileInteractionStub);
 
