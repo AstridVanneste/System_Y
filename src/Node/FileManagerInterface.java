@@ -6,6 +6,11 @@ import java.rmi.RemoteException;
 
 public interface FileManagerInterface extends Remote
 {
+	/**
+	 *
+	 * @param type
+	 * @throws RemoteException
+	 */
 	public void checkFiles (FileType type) throws RemoteException;
 
 	/**
@@ -37,4 +42,10 @@ public interface FileManagerInterface extends Remote
 	 * @throws IOException
 	 */
 	public void addFileLedger(FileLedger fileLedger) throws IOException;
+
+	/**
+	 *
+	 * @param filename
+	 */
+	public void notifyLeaving (String filename);
 }

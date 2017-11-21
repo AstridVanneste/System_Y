@@ -295,16 +295,19 @@ public class LifeCycleManager implements Runnable
 		String IPprevious = "";
 		String IPnext = "";
 
-		if((Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour()) && (Node.getInstance().getId() == Node.getInstance().getNextNeighbour())){
+		if((Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour()) && (Node.getInstance().getId() == Node.getInstance().getNextNeighbour()))
+		{
 			try
 			{
-				shutdownStub.requestShutdown(Node.getInstance().getId());
-			} catch (RemoteException e)
+				this.shutdownStub.requestShutdown(Node.getInstance().getId());
+			}
+			catch (RemoteException e)
 			{
 				e.printStackTrace();
 			}
 		}
-		else{
+		else
+		{
 			// Get IP's of next and prev. node
 			try
 			{
@@ -345,7 +348,7 @@ public class LifeCycleManager implements Runnable
 			// Tell the NameServer we're done
 			try
 			{
-				shutdownStub.requestShutdown(Node.getInstance().getId());
+				this.shutdownStub.requestShutdown(Node.getInstance().getId());
 			}
 			catch(RemoteException re)
 			{
