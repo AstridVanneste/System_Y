@@ -56,9 +56,9 @@ public class FileLedger
 	 * @return  true if successfully added
 	 * 			false if ID was already in the list
 	 */
-	public synchronized boolean addDownloader (short ID)
+	public boolean addDownloader (short ID)
 	{
-		return copies.add(ID);
+		return this.copies.add(ID);
 	}
 
 	/**
@@ -67,9 +67,9 @@ public class FileLedger
 	 * @return  true if successfully removed
 	 * 			false if ID was not in the list
 	 */
-	public synchronized boolean removeDownloader (short ID)
+	public boolean removeDownloader (short ID)
 	{
-		return copies.remove(ID);
+		return this.copies.remove(ID);
 	}
 
 	public short getOwnerID()
@@ -95,5 +95,10 @@ public class FileLedger
 	public String getFileName()
 	{
 		return this.fileName;
+	}
+
+	public int getNumDownloads ()
+	{
+		return this.copies.size();
 	}
 }

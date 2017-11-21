@@ -149,7 +149,7 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				ownerInterface.notifyLeaving();
+				ownerInterface.notifyLeaving(localFile.getName());
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -161,7 +161,18 @@ public class FileManager implements FileManagerInterface
 
 	public void notifyLeaving (String filename)
 	{
+		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
+		if (this.files.get(fullPath).getNumDownloads() > 0)
+		{
+			File fileObj = new File (fullPath);
+			fileObj.delete();
+			this.files.remove(filename);
+		}
+		else
+		{
+			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE);
+		}
 	}
 
 	/**
