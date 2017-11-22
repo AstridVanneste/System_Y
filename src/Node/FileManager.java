@@ -46,8 +46,7 @@ public class FileManager implements FileManagerInterface
 	/**
 	 * Starts the filemanager:
 	 * - starts TCP server
-	 * - creates all necessary folders for the filemanager functions (/LOCAL, /OWNED and /DOWNLOADS
-	 *
+	 * - creates all necessary folders for the filemanager functions (/LOCAL, /OWNED and /DOWNLOADS)
 	 */
 	public void start ()
 	{
@@ -80,6 +79,7 @@ public class FileManager implements FileManagerInterface
 		}
 
 		//start replicating files.
+		System.out.println("Starting to replicate files");
 		try
 		{
 			this.checkFiles(FileType.LOCAL_FILE);
@@ -248,15 +248,17 @@ public class FileManager implements FileManagerInterface
 					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(localIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
-					fileManager.pushFile(file.getName(),file.length(),FileType.LOCAL_FILE, localIP);
+
+					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE);
 					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
-					fileManager.addFileLedger(fileLedger);
+					this.addFileLedger(fileLedger);
 				}
 				else if(ownerId != Node.getInstance().getId())
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
-					fileManager.pushFile(file.getName(),file.length(),type,  Node.getInstance().getResolverStub().getIP(ownerId));
+
+					this.sendFile(ownerId,file.getName(),FileType.OWNED_FILE);
 
 					if(type == FileType.LOCAL_FILE)
 					{
