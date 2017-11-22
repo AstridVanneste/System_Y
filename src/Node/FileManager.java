@@ -4,6 +4,7 @@ import IO.Network.Constants;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
+import com.sun.org.apache.regexp.internal.RE;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +77,16 @@ public class FileManager implements FileManagerInterface
 		if(!folder.exists())
 		{
 			folder.mkdir();
+		}
+
+		//start replicating files.
+		try
+		{
+			this.checkFiles(FileType.LOCAL_FILE);
+		}
+		catch (RemoteException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -466,7 +477,15 @@ public class FileManager implements FileManagerInterface
 
 		for(File file: folder.listFiles())
 		{
-			builder.append(file.getName() + "\n");
+			builder.append(file.getName() + "	");
+			try
+			{
+				builder.append("OWNER: " + Node.getInstance().getResolverStub().getOwnerID(file.getName()) + "\n");
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+			}
 		}
 
 		builder.append("OWNED:\n");
@@ -475,6 +494,7 @@ public class FileManager implements FileManagerInterface
 		for(File file: folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
+			builder.append("OWNER: " + files.get(file.getName()).getOwnerID());
 		}
 
 		builder.append("DOWNLOADS:\n");
@@ -483,6 +503,14 @@ public class FileManager implements FileManagerInterface
 		for(File file: folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
+			try
+			{
+				builder.append("OWNER: " + Node.getInstance().getResolverStub().getOwnerID(file.getName()) + "\n");
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+			}
 		}
 
 		return builder.toString();
