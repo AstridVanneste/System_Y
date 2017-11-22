@@ -294,6 +294,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException
 	{
+		System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
 		long bytesWritten = this.tcpServer.receiveFile(remoteHost, filename, fileSize);

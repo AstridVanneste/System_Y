@@ -245,6 +245,8 @@ public class Server implements Runnable
 		long timer = 0;
 		long offset = 0;
 
+		System.out.println("Receiving file " + filename);
+
 		try
 		{
 			while (!(offset >= fileLength) && !timeout)
@@ -254,8 +256,6 @@ public class Server implements Runnable
 					Datagram datagram = new Datagram(this.receive(remoteHost));
 					if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE && datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
 					{
-
-
 						if (firstSegment)
 						{
 							transactionID = datagram.getHeader().getTransactionID();
