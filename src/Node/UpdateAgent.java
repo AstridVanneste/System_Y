@@ -72,9 +72,10 @@ public class UpdateAgent implements Runnable
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
 
+				short idFileOwner = Node.DEFAULT_ID;
 				try
 				{
-					short idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
+					idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
 
 					//when owner is different from own id, no changes need to be made
 					if(idFileOwner != Node.getInstance().getId()){
@@ -94,6 +95,7 @@ public class UpdateAgent implements Runnable
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
+					Node.getInstance().getFailureAgent().failure(idFileOwner);
 				} catch (IOException e)
 				{
 					e.printStackTrace();
