@@ -85,9 +85,9 @@ public class UpdateAgent implements Runnable
 						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner));
 
 					}
-					/*	when owner is the same as your own id
-						You are the owner, but the local file should be held by the previous neighbour
-					 */
+					
+					//when owner is the same as your own id
+					//You are the owner, but the local file should be held by the previous neighbour
 					if(idFileOwner == Node.getInstance().getId()){
 						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE);
 						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId()));
