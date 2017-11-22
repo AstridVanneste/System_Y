@@ -84,8 +84,8 @@ public class Node implements NodeInteractionInterface
 				e.printStackTrace();
 			}
 
-			this.fileManager.start();
 			this.lifeCycleManager.start();
+			this.fileManager.start();
 			this.updateAgent.start();
 		}
 		else
