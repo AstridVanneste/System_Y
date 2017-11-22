@@ -117,7 +117,7 @@ public class UpdateAgent implements Runnable
 	{
 		try
 		{
-			this.running =false;
+			this.running = false;
 			service.close();
 		}
 		catch (IOException e)
