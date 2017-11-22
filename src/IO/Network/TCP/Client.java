@@ -40,8 +40,8 @@ public class Client implements Runnable
 		try
 		{
 			this.clientSocket = new Socket(this.IP, this.portNum);
-			in = new DataInputStream(clientSocket.getInputStream());
-			out = new DataOutputStream(clientSocket.getOutputStream());
+			this.in = new DataInputStream(clientSocket.getInputStream());
+			this.out = new DataOutputStream(clientSocket.getOutputStream());
 			Thread ownThread = new Thread(this);
 			ownThread.start();
 		}
@@ -60,7 +60,8 @@ public class Client implements Runnable
 	{
 		try
 		{
-			out.write(data);
+			//System.out.println("writing " + data.length + " bytes to outputStream");
+			this.out.write(data);
 		}
 		catch(IOException e)
 		{
@@ -143,7 +144,7 @@ public class Client implements Runnable
 
 					int i = 0;
 
-					for(byte b: header.serialize())
+					/*for(byte b: header.serialize())
 					{
 						bytes[i] = b;
 						i++;
@@ -154,12 +155,16 @@ public class Client implements Runnable
 						bytes[i] = b;
 						i++;
 					}
-
 					this.send(bytes);
+					*/
+
+					Datagram data = new Datagram(header, file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE));
+					this.send(data.serialize());
+
 				}
 				else
 				{
-					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + (int) file.available()];
+					/*byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + (int) file.available()];
 
 					int i = 0;
 
@@ -173,9 +178,13 @@ public class Client implements Runnable
 					{
 						bytes[i] = b;
 						i++;
-					}
+					}*/
 
-					this.send(bytes);
+					//System.out.println("last packet has " + file.available() + " bytes");
+
+					Datagram data = new Datagram(header,file.read((int) file.available()));
+
+					this.send(data.serialize());
 				}
 
 

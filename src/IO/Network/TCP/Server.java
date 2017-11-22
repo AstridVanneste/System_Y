@@ -139,7 +139,15 @@ public class Server implements Runnable
 
 	public boolean hasData (String remoteHost)
 	{
-		return this.incomingConnections.get(remoteHost).hasData();
+		if(this.getActiveConnections().contains(remoteHost))
+		{
+			return this.incomingConnections.get(remoteHost).hasData();
+		}
+		else
+		{
+			System.out.println("No remote connection on " + remoteHost);
+			return false;
+		}
 	}
 
 	public String toString()
