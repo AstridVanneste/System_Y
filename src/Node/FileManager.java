@@ -194,6 +194,8 @@ public class FileManager implements FileManagerInterface
 		{
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
+
+		this.files.get(filename).addDownloader(dstID); //add person who requests to downloaders
 	}
 
 	@Override
@@ -245,7 +247,7 @@ public class FileManager implements FileManagerInterface
 
 					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(localIP);
-					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					fileManager.pushFile(file.getName(),file.length(),FileType.LOCAL_FILE, localIP);
 					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
 					fileManager.addFileLedger(fileLedger);
@@ -253,7 +255,7 @@ public class FileManager implements FileManagerInterface
 				else if(ownerId != Node.getInstance().getId())
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
-					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					fileManager.pushFile(file.getName(),file.length(),type,  Node.getInstance().getResolverStub().getIP(ownerId));
 
 					if(type == FileType.LOCAL_FILE)
@@ -308,7 +310,7 @@ public class FileManager implements FileManagerInterface
 	 * @param filename
 	 * @param type
 	 */
-	private void sendFile(short dstID, String filename, FileType type)
+	public void sendFile(short dstID, String filename, FileType type)
 	{
 		String dstIP = "";
 
@@ -343,7 +345,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_INTERACTION_NAME);
+			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
 			IO.File file = new IO.File(this.getFullPath(filename,type));
 			fileManager.pushFile(filename,file.size(),type,remoteHost);
 		}
@@ -384,7 +386,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
-			FileManagerInterface fileManager =(FileManagerInterface) registry.lookup(Node.FILE_INTERACTION_NAME);
+			FileManagerInterface fileManager =(FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 			fileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
 			the owner will later call a push() method on this node to actually receive the file.
@@ -442,6 +444,11 @@ public class FileManager implements FileManagerInterface
 	public void setRootDirectory(String rootDirectory)
 	{
 		this.rootDirectory = rootDirectory;
+	}
+
+	public String getRootDirectory()
+	{
+		return this.rootDirectory;
 	}
 
 	/**

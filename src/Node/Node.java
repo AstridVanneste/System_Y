@@ -151,6 +151,10 @@ public class Node implements NodeInteractionInterface
 		return this.failureAgent;
 	}
 
+	public UpdateAgent getUpdateAgent(){
+		return this.updateAgent;
+	}
+
 	public short getId()
 	{
 		return this.id;

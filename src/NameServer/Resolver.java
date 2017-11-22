@@ -2,7 +2,10 @@ package NameServer;
 
 
 import java.rmi.RemoteException;
+import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
+
+import static java.rmi.server.RemoteServer.getClientHost;
 
 
 /**
@@ -17,13 +20,19 @@ public class Resolver implements ResolverInterface
 	@Override
 	public String getIP(short nodeId) throws RemoteException, InvalidParameterException
 	{
-		Util.General.printLineSep();
-
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
 			Util.General.printLineSep();
 			String IP=  NameServer.getInstance().map.get(nodeId);
 			System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")" + " = " + IP);
+			try
+			{
+				System.out.println("Called by: " + getClientHost());
+			}
+			catch (ServerNotActiveException snae)
+			{
+				snae.printStackTrace();
+			}
 			return IP;
 		}
 		else
