@@ -324,7 +324,6 @@ public class FileManager implements FileManagerInterface
 		{
 			re.printStackTrace();
 		}
-
 		Random random = new Random();
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION, 0, random.nextInt(),ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
 		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
