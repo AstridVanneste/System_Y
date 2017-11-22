@@ -19,7 +19,7 @@ public class UpdateAgent implements Runnable
 	 */
 	public void start()
 	{
-		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getRootDirectory());
+		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getRootDirectory() + "/" +FileType.LOCAL_FILE);
 		try{
 			this.running = true;
 			this.service = FileSystems.getDefault().newWatchService();
