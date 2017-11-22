@@ -22,7 +22,7 @@ public class UpdateAgent implements Runnable
 	 */
 	public void start()
 	{
-		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getRootDirectory() + "/" +FileType.LOCAL_FILE);
+		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 		try{
 			this.running = true;
 			this.service = FileSystems.getDefault().newWatchService();
@@ -85,7 +85,7 @@ public class UpdateAgent implements Runnable
 						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner));
 
 					}
-					
+
 					//when owner is the same as your own id
 					//You are the owner, but the local file should be held by the previous neighbour
 					if(idFileOwner == Node.getInstance().getId()){
