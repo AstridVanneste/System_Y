@@ -47,5 +47,5 @@ public interface FileManagerInterface extends Remote
 	 *
 	 * @param filename
 	 */
-	public void notifyLeaving (String filename);
+	public void notifyLeaving (String filename) throws RemoteException;
 }

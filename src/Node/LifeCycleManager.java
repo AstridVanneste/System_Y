@@ -27,7 +27,7 @@ import java.util.Scanner;
 public class LifeCycleManager implements Runnable
 {
 	private boolean running;
-	private int bootstrapTransactionID;
+	private Integer bootstrapTransactionID;
 	private Subscriber subscriber;
 	private ShutdownAgentInterface shutdownStub;
 
@@ -50,6 +50,21 @@ public class LifeCycleManager implements Runnable
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
 		this.sendAccessRequest();
+
+
+		//synchronized (this.bootstrapTransactionID)
+		//{
+			while (this.bootstrapTransactionID != -1)
+			{
+				synchronized (this.bootstrapTransactionID)
+				{
+
+				}
+				//System.out.println("TansactionID = " + this.bootstrapTransactionID);
+				//wait until discovery is finished...
+			}
+		//}
+		System.out.println("finished discovery");
 	}
 
 	/**

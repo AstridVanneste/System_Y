@@ -1,6 +1,9 @@
 package Node;
 
 
+import Util.General;
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,6 +73,19 @@ public class FileLedger
 	public boolean removeDownloader (short ID)
 	{
 		return this.copies.remove(ID);
+	}
+
+	public void printFileLedger ()
+	{
+		General.printLineSep();
+		System.out.println("FileLedger of file: " + this.fileName);
+		System.out.println("Local: " + this.localID);
+		System.out.println("Owner: " + this.ownerID);
+		System.out.println("Downloads: ");
+		for (Short ID : copies){
+			System.out.println("Node " + ID);
+		}
+
 	}
 
 	public short getOwnerID()
