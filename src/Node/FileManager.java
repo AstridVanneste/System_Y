@@ -4,7 +4,6 @@ import IO.Network.Constants;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
-import com.sun.org.apache.regexp.internal.RE;
 
 import java.io.File;
 import java.io.IOException;
@@ -338,13 +337,14 @@ public class FileManager implements FileManagerInterface
 		Random random = new Random();
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION, 0, random.nextInt(),ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
 		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
-		client.sendFile(filename, header);
+		client.start();
+		client.sendFile(this.getFullPath(filename,type), header);
 		int localPort =  client.getLocalPort();
 		String remoteHost = "";
 
 		try
 		{
-			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost(),localPort);
+			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(),localPort);
 
 			remoteHost = socket.toString();
 		}
