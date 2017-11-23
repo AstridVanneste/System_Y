@@ -83,15 +83,15 @@ public class UpdateAgent implements Runnable
 						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
 						Registry registry = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(idFileOwner));
 						FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
-						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner));
+						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner,Node.getInstance().getId(),Node.DEFAULT_ID));
 
 					}
 
 					//when owner is the same as your own id
 					//You are the owner, but the local file should be held by the previous neighbour
 					if(idFileOwner == Node.getInstance().getId()){
-						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.LOCAL_FILE);
-						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId()));
+						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
+						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId(),Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
 					}
 				} catch (RemoteException e)
 				{
