@@ -1,15 +1,12 @@
 package Node;
 
-
 import Util.General;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
-public class FileLedger
+public class FileLedger implements Serializable
 {
 	/*
 	 * 	This class handles about logging the distribution of each file.
