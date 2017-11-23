@@ -75,13 +75,13 @@ public class UpdateAgent implements Runnable
 
 					//when owner is different from own id, no changes need to be made
 					if(idFileOwner != Node.getInstance().getId()){
-						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.OWNED_FILE);
+						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
 					}
 					/*	when owner is the same as your own id
 						You are the owner, but the local file should be held by the previous neighbour
 					 */
 					if(idFileOwner == Node.getInstance().getId()){
-						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE);
+						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.LOCAL_FILE);
 						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId()));
 					}
 				} catch (RemoteException e)
