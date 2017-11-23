@@ -141,7 +141,7 @@ public class FileManager implements FileManagerInterface
 				// I'm the owner
 				// Copy the file to my previous
 				// Tell him he's the new owner
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE);
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
 			}
 		}
 
@@ -199,7 +199,7 @@ public class FileManager implements FileManagerInterface
 		IO.File file = new IO.File(OWNED_FILE_PREFIX + filename);
 		if(file.exists())
 		{
-			this.sendFile(dstID, filename, FileType.OWNED_FILE);
+			this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
 		}
 		else
 		{
@@ -260,7 +260,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(localIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
-					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE);
+					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.LOCAL_FILE);
 					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
 					this.addFileLedger(fileLedger);
 				}
@@ -269,7 +269,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
-					this.sendFile(ownerId,file.getName(),FileType.OWNED_FILE);
+					this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE );
 
 					if(type == FileType.LOCAL_FILE)
 					{
@@ -322,9 +322,9 @@ public class FileManager implements FileManagerInterface
 	 * Sends a file to a certain node.
 	 * @param dstID
 	 * @param filename
-	 * @param type
+	 * @param srcType
 	 */
-	public void sendFile(short dstID, String filename, FileType type)
+	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
 		String dstIP = "";
 
@@ -340,7 +340,7 @@ public class FileManager implements FileManagerInterface
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION, 0, random.nextInt(),ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
 		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
 		client.start();
-		client.sendFile(this.getFullPath(filename,type), header);
+		client.sendFile(this.getFullPath(filename,dstType), header);
 		int localPort =  client.getLocalPort();
 		String remoteHost = "";
 
@@ -361,8 +361,8 @@ public class FileManager implements FileManagerInterface
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
-			File file = new File(this.getFullPath(filename,type));
-			fileManager.pushFile(filename,file.length(),type,remoteHost);
+			File file = new File(this.getFullPath(filename,srcType));
+			fileManager.pushFile(filename,file.length(),srcType,remoteHost);
 		}
 		catch(RemoteException re)
 		{
