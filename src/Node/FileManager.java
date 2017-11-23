@@ -160,7 +160,7 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				//ownerInterface.notifyLeaving();
+				ownerInterface.notifyLeaving(localFile.getName());
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -172,7 +172,18 @@ public class FileManager implements FileManagerInterface
 
 	public void notifyLeaving (String filename)
 	{
+		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
+		if (this.files.get(fullPath).getNumDownloads() > 0)
+		{
+			File fileObj = new File (fullPath);
+			fileObj.delete();
+			this.files.remove(filename);
+		}
+		else
+		{
+			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE,FileType.OWNED_FILE);
+		}
 	}
 
 	/**
@@ -244,10 +255,11 @@ public class FileManager implements FileManagerInterface
 				{
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
-
+					System.out.println("OWNER IS SAME AS LOCAL");
 					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(localIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.LOCAL_FILE);
 					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
@@ -258,6 +270,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
+					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
 					this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE );
 
 					if(type == FileType.LOCAL_FILE)
@@ -329,7 +342,7 @@ public class FileManager implements FileManagerInterface
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION, 0, random.nextInt(),ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
 		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
 		client.start();
-		client.sendFile(this.getFullPath(filename,dstType), header);
+		client.sendFile(this.getFullPath(filename,srcType), header);
 		int localPort =  client.getLocalPort();
 		String remoteHost = "";
 
@@ -351,7 +364,7 @@ public class FileManager implements FileManagerInterface
 			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
 			File file = new File(this.getFullPath(filename,srcType));
-			fileManager.pushFile(filename,file.length(),srcType,remoteHost);
+			fileManager.pushFile(filename,file.length(),dstType,remoteHost);
 		}
 		catch(RemoteException re)
 		{
@@ -458,7 +471,7 @@ public class FileManager implements FileManagerInterface
 
 	public String getRootDirectory()
 	{
-		return rootDirectory;
+		return this.rootDirectory;
 	}
 
 	/**

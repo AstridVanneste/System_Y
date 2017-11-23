@@ -1,15 +1,12 @@
 package Node;
 
-
 import Util.General;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
-public class FileLedger
+public class FileLedger implements Serializable
 {
 	/*
 	 * 	This class handles about logging the distribution of each file.
@@ -59,9 +56,9 @@ public class FileLedger
 	 * @return  true if successfully added
 	 * 			false if ID was already in the list
 	 */
-	public synchronized boolean addDownloader (short ID)
+	public boolean addDownloader (short ID)
 	{
-		return copies.add(ID);
+		return this.copies.add(ID);
 	}
 
 	/**
@@ -70,9 +67,9 @@ public class FileLedger
 	 * @return  true if successfully removed
 	 * 			false if ID was not in the list
 	 */
-	public synchronized boolean removeDownloader (short ID)
+	public boolean removeDownloader (short ID)
 	{
-		return copies.remove(ID);
+		return this.copies.remove(ID);
 	}
 
 	public void printFileLedger ()
@@ -111,5 +108,10 @@ public class FileLedger
 	public String getFileName()
 	{
 		return this.fileName;
+	}
+
+	public int getNumDownloads ()
+	{
+		return this.copies.size();
 	}
 }
