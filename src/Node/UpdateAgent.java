@@ -2,7 +2,10 @@ package Node;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class UpdateAgent implements Runnable
 {
@@ -69,17 +72,23 @@ public class UpdateAgent implements Runnable
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
 
+				short idFileOwner = Node.DEFAULT_ID;
 				try
 				{
-					short idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
+					idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
 
 					//when owner is different from own id, no changes need to be made
 					if(idFileOwner != Node.getInstance().getId()){
+
 						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
+						Registry registry = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(idFileOwner));
+						FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner));
+
 					}
-					/*	when owner is the same as your own id
-						You are the owner, but the local file should be held by the previous neighbour
-					 */
+
+					//when owner is the same as your own id
+					//You are the owner, but the local file should be held by the previous neighbour
 					if(idFileOwner == Node.getInstance().getId()){
 						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.LOCAL_FILE);
 						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId()));
@@ -87,7 +96,11 @@ public class UpdateAgent implements Runnable
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
+					Node.getInstance().getFailureAgent().failure(idFileOwner);
 				} catch (IOException e)
+				{
+					e.printStackTrace();
+				} catch (NotBoundException e)
 				{
 					e.printStackTrace();
 				}
@@ -105,7 +118,7 @@ public class UpdateAgent implements Runnable
 	{
 		try
 		{
-			this.running =false;
+			this.running = false;
 			service.close();
 		}
 		catch (IOException e)
