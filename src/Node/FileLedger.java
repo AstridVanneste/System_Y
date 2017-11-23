@@ -27,26 +27,22 @@ public class FileLedger implements Serializable
 	private String fileName;
 	private short ownerID;
 	private short localID;
+	private short replicatedID;
 	private Set<Short> copies;
 
 	/**
 	 * Each file has a ledger-object
 	 * @param fileName name of file of this logging-object
 	 * @param localID ID of node that has the file locally
+	 * @param ownerID ID of the owner of the node
+	 * @param replicatedID ID of another replication of the file (if owner = local)
 	 */
-	public FileLedger (String fileName, short localID)
-	{
-		this.fileName = fileName;
-		this.localID = localID;
-		this.ownerID = -1;
-		this.copies = new HashSet();
-	}
-
-	public FileLedger (String fileName, short localID, short ownerID)
+	public FileLedger (String fileName, short localID, short ownerID, short replicatedID)
 	{
 		this.fileName = fileName;
 		this.localID = localID;
 		this.ownerID = ownerID;
+		this.replicatedID = replicatedID;
 		this.copies = new HashSet<>();
 	}
 

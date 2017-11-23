@@ -30,6 +30,7 @@ public class FileManager implements FileManagerInterface
 	private static final String LOCAL_FILE_PREFIX = "Local/";
 	private static final String OWNED_FILE_PREFIX = "Owned/";
 	private static final String DOWNLOADED_FILE_PREFIX = "Downloads/";
+	private static final String REPLICATED_FILE_PREFIX = "Replicated/";
 
 	private Server tcpServer;
 	private String rootDirectory;
@@ -78,6 +79,12 @@ public class FileManager implements FileManagerInterface
 			folder.mkdir();
 		}
 
+		folder = new File(getFullPath("",FileType.REPLICATED_FILE));
+		if(!folder.exists())
+		{
+			folder.mkdir();
+		}
+
 		//start replicating files.
 		System.out.println("Starting to replicate files");
 		try
@@ -120,16 +127,6 @@ public class FileManager implements FileManagerInterface
 			file.delete();
 		}
 		folder.delete();
-
-
-		/*folder = new File(getFullPath("",FileType.DOWNLOADED_FILE));
-
-		for(File file: folder.listFiles())
-		{
-			file.delete();
-		}
-		folder.delete();
-		*/
 	}
 
 	public void shutdown ()
@@ -256,13 +253,13 @@ public class FileManager implements FileManagerInterface
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
 					System.out.println("OWNER IS SAME AS LOCAL");
-					String localIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
-					Registry registry = LocateRegistry.getRegistry(localIP);
+					String replicatedIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
+					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
 
-					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.LOCAL_FILE);
-					FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getPreviousNeighbour(), Node.getInstance().getId());
+					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+					FileLedger fileLedger = new FileLedger(file.getName(),Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour());
 					this.addFileLedger(fileLedger);
 				}
 				else if(ownerId != Node.getInstance().getId())
@@ -275,7 +272,7 @@ public class FileManager implements FileManagerInterface
 
 					if(type == FileType.LOCAL_FILE)
 					{
-						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId);
+						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);
 						fileManager.addFileLedger(fileLedger);
 					}
 					else if(type == FileType.OWNED_FILE)
@@ -452,6 +449,9 @@ public class FileManager implements FileManagerInterface
 
 			case DOWNLOADED_FILE:
 				return this.rootDirectory + DOWNLOADED_FILE_PREFIX;
+
+			case REPLICATED_FILE:
+				return this.rootDirectory + REPLICATED_FILE_PREFIX;
 
 			default:
 				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
