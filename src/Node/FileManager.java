@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * This class will handle everything concerning the files. To get a functional filemanager you need to set the root directory and then call the start() method.
+ * This class will handle everything concerning the files.
+ * To get a functional filemanager you need to set the root directory and then call the start() method.
  */
 public class FileManager implements FileManagerInterface
 {
@@ -348,8 +349,9 @@ public class FileManager implements FileManagerInterface
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
-			IO.File file = new IO.File(this.getFullPath(filename,type));
-			fileManager.pushFile(filename,file.size(),type,remoteHost);
+			//IO.File file = new IO.File(this.getFullPath(filename,type));
+			File file = new File(this.getFullPath(filename,type));
+			fileManager.pushFile(filename,file.length(),type,remoteHost);
 		}
 		catch(RemoteException re)
 		{
@@ -445,6 +447,12 @@ public class FileManager implements FileManagerInterface
 
 	public void setRootDirectory(String rootDirectory)
 	{
+		File folder = new File(rootDirectory);
+
+		if(!folder.exists())
+		{
+			folder.mkdir();
+		}
 		this.rootDirectory = rootDirectory;
 	}
 
