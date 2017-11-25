@@ -34,14 +34,14 @@ public class FileManager implements FileManagerInterface
 
 	private Server tcpServer;
 	private String rootDirectory;
-	private HashMap <String, FileLedger> files;
+	private HashMap <String, FileLedger> fileLedgers;
 
 
 	public FileManager ()
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
-		this.files = new HashMap<>();
+		this.fileLedgers = new HashMap<>();
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class FileManager implements FileManagerInterface
 
 	public void shutdown ()
 	{
-		for (Map.Entry<String, FileLedger> pair : this.files.entrySet())
+		for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
 		{
 			if (pair.getValue().getOwnerID() == Node.getInstance().getId())
 			{
@@ -171,11 +171,11 @@ public class FileManager implements FileManagerInterface
 	{
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
-		if (this.files.get(fullPath).getNumDownloads() > 0)
+		if (this.fileLedgers.get(fullPath).getNumDownloads() > 0)
 		{
 			File fileObj = new File (fullPath);
 			fileObj.delete();
-			this.files.remove(filename);
+			this.fileLedgers.remove(filename);
 		}
 		else
 		{
@@ -203,19 +203,19 @@ public class FileManager implements FileManagerInterface
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
 
-		this.files.get(filename).addDownloader(dstID); //add person who requests to downloaders
+		this.fileLedgers.get(filename).addDownloader(dstID); //add person who requests to downloaders
 	}
 
 	@Override
 	public void addFileLedger(FileLedger fileLedger) throws IOException
 	{
-		if(this.files.containsKey(fileLedger.getFileName()))
+		if(this.fileLedgers.containsKey(fileLedger.getFileName()))
 		{
 			throw new IOException("Already have a fileLedger with filename " + fileLedger.getFileName());
 		}
 		else
 		{
-			this.files.put(fileLedger.getFileName(), fileLedger);
+			this.fileLedgers.put(fileLedger.getFileName(), fileLedger);
 		}
 	}
 
@@ -277,7 +277,7 @@ public class FileManager implements FileManagerInterface
 					}
 					else if(type == FileType.OWNED_FILE)
 					{
-						FileLedger fileLedger = this.files.get(file.getName());
+						FileLedger fileLedger = this.fileLedgers.get(file.getName());
 						fileLedger.setOwnerID(ownerId);
 						fileManager.addFileLedger(fileLedger);
 					}
@@ -506,7 +506,7 @@ public class FileManager implements FileManagerInterface
 		for(File file: folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
-			builder.append("OWNER: " + files.get(file.getName()).getOwnerID());
+			builder.append("OWNER: " + fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + fileLedgers.get(file.getName()).getLocalID() + "\n");
 		}
 
 		builder.append("DOWNLOADS:\n");
