@@ -34,7 +34,7 @@ public class NodeMain
 				System.out.println("Set root directory " + args[1]);
 				Node.getInstance().getFileManager().setRootDirectory(args[1]);
 			}
-		    Node.getInstance().start();
+			Node.getInstance().start();
 		    System.out.println("Started Node...");
 
 			

@@ -72,7 +72,6 @@ public class Node implements NodeInteractionInterface
 				Registry registry = LocateRegistry.createRegistry(1099);
 				registry.bind(Node.NODE_INTERACTION_NAME, nodeInteractionStub);
 				registry.bind(Node.FILE_MANAGER_NAME, fileInteractionStub);
-
 			}
 			catch (RemoteException re)
 			{

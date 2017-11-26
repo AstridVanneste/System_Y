@@ -51,7 +51,6 @@ public class LifeCycleManager implements Runnable
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
 		this.sendAccessRequest();
 
-
 		//synchronized (this.bootstrapTransactionID)
 		//{
 			while (this.bootstrapTransactionID != -1)
@@ -64,7 +63,7 @@ public class LifeCycleManager implements Runnable
 				//wait until discovery is finished...
 			}
 		//}
-		System.out.println("finished discovery");
+		System.out.println("Finished discovery");
 	}
 
 	/**
