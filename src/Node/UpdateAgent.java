@@ -13,7 +13,8 @@ public class UpdateAgent implements Runnable
 	private Path LOCAL_DIR;
 	public boolean running;
 
-	public UpdateAgent(){
+	public UpdateAgent()
+	{
 		this.LOCAL_DIR = null;
 	}
 
@@ -23,18 +24,20 @@ public class UpdateAgent implements Runnable
 	public void start()
 	{
 		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
-		try{
+
+		try
+		{
 			this.running = true;
 			this.service = FileSystems.getDefault().newWatchService();
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
-
 			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			Thread thread = new Thread(this);
 			thread.start();
 
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -43,12 +46,15 @@ public class UpdateAgent implements Runnable
 
 	public void run()
 	{
-		while(this.running){
+		while(this.running)
+		{
 			watcher();
+
 			try
 			{
 				Thread.sleep(100);
-			} catch (InterruptedException e)
+			}
+			catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
@@ -67,37 +73,42 @@ public class UpdateAgent implements Runnable
 
 			//events will in THIS case always return a path, so it can be cast as one
 			Path eventDir = (Path)watchkey.watchable();
+
 			//iterate over all possible events
-			for(WatchEvent<?> event : watchkey.pollEvents()){
+			for(WatchEvent<?> event : watchkey.pollEvents())
+			{
 				WatchEvent.Kind<?> kind = event.kind();
 				Path eventPath = (Path)event.context();
 
 				short idFileOwner = Node.DEFAULT_ID;
+
 				try
 				{
 					idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
 
 					//when owner is different from own id, no changes need to be made
-					if(idFileOwner != Node.getInstance().getId()){
-
+					if(idFileOwner != Node.getInstance().getId())
+					{
 						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
 						Registry registry = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(idFileOwner));
 						FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 						fileManager.addFileLedger(new FileLedger(eventPath.toString(),idFileOwner,Node.getInstance().getId(),Node.DEFAULT_ID));
-
 					}
 
 					//when owner is the same as your own id
 					//You are the owner, but the local file should be held by the previous neighbour
-					if(idFileOwner == Node.getInstance().getId()){
+					if(idFileOwner == Node.getInstance().getId())
+					{
 						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
 						Node.getInstance().getFileManager().addFileLedger(new FileLedger(eventPath.toString(),Node.getInstance().getId(),Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
 					}
-				} catch (RemoteException e)
+				}
+				catch (RemoteException e)
 				{
 					e.printStackTrace();
 					Node.getInstance().getFailureAgent().failure(idFileOwner);
-				} catch (IOException e)
+				}
+				catch (IOException e)
 				{
 					e.printStackTrace();
 				} catch (NotBoundException e)
@@ -108,7 +119,8 @@ public class UpdateAgent implements Runnable
 
 			watchkey.reset();
 
-		} catch (InterruptedException e)
+		}
+		catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}

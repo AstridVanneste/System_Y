@@ -10,18 +10,7 @@ public class FileLedger implements Serializable
 {
 	/*
 	 * 	This class handles about logging the distribution of each file.
-	 * 	Each node has some local files. Each file has a FileLedger-object with localID = his ID.
-	 * 	Next, he will calculate the new ownerID and give the file + FileLedger-object to that node.
-	 * 	The ownerID becomes the ID of the new node.
-	 *
-	 * 	When someone downloads the file from the owner, the owner has to update the copies-list.
-	 *
-	 * 	When the owner gets a new nextNeighbour, he has to check whether the new node becomes the owner
-	 * 	If so:
-	 * 		The new owner becomes the ownerID
-	 * 		The previous owner becomes a downloader in the copies-list
-	 * 	If not:
-	 *		Do nothing
+	 * 	Each file has a FileLedger-object
 	 */
 
 	private String fileName;
