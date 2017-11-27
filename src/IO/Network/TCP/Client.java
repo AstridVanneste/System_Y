@@ -134,57 +134,26 @@ public class Client implements Runnable
 		try
 		{
 
+			int length = 0;
 			while(file.available() != 0)
 			{
-				int length;
 
 				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
 				{
-					byte[] bytes = new byte[Constants.MAX_TCP_SEGMENT_SIZE];
-
-					int i = 0;
-
-					/*for(byte b: header.serialize())
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					for(byte b: file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE))
-					{
-						bytes[i] = b;
-						i++;
-					}
-					this.send(bytes);
-					*/
-
 					Datagram data = new Datagram(header, file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE));
 					this.send(data.serialize());
+					length++;
 
 				}
 				else
 				{
-					/*byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + (int) file.available()];
-
-					int i = 0;
-
-					for(byte b: header.serialize())
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					for(byte b: file.read((int) file.available()))
-					{
-						bytes[i] = b;
-						i++;
-					}*/
-
-					//System.out.println("last packet has " + file.available() + " bytes");
-
+					System.out.println("setting end reply code");
+					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
 					Datagram data = new Datagram(header,file.read((int) file.available()));
 
 					this.send(data.serialize());
+					length++;
+					System.out.println(length + " packets send");
 				}
 
 
@@ -194,73 +163,6 @@ public class Client implements Runnable
 		{
 			ioe.printStackTrace();
 		}
-	}
-
-	/**
-	 * Receives complete file and writes to given path
-	 * @param filename
-	 */
-	public long receiveFile(String filename, long fileLength)
-	{
-		File file = new File(filename);
-		boolean firstSegment = true;
-		boolean timeout = false;
-		int transactionID = -1;
-		long timer = 0;
-		long offset = 0;
-
-		try
-		{
-			while (!(offset >= fileLength) && !timeout)
-			{
-				if (this.hasData())
-				{
-					Datagram datagram = new Datagram(this.receive());
-					if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE && datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
-					{
-
-
-						if (firstSegment)
-						{
-							transactionID = datagram.getHeader().getTransactionID();
-							firstSegment = false;
-							file.write(datagram.getData()); //write first bytes to empty previous values at the same time
-						} else if (transactionID != datagram.getHeader().getTransactionID())
-						{
-							throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
-						} else
-						{
-							file.append(datagram.getData());
-						}
-						offset += datagram.getData().length;
-						timer = 0;
-					}
-					else
-					{
-						throw new IOException("Invalid reply code (= " + datagram.getHeader().getReplyCode() + "should be " + ProtocolHeader.REPLY_FILE+ ") or request code (= " + datagram.getHeader().getRequestCode() + " should be " + ProtocolHeader.REQUEST_FILE + ")");
-					}
-				}
-				else
-				{
-					if(timer == 0)
-					{
-						timer = System.nanoTime();
-					}
-					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
-					{
-						timeout = true;
-					}
-				}
-			}
-
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-
-		return offset;
-
 	}
 
 	/**

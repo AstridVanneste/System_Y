@@ -47,8 +47,8 @@ public class ConnectionHandler implements Runnable
 	public byte[] readBytes()
 	{
 		byte[] data = this.inputBuffer.getFirst();
-		System.out.println("Num Buffered Packets: " + this.inputBuffer.size());
-		System.out.println("First Packet Size: " + data.length);
+		//System.out.println("Num Buffered Packets: " + this.inputBuffer.size());
+		//System.out.println("First Packet Size: " + data.length);
 		this.inputBuffer.removeFirst();
 		return data;
 	}
@@ -94,6 +94,8 @@ public class ConnectionHandler implements Runnable
 		{
 			try
 			{
+				//if (this.in.available() > 0)
+				//{
 				byte[] data = new byte [this.in.available()];
 				int numBytes = this.in.read(data);
 

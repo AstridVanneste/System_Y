@@ -22,7 +22,6 @@ public class TCPServerMain
 			scanner.nextLine();
 			server.start();
 
-			File file = new File("result.txt");
 
 			System.out.println("Press enter to loop through active connections looking for files");
 			scanner.nextLine();
@@ -30,15 +29,15 @@ public class TCPServerMain
 			for(String remoteHost: server.getActiveConnections())
 			{
 				System.out.println("Got TCP connection on " + remoteHost);
-				long received = server.receiveFile(remoteHost, "Vaultboy.png", new File("src/Mains/IO/64x64.png").size());
-				System.out.println("Received " + received + "B");
-				System.out.println("Should have been " + new File("src/Mains/IO/64x64.png").size() + "B");
+				server.receiveFile(remoteHost, "Result.gif");
+				System.out.println("File received");
 			}
 
 			System.out.println("press enter to stop server");
 			scanner.nextLine();
 
 			server.stop();
+
 		}
 		catch(IOException ioe)
 		{
