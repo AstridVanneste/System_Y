@@ -65,6 +65,14 @@ public class Resolver implements ResolverInterface
 
 		Util.General.printLineSep();
 		System.out.println("Resolver.getOwnerIP(" + filename + ") = " + id);
+		try
+		{
+			System.out.println("Called by: " + getClientHost());
+		}
+		catch (ServerNotActiveException snae)
+		{
+			snae.printStackTrace();
+		}
 
 		return id;
 	}
@@ -93,6 +101,14 @@ public class Resolver implements ResolverInterface
 
 		Util.General.printLineSep();
 		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ") = " + id);
+		try
+		{
+			System.out.println("Called by: " + getClientHost());
+		}
+		catch (ServerNotActiveException snae)
+		{
+			snae.printStackTrace();
+		}
 
 		return id;
 	}
@@ -115,6 +131,14 @@ public class Resolver implements ResolverInterface
 
 		Util.General.printLineSep();
 		System.out.println("Resolver.getNext(" + Short.toString(ID) + ") = " + id);
+		try
+		{
+			System.out.println("Called by: " + getClientHost());
+		}
+		catch (ServerNotActiveException snae)
+		{
+			snae.printStackTrace();
+		}
 
 		return id;
 	}

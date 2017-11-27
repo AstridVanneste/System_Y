@@ -6,7 +6,10 @@ import Util.Serializer;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.RemoteException;
+import java.rmi.server.ServerNotActiveException;
 import java.util.*;
+
+import static java.rmi.server.RemoteServer.getClientHost;
 
 /**
  * Created by Axel on 22/10/2017.
@@ -50,6 +53,14 @@ public class ShutdownAgent implements ShutdownAgentInterface
     {
 		Util.General.printLineSep();
 		System.out.println("ShutdownAgent.requestShutdown(" + id + ")");
+		try
+		{
+			System.out.println("Called by: " + getClientHost());
+		}
+		catch (ServerNotActiveException snae)
+		{
+			snae.printStackTrace();
+		}
 		System.out.println("BEFORE SHUTDOWN");
 		System.out.println(NameServer.getInstance().toString());
 		if(NameServer.getInstance().map.containsKey(id))

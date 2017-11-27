@@ -10,6 +10,7 @@ import java.net.*;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class Client implements Runnable
 {
@@ -126,10 +127,11 @@ public class Client implements Runnable
 	/**
 	 * Send complete file
 	 * @param filename
-	 * @param header
 	 */
-	public void sendFile(String filename, ProtocolHeader header)
+	public void sendFile(String filename)
 	{
+		Random random = new Random();
+		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION,0,random.nextInt(),ProtocolHeader.REQUEST_FILE,ProtocolHeader.REPLY_FILE);
 		File file = new File(filename);
 		try
 		{
