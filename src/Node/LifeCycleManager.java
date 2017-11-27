@@ -83,13 +83,9 @@ public class LifeCycleManager implements Runnable
 				{
 					System.out.println("Got Data");
 
-
-
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
-
-
 
 					Datagram request = new Datagram(packet.getData());
 					System.out.println("Reply code" + request.getHeader().getReplyCode());

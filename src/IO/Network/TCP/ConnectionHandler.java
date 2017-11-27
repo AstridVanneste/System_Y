@@ -83,12 +83,12 @@ public class ConnectionHandler implements Runnable
 		{
 			try
 			{
-				if (this.in.available() > 0)
-				{
-					byte[] data = new byte [this.in.available()];
-					int numBytes = this.in.read(data);
-					this.inputBuffer.add(data);
-				}
+				//if (this.in.available() > 0)
+				//{
+				byte[] data = new byte [this.in.available()];
+				int numBytes = this.in.read(data);
+				this.inputBuffer.add(data);
+				//}
 			}
 			catch (IOException ioe)
 			{
