@@ -187,6 +187,8 @@ public class Server implements Runnable
 		int transactionID = -1;
 		long timer = 0;
 
+		//int packets = 0;
+
 		System.out.println("Receiving file " + filename);
 
 		try
@@ -207,6 +209,7 @@ public class Server implements Runnable
 								transactionID = datagram.getHeader().getTransactionID();
 								firstSegment = false;
 								file.write(datagram.getData()); //write first bytes to empty previous values at the same time
+								//packets++;
 
 							} else if (transactionID != datagram.getHeader().getTransactionID())
 							{
@@ -214,6 +217,8 @@ public class Server implements Runnable
 							} else
 							{
 								file.append(datagram.getData());
+								//packets++;
+								//System.out.println("packet " + packets + " appended");
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
@@ -245,6 +250,7 @@ public class Server implements Runnable
 					}
 				}
 			}
+			//System.out.println(packets + " packets written");
 		}
 		catch (IOException ioe)
 		{
