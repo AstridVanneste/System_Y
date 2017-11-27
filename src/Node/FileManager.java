@@ -257,7 +257,6 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
-
 					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 					FileLedger fileLedger = new FileLedger(file.getName(),Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour());
 					this.addFileLedger(fileLedger);
@@ -501,12 +500,19 @@ public class FileManager implements FileManagerInterface
 		}
 
 		builder.append("OWNED:\n");
-		folder = new File(this.getFullPath("", FileType.OWNED_FILE));
+		folder = new File(this.getFolder( FileType.OWNED_FILE));
 
 		for(File file: folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
 			builder.append("OWNER: " + fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + fileLedgers.get(file.getName()).getLocalID() + "\n");
+		}
+
+		builder.append("REPLICATED\n");
+		folder = new File(this.getFolder(FileType.REPLICATED_FILE));
+		for(File file: folder.listFiles())
+		{
+			builder.append(file.getName() + "\n");
 		}
 
 		builder.append("DOWNLOADS:\n");
