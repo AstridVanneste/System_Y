@@ -11,8 +11,6 @@ import java.util.LinkedList;
 
 public class ConnectionHandler implements Runnable
 {
-	private static final int BUFFER_SIZE = 1 << 14; // Buffer is 16K in size
-
 	private boolean stop;
 	private DataInputStream in;
 	private DataOutputStream out;
@@ -22,7 +20,6 @@ public class ConnectionHandler implements Runnable
 
 	public ConnectionHandler (Socket socket)
 	{
-		System.out.println("Created ConnectionHandler on socket " + socket.getRemoteSocketAddress());
 		this.stop = false;
 		this.socket = socket;
 		this.inputBuffer = new LinkedList<byte[]>();
@@ -47,8 +44,6 @@ public class ConnectionHandler implements Runnable
 	public byte[] readBytes()
 	{
 		byte[] data = this.inputBuffer.getFirst();
-		//System.out.println("Num Buffered Packets: " + this.inputBuffer.size());
-		//System.out.println("First Packet Size: " + data.length);
 		this.inputBuffer.removeFirst();
 		return data;
 	}
@@ -72,6 +67,9 @@ public class ConnectionHandler implements Runnable
 	{
 		try
 		{
+			this.stop = true;
+			this.in.close();
+			this.out.close();
 			this.socket.close();
 			this.thread.join();
 		}
@@ -90,24 +88,25 @@ public class ConnectionHandler implements Runnable
 	@Override
 	public void run()
 	{
-		while (!this.stop)
+		while (!this.stop && !this.socket.isClosed())
 		{
 			try
 			{
-				//if (this.in.available() > 0)
-				//{
-				byte[] data = new byte [this.in.available()];
-				int numBytes = this.in.read(data);
-
-				if (numBytes > 0)
+				if (this.in.available() > 0)
 				{
-					this.inputBuffer.add(data);
+					byte[] data = new byte[this.in.available()];
+					int numBytes = this.in.read(data);
+
+					if (numBytes > 0)
+					{
+						this.inputBuffer.add(data);
+					}
 				}
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("ConnectionHandler: An exception occurred while trying to read data.");
-				//ioe.printStackTrace();
+				System.err.println("ConnectionHandler: An exception occurred while trying to read data: '" + ioe.getMessage() + "'");
+				ioe.printStackTrace();
 			}
 		}
 	}

@@ -27,6 +27,7 @@ import java.util.Scanner;
 public class LifeCycleManager implements Runnable
 {
 	private boolean running;
+	private Thread thread;
 	private Integer bootstrapTransactionID;
 	private Subscriber subscriber;
 	private ShutdownAgentInterface shutdownStub;
@@ -45,8 +46,9 @@ public class LifeCycleManager implements Runnable
 
 		this.running = true;
 
-		Thread thread = new Thread(this);
-		thread.start();
+		this.thread = new Thread(this);
+		this.thread.setName("Thread - Node.LifeCycleManager Thread");
+		this.thread.start();
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
 		this.sendAccessRequest();
@@ -297,6 +299,15 @@ public class LifeCycleManager implements Runnable
 		this.subscriber.stop();
 		// shut ourselves down
 		this.shutdown();
+		try
+		{
+			this.thread.join();
+		}
+		catch (InterruptedException ie)
+		{
+			System.err.println("An exception was thrown while trying to join LifeCyleManager Thread");
+			ie.printStackTrace();
+		}
 	}
 
 	/**
