@@ -53,6 +53,10 @@ public class Resolver implements ResolverInterface
 			Util.General.printLineSep();
 			id = NameServer.getInstance().map.lastKey();
 		}
+		else if(NameServer.getInstance().map.containsKey(hash))
+		{
+			return hash;
+		}
 		else
 		{
 			Util.General.printLineSep();
