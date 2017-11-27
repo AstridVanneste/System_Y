@@ -36,7 +36,6 @@ public class FileManager implements FileManagerInterface
 	private String rootDirectory;
 	private HashMap <String, FileLedger> fileLedgers;
 
-
 	public FileManager ()
 	{
 		this.tcpServer = null;

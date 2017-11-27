@@ -11,6 +11,7 @@ public class UpdateAgent implements Runnable
 {
 	private WatchService service;
 	private Path LOCAL_DIR;
+	private Thread thread;
 	public boolean running;
 
 	public UpdateAgent()
@@ -33,8 +34,9 @@ public class UpdateAgent implements Runnable
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
 			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
-			Thread thread = new Thread(this);
-			thread.start();
+			this.thread = new Thread(this);
+			this.thread.setName("Thread - Node.UpdateAgent Thread");
+			this.thread.start();
 
 		}
 		catch (IOException e)
@@ -65,7 +67,8 @@ public class UpdateAgent implements Runnable
 	 * If a file is added, watcher will be notified.
 	 * Then it will handle a new file using the correct procedure
 	 */
-	public void watcher(){
+	public void watcher()
+	{
 		try
 		{
 
@@ -111,7 +114,8 @@ public class UpdateAgent implements Runnable
 				catch (IOException e)
 				{
 					e.printStackTrace();
-				} catch (NotBoundException e)
+				}
+				catch (NotBoundException e)
 				{
 					e.printStackTrace();
 				}
@@ -131,12 +135,17 @@ public class UpdateAgent implements Runnable
 		try
 		{
 			this.running = false;
-			service.close();
+			this.service.close();
+			this.thread.join();
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		catch (InterruptedException ie)
+		{
+			System.err.println("An exception was thrown while trying to join UpdateAgent Thread");
+			ie.printStackTrace();
+		}
 	}
-
 }

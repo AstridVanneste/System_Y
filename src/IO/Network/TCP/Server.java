@@ -7,11 +7,13 @@ import IO.Network.Datagrams.ProtocolHeader;
 
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.StrictMath.abs;
 
@@ -19,7 +21,7 @@ public class Server implements Runnable
 {
 	private static long TIMEOUT = 50000; //TIMEOUT IN MS (50 seconds)
 
-	private boolean stop;
+	private Boolean stop;
 	private int portNum;
 	private ServerSocket socket;
 	private HashMap<String, ConnectionHandler> incomingConnections;
@@ -38,6 +40,7 @@ public class Server implements Runnable
 		this.socket = new ServerSocket(this.portNum);
 
 		this.thread = new Thread(this);
+		this.thread.setName("Thread - TCP Server on " + InetAddress.getLocalHost().toString());
 		this.thread.start();
 	}
 
@@ -108,43 +111,6 @@ public class Server implements Runnable
 		}
 	}
 
-	public void stop() throws IOException
-	{
-		try
-		{
-			for (String remoteHost : this.incomingConnections.keySet())
-			{
-				this.stopConnectionHandler(remoteHost);
-			}
-			this.thread.join();
-			this.socket.close();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public void run()
-	{
-		try
-		{
-			while (!this.stop && !this.socket.isClosed())
-			{
-				Socket clientSocket = this.socket.accept();
-				ConnectionHandler ch = new ConnectionHandler(clientSocket);
-				ch.start();
-
-				this.incomingConnections.put(clientSocket.getRemoteSocketAddress().toString(), ch);
-			}
-		}
-		catch (IOException ioe)
-		{
-			System.err.println("IO.Network.TCP.Server.run()\tIOException was thrown in call to accept() or close()");
-			ioe.printStackTrace();
-		}
-	}
-
 	public Set<String> getActiveConnections ()
 	{
 		return this.incomingConnections.keySet();
@@ -200,14 +166,16 @@ public class Server implements Runnable
 		int transactionID = -1;
 		long timer = 0;
 
-		System.out.println("Receiving file " + filename);
+		//System.out.println("Receiving file " + filename + " from " + remoteHost);
 
 		try
 		{
 			while (!quit)
 			{
+				//System.out.println("quit: " + Boolean.toString(quit));
 				if (this.hasData(remoteHost))
 				{
+					//System.out.println("System has data for remote host");
 					Datagram datagram = new Datagram(this.receive(remoteHost));
 
 					if (datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
@@ -221,10 +189,12 @@ public class Server implements Runnable
 								firstSegment = false;
 								file.write(datagram.getData()); //write first bytes to empty previous values at the same time
 
-							} else if (transactionID != datagram.getHeader().getTransactionID())
+							}
+							else if (transactionID != datagram.getHeader().getTransactionID())
 							{
 								throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
-							} else
+							}
+							else
 							{
 								file.append(datagram.getData());
 							}
@@ -264,12 +234,67 @@ public class Server implements Runnable
 			ioe.printStackTrace();
 		}
 
-		//this.stopConnectionHandler(remoteHost); todo: stop connectionhandler
+		this.stopConnectionHandler(remoteHost); //todo: stop connectionhandler
 	}
 
-	public void stopConnectionHandler (String remoteHost)
+	@Override
+	public void run()
 	{
+		try
+		{
+			while (!this.stop)
+			{
+				//synchronized (this.stop)
+				//{
+				//System.out.println("Pre-Accept");
+				Socket clientSocket = this.socket.accept();
+				//System.out.println("Creating ConnectionHandler");
+				ConnectionHandler ch = new ConnectionHandler(clientSocket);
+				ch.start();
+
+				this.incomingConnections.put(clientSocket.getRemoteSocketAddress().toString(), ch);
+				//}
+				//System.out.println("Server loop");
+			}
+		}
+		catch (IOException ioe)
+		{
+			System.err.println("IO.Network.TCP.Server.run()\tIOException was thrown in call to accept() or close()");
+			ioe.printStackTrace();
+		}
+
+		//System.out.println("Returning from Server.run()");
+	}
+
+	private void stopConnectionHandler (String remoteHost)
+	{
+		//System.out.println("Stopping connection with " + remoteHost);
 		this.incomingConnections.get(remoteHost).stop();
 		this.incomingConnections.remove(remoteHost);
+	}
+
+	public void stop() throws IOException
+	{
+		try
+		{
+			//System.out.println("Removing ConnectionHandlers");
+			for (String remoteHost : this.incomingConnections.keySet())
+			{
+				//System.out.println("Stopping Connection to " + remoteHost);
+				this.stopConnectionHandler(remoteHost);
+			}
+
+			//System.out.println("Closed all ConnectionHandlers");
+			this.stop = true;
+			//System.out.println("Set stop to true, stop: " + Boolean.toString(this.stop));
+			this.socket.close();
+			//System.out.println("Closed ServerSocket");
+			this.thread.join();
+			//System.out.println("Joined Thread");
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
 	}
 }

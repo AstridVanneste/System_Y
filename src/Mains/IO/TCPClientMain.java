@@ -7,10 +7,10 @@ import java.util.Scanner;
 
 public class TCPClientMain
 {
-	private static final String localIP = "localhost";
+	private static final String localIP = "192.168.0.247";
 	private static final int localPort = 2002;
 
-	private static final String remoteIP = "192.168.0.244";
+	private static final String remoteIP = "192.168.0.247";
 	private static final int remotePort = 2001;
 
 	public static void main(String args[])
@@ -28,7 +28,7 @@ public class TCPClientMain
 
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION,0,1, ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
 		//client.sendFile("/Users/Astrid/Dropbox/A_Universiteit/Semester_5/Gedistribueerde_systemen/Practicum/System_Y/src/Mains/IO/bitjes_be_crazy.gif", header);
-		client.sendFile("src/Mains/IO/64x64.png", header);
+		client.sendFile("src/Mains/IO/16x16.bmp", header);
 
 		System.out.println("Sent file");
 
@@ -36,6 +36,5 @@ public class TCPClientMain
 		scanner.nextLine();
 
 		client.stop();
-
 	}
 }

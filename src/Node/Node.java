@@ -84,6 +84,7 @@ public class Node implements NodeInteractionInterface
 			}
 
 			this.lifeCycleManager.start();
+
 			while (this.previousNeighbour == -1 || this.nextNeighbour == -1)
 			{
 			//System.out.println("TansactionID = " + this.bootstrapTransactionID);

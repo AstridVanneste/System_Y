@@ -14,7 +14,6 @@ public class TCPServerMain
 	{
 		Scanner scanner = new Scanner(System.in);
 		Server server = new Server(localPort);
-		System.out.println("Created server on port " + Integer.toString(localPort));
 
 		try
 		{
@@ -28,19 +27,17 @@ public class TCPServerMain
 
 			for(String remoteHost: server.getActiveConnections())
 			{
-				System.out.println("Got TCP connection on " + remoteHost);
-				server.receiveFile(remoteHost, "Vaultboy.png");
-				System.out.println("File received");
+				server.receiveFile(remoteHost, "Vaultboy.bmp");
 			}
 
 			System.out.println("Press enter to stop server");
 			scanner.nextLine();
 
 			server.stop();
-
 		}
 		catch(IOException ioe)
 		{
+			System.out.println("IOException when working with TCP Server");
 			ioe.printStackTrace();
 		}
 	}
