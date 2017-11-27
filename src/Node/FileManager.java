@@ -307,13 +307,8 @@ public class FileManager implements FileManagerInterface
 		System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
-		long bytesWritten = this.tcpServer.receiveFile(remoteHost, filename, fileSize);
-		//int bytesWritten = 0;
+		this.tcpServer.receiveFile(remoteHost, filename);
 
-		if (bytesWritten != fileSize)
-		{
-			throw new IOException ("[ERROR]\tDid not receive all (" + Long.toString(fileSize) + ") Bytes, only got " + Long.toString(bytesWritten) + " Bytes.");
-		}
 	}
 
 	/**

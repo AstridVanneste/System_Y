@@ -179,135 +179,79 @@ public class Server implements Runnable
 		return resBuilder.toString();
 	}
 
-	public void sendFile(String remoteHost, String filename, ProtocolHeader header)
-	{
-		File file = new File(filename);
-		try
-		{
-			while(file.available() != 0)
-			{
-				int length;
-
-				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
-				{
-					byte[] bytes = new byte[Constants.MAX_TCP_SEGMENT_SIZE];
-
-					int i = 0;
-
-					for(byte b: header.serialize())
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					for(byte b: file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE))
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					this.send(remoteHost,bytes);
-				}
-				else
-				{
-					byte[] bytes = new byte[ProtocolHeader.HEADER_LENGTH + (int) file.available()];
-
-					int i = 0;
-
-					for(byte b: header.serialize())
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					for(byte b: file.read((int) file.available()))
-					{
-						bytes[i] = b;
-						i++;
-					}
-
-					this.send(remoteHost, bytes);
-				}
-			}
-		}
-		catch(IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-	}
-
-	public long receiveFile(String remoteHost, String filename, long fileLength)
+	public void receiveFile(String remoteHost, String filename)
 	{
 		File file = new File(filename);
 		boolean firstSegment = true;
-		boolean timeout = false;
+		boolean quit = false;
 		int transactionID = -1;
 		long timer = 0;
-		long offset = 0;
 
 		System.out.println("Receiving file " + filename);
 
 		try
 		{
-			while (!(offset >= fileLength) && !timeout)
+			while (!quit)
 			{
-				System.out.println("While-check passed, filelength: " + Long.toString(fileLength));
 				if (this.hasData(remoteHost))
 				{
-					System.out.println("Had data for given remote host");
-
 					Datagram datagram = new Datagram(this.receive(remoteHost));
 
-					if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE && datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
+					if (datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
 					{
-						if (firstSegment)
+						if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE || datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 						{
-							System.out.println("First Segment");
-							transactionID = datagram.getHeader().getTransactionID();
-							firstSegment = false;
-							file.write(datagram.getData()); //write first bytes to empty previous values at the same time
-						}
-						else if (transactionID != datagram.getHeader().getTransactionID())
-						{
-							throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
+							//System.out.println("Datagram with reply code: " + datagram.getHeader().getReplyCode());
+							if (firstSegment)
+							{
+								transactionID = datagram.getHeader().getTransactionID();
+								firstSegment = false;
+								file.write(datagram.getData()); //write first bytes to empty previous values at the same time
+
+							} else if (transactionID != datagram.getHeader().getTransactionID())
+							{
+								throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
+							} else
+							{
+								file.append(datagram.getData());
+							}
+
+							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
+							{
+								//System.out.println("last packet received");
+								quit = true;
+							}
+							timer = 0;
 						}
 						else
 						{
-							file.append(datagram.getData());
+							throw new IOException("Invalid reply code (= " + datagram.getHeader().getReplyCode() + ") should be " + ProtocolHeader.REPLY_FILE + " or " + ProtocolHeader.REPLY_FILE_END + " at the end of the file");
 						}
-						offset += datagram.getData().length;
-						timer = 0;
 					}
 					else
 					{
-						throw new IOException("Invalid reply code (= " + datagram.getHeader().getReplyCode() + "should be " + ProtocolHeader.REPLY_FILE+ ") or request code (= " + datagram.getHeader().getRequestCode() + " should be " + ProtocolHeader.REQUEST_FILE + ")");
+						throw new IOException("Invalid request code (= " + datagram.getHeader().getRequestCode() + "should be " + ProtocolHeader.REQUEST_FILE+ ")");
 					}
 				}
 				else
 				{
-					System.out.println("Entering time-out routine");
 					if(timer == 0)
 					{
-						System.out.println("Set timer to 0");
 						timer = System.nanoTime();
 					}
 					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
 					{
-						System.out.println("Reached time-out");
-						timeout = true;
+						throw new IOException("Timeout when receiving file " + filename);
 					}
 				}
 			}
-
-			this.stopConnectionHandler(remoteHost);
-			//this.incomingConnections.remove(remoteHost);
 		}
 		catch (IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
 
-		return offset;
+		//this.stopConnectionHandler(remoteHost); todo: stop connectionhandler
 	}
 
 	public void stopConnectionHandler (String remoteHost)

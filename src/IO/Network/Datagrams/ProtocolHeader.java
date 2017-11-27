@@ -35,6 +35,7 @@ public class ProtocolHeader
 	public static final int REPLY_DUPLICATE_ID = 0x00000002;
 	public static final int REPLY_DUPLICATE_IP = 0x00000003;
 	public static final int REPLY_FILE = 0x00004001;
+	public static final int REPLY_FILE_END = 0x00004002;
 
 	private byte version;
 	private int dataLength;
