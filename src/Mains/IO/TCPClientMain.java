@@ -24,5 +24,6 @@ public class TCPClientMain
 		scanner.nextLine();
 
 		client.stop();
+
 	}
 }
