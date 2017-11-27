@@ -17,8 +17,8 @@ public class Node implements NodeInteractionInterface
 
 	private String name;
 	private short id;
-	private short previousNeighbour;
-	private short nextNeighbour;
+	private Short previousNeighbour;
+	private Short nextNeighbour;
 
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
@@ -84,6 +84,19 @@ public class Node implements NodeInteractionInterface
 			}
 
 			this.lifeCycleManager.start();
+			while (this.previousNeighbour == -1 || this.nextNeighbour == -1)
+			{
+			//System.out.println("TansactionID = " + this.bootstrapTransactionID);
+			//wait until discovery is finished...
+				synchronized (this.nextNeighbour)
+				{
+					synchronized (this.previousNeighbour)
+					{
+
+					}
+				}
+
+			}
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
