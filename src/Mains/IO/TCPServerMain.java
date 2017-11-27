@@ -8,33 +8,37 @@ import java.util.Scanner;
 
 public class TCPServerMain
 {
+	private static final int localPort = 2002;
+
 	public static void main(String args[])
 	{
 		Scanner scanner = new Scanner(System.in);
-		Server server = new Server(2002);
+		Server server = new Server(localPort);
+		System.out.println("Created server on port " + Integer.toString(localPort));
 
 		try
 		{
-			server.start();
-
-			System.out.println("press enter to receive file");
+			System.out.println("Press enter to start Server");
 			scanner.nextLine();
+			server.start();
 
 			File file = new File("result.txt");
 
+			System.out.println("Press enter to loop through active connections looking for files");
+			scanner.nextLine();
+
 			for(String remoteHost: server.getActiveConnections())
 			{
-				System.out.println("RECEIVING FILE ON " + remoteHost);
-				long received = server.receiveFile(remoteHost, "result.gif", new File("/Users/Astrid/Dropbox/A_Universiteit/Semester_5/Gedistribueerde_systemen/Practicum/System_Y/src/IO/Network/TCP/bitjes_be_crazy.gif").size());
-				System.out.println("Received " + received + " bytes");
-				System.out.println("Should have been " + new File("/Users/Astrid/Dropbox/A_Universiteit/Semester_5/Gedistribueerde_systemen/Practicum/System_Y/src/IO/Network/TCP/bitjes_be_crazy.gif").size() + " bytes");
+				System.out.println("Got TCP connection on " + remoteHost);
+				long received = server.receiveFile(remoteHost, "Vaultboy.png", new File("src/Mains/IO/64x64.png").size());
+				System.out.println("Received " + received + "B");
+				System.out.println("Should have been " + new File("src/Mains/IO/64x64.png").size() + "B");
 			}
 
 			System.out.println("press enter to stop server");
 			scanner.nextLine();
 
 			server.stop();
-
 		}
 		catch(IOException ioe)
 		{

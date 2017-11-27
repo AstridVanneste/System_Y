@@ -1,6 +1,7 @@
 package IO.Network.TCP;
 
 import IO.Network.Constants;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,6 +18,7 @@ public class ConnectionHandler implements Runnable
 	private DataOutputStream out;
 	private LinkedList<byte[]> inputBuffer;
 	private Socket socket;
+	private Thread thread;
 
 	public ConnectionHandler (Socket socket)
 	{
@@ -32,8 +34,9 @@ public class ConnectionHandler implements Runnable
 		{
 			this.in = new DataInputStream(this.socket.getInputStream());
 			this.out = new DataOutputStream(this.socket.getOutputStream());
-			Thread ownThread = new Thread(this);
-			ownThread.start();
+			this.thread = new Thread(this);
+			this.thread.setName("Thread - ConnectionHandler to " + this.socket.getRemoteSocketAddress().toString());
+			this.thread.start();
 		}
 		catch (IOException ioe)
 		{
@@ -41,9 +44,11 @@ public class ConnectionHandler implements Runnable
 		}
 	}
 
-	public synchronized byte[] readBytes()
+	public byte[] readBytes()
 	{
 		byte[] data = this.inputBuffer.getFirst();
+		System.out.println("Num Buffered Packets: " + this.inputBuffer.size());
+		System.out.println("First Packet Size: " + data.length);
 		this.inputBuffer.removeFirst();
 		return data;
 	}
@@ -68,11 +73,17 @@ public class ConnectionHandler implements Runnable
 		try
 		{
 			this.socket.close();
+			this.thread.join();
 		}
-		catch (IOException e)
+		catch (IOException ioe)
 		{
-			System.err.println("An exception occurred while trying to close socket.");
-			e.printStackTrace();
+			System.err.println("An exception was thrown while trying to close socket.");
+			ioe.printStackTrace();
+		}
+		catch (InterruptedException ie)
+		{
+			System.err.println("An exception was thrown while trying to join thread");
+			ie.printStackTrace();
 		}
 	}
 
@@ -83,16 +94,18 @@ public class ConnectionHandler implements Runnable
 		{
 			try
 			{
-				//if (this.in.available() > 0)
-				//{
 				byte[] data = new byte [this.in.available()];
 				int numBytes = this.in.read(data);
-				this.inputBuffer.add(data);
-				//}
+
+				if (numBytes > 0)
+				{
+					this.inputBuffer.add(data);
+				}
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("An exception occurred while trying to read data.");
+				System.err.println("ConnectionHandler: An exception occurred while trying to read data.");
+				//ioe.printStackTrace();
 			}
 		}
 	}

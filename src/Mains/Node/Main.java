@@ -1,4 +1,6 @@
-package Node;
+package Mains.Node;
+
+import Node.Node;
 
 import java.util.Scanner;
 
@@ -7,7 +9,7 @@ import static Util.General.printLineSep;
 /**
  * Created by Axel on 25/10/2017.
  */
-public class NodeMain
+public class Main
 {
     public static void main(String[] args)
     {

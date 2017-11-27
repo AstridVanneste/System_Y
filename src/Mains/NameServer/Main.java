@@ -1,7 +1,8 @@
-package NameServer;
+package Mains.NameServer;
 
 
 import IO.File;
+import NameServer.NameServer;
 
 import java.util.Scanner;
 
