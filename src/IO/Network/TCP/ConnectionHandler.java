@@ -106,7 +106,7 @@ public class ConnectionHandler implements Runnable
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("ConnectionHandler: An exception occurred while trying to read data.");
+				//System.err.println("ConnectionHandler: An exception occurred while trying to read data.");
 				//ioe.printStackTrace();
 			}
 		}

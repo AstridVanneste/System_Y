@@ -23,6 +23,7 @@ public class Server implements Runnable
 	private int portNum;
 	private ServerSocket socket;
 	private HashMap<String, ConnectionHandler> incomingConnections;
+	private Thread thread;
 
 	public Server (int port)
 	{
@@ -36,8 +37,8 @@ public class Server implements Runnable
 	{
 		this.socket = new ServerSocket(this.portNum);
 
-		Thread ownThread = new Thread(this);
-		ownThread.start();
+		this.thread = new Thread(this);
+		this.thread.start();
 	}
 
 	public void send(String remoteHost, String data)
@@ -107,9 +108,21 @@ public class Server implements Runnable
 		}
 	}
 
-	public synchronized void stop() throws IOException
+	public void stop() throws IOException
 	{
-		this.socket.close();
+		try
+		{
+			for (String remoteHost : this.incomingConnections.keySet())
+			{
+				this.stopConnectionHandler(remoteHost);
+			}
+			this.thread.join();
+			this.socket.close();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public void run()
@@ -127,7 +140,7 @@ public class Server implements Runnable
 		}
 		catch (IOException ioe)
 		{
-			System.err.println("IO.Network.TCP.Server.run()\tException was thrown in call to accept() or close()");
+			System.err.println("IO.Network.TCP.Server.run()\tIOException was thrown in call to accept() or close()");
 			ioe.printStackTrace();
 		}
 	}
@@ -241,7 +254,7 @@ public class Server implements Runnable
 					}
 					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
 					{
-						throw new IOException("Timeout when receiving file " + filename);
+						throw new IOException("Timeout when receiving '" + filename + "' from " + remoteHost);
 					}
 				}
 			}

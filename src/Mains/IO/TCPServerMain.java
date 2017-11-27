@@ -29,11 +29,11 @@ public class TCPServerMain
 			for(String remoteHost: server.getActiveConnections())
 			{
 				System.out.println("Got TCP connection on " + remoteHost);
-				server.receiveFile(remoteHost, "Result.gif");
+				server.receiveFile(remoteHost, "Vaultboy.png");
 				System.out.println("File received");
 			}
 
-			System.out.println("press enter to stop server");
+			System.out.println("Press enter to stop server");
 			scanner.nextLine();
 
 			server.stop();
