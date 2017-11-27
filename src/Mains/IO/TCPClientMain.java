@@ -26,9 +26,7 @@ public class TCPClientMain
 		System.out.println("Press enter to send file");
 		scanner.nextLine();
 
-		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION,0,1, ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
-		//client.sendFile("/Users/Astrid/Dropbox/A_Universiteit/Semester_5/Gedistribueerde_systemen/Practicum/System_Y/src/Mains/IO/bitjes_be_crazy.gif", header);
-		client.sendFile("src/Mains/IO/16x16.bmp", header);
+	  client.sendFile("src/Mains/IO/64x64.png", header);
 
 		System.out.println("Sent file");
 

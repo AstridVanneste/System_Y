@@ -328,11 +328,10 @@ public class FileManager implements FileManagerInterface
 		{
 			re.printStackTrace();
 		}
-		Random random = new Random();
-		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION, 0, random.nextInt(),ProtocolHeader.REQUEST_FILE, ProtocolHeader.REPLY_FILE);
+
 		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
 		client.start();
-		client.sendFile(this.getFullPath(filename,srcType), header);
+		client.sendFile(this.getFullPath(filename,srcType));
 		int localPort =  client.getLocalPort();
 		String remoteHost = "";
 
