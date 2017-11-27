@@ -68,14 +68,15 @@ The reply code tells the receiver the result of their request. It also tells the
 
 - 0x0001  Request to be added to network
 
+- 0x4001  Request for file
+
 ## Reply Codes
 
 - 0x0001  Succesfully added to network, reply to 0x0001
 - 0x0002  Failed to add to network, Duplicate ID, choose new Node ID. Reply to 0x0001.
 - 0x0003  Failed to add to network, Duplicate IP, choose new IP address or fix DHCP. Reply to 0x0001.
 
-- 0x4001  Sending file.
-- 0x4002  Last packet of file.
+- 0x4001  Sending file. reply to 0x8001.
 
 ### Discovery Service
 The Discovery Service in System Y will consist of a client sending a multicast message onto the network and the Nameserver replying with a unicast message to the new client.

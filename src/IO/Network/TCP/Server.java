@@ -251,20 +251,27 @@ public class Server implements Runnable
 		{
 			while (!(offset >= fileLength) && !timeout)
 			{
+				System.out.println("While-check passed, filelength: " + Long.toString(fileLength));
 				if (this.hasData(remoteHost))
 				{
+					System.out.println("Had data for given remote host");
+
 					Datagram datagram = new Datagram(this.receive(remoteHost));
+
 					if (datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE && datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
 					{
 						if (firstSegment)
 						{
+							System.out.println("First Segment");
 							transactionID = datagram.getHeader().getTransactionID();
 							firstSegment = false;
 							file.write(datagram.getData()); //write first bytes to empty previous values at the same time
-						} else if (transactionID != datagram.getHeader().getTransactionID())
+						}
+						else if (transactionID != datagram.getHeader().getTransactionID())
 						{
 							throw new IOException("Transaction ID was " + transactionID + " but changed to " + datagram.getHeader().getTransactionID());
-						} else
+						}
+						else
 						{
 							file.append(datagram.getData());
 						}
@@ -278,18 +285,22 @@ public class Server implements Runnable
 				}
 				else
 				{
+					System.out.println("Entering time-out routine");
 					if(timer == 0)
 					{
+						System.out.println("Set timer to 0");
 						timer = System.nanoTime();
 					}
 					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
 					{
+						System.out.println("Reached time-out");
 						timeout = true;
 					}
 				}
 			}
 
-			this.incomingConnections.remove(remoteHost);
+			this.stopConnectionHandler(remoteHost);
+			//this.incomingConnections.remove(remoteHost);
 		}
 		catch (IOException ioe)
 		{
@@ -297,5 +308,11 @@ public class Server implements Runnable
 		}
 
 		return offset;
+	}
+
+	public void stopConnectionHandler (String remoteHost)
+	{
+		this.incomingConnections.get(remoteHost).stop();
+		this.incomingConnections.remove(remoteHost);
 	}
 }

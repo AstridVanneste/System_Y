@@ -303,7 +303,7 @@ public class Client implements Runnable
 			}
 			catch (IOException ioe)
 			{
-				System.err.println("An exception occurred while trying to read data.");
+				System.err.println("TCPClient: An exception occurred while trying to read data.");
 			}
 		}
 	}

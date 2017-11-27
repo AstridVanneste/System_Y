@@ -27,10 +27,10 @@ import java.util.Random;
 public class FileManager implements FileManagerInterface
 {
 	// Please leave the trailing '/' at the end of these constants, it denotes that they are directories
-	private static final String LOCAL_FILE_PREFIX = "Local/";
-	private static final String OWNED_FILE_PREFIX = "Owned/";
-	private static final String DOWNLOADED_FILE_PREFIX = "Downloads/";
-	private static final String REPLICATED_FILE_PREFIX = "Replicated/";
+	private static final String LOCAL_FILE_PREFIX = "Local\\";
+	private static final String OWNED_FILE_PREFIX = "Owned\\";
+	private static final String DOWNLOADED_FILE_PREFIX = "Downloads\\";
+	private static final String REPLICATED_FILE_PREFIX = "Replicated\\";
 
 	private Server tcpServer;
 	private String rootDirectory;
@@ -488,15 +488,8 @@ public class FileManager implements FileManagerInterface
 
 		for(File file: folder.listFiles())
 		{
-			builder.append(file.getName() + "	");
-			try
-			{
-				builder.append("OWNER: " + Node.getInstance().getResolverStub().getOwnerID(file.getName()) + "\n");
-			}
-			catch(RemoteException re)
-			{
-				re.printStackTrace();
-			}
+			builder.append(file.getName());
+			builder.append('\n');
 		}
 
 		builder.append("OWNED:\n");
