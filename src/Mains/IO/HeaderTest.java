@@ -1,4 +1,6 @@
-package IO.Network.Datagrams;
+package Mains.IO;
+
+import IO.Network.Datagrams.ProtocolHeader;
 
 /**
  * Created by Astrid on 25-Oct-17.
