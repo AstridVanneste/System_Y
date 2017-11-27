@@ -53,12 +53,8 @@ public class LifeCycleManager implements Runnable
 
 		//synchronized (this.bootstrapTransactionID)
 		//{
-			while (this.bootstrapTransactionID != -1)
+			while (Node.getInstance().getPreviousNeighbour() == -1 || Node.getInstance().getNextNeighbour() == -1)
 			{
-				synchronized (this.bootstrapTransactionID)
-				{
-
-				}
 				//System.out.println("TansactionID = " + this.bootstrapTransactionID);
 				//wait until discovery is finished...
 			}
