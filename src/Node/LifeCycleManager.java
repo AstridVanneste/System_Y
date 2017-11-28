@@ -285,6 +285,8 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
+
+			Node.getInstance().getFileManager().transferReplicaded();
 		}
 	}
 

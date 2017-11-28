@@ -26,7 +26,7 @@ public class TCPClientMain
 		System.out.println("Press enter to send file");
 		scanner.nextLine();
 
-	  client.sendFile("src/Mains/IO/64x64.png", header);
+	  client.sendFile("src/Mains/IO/64x64.png");
 
 		System.out.println("Sent file");
 

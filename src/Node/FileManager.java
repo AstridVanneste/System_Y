@@ -278,6 +278,8 @@ public class FileManager implements FileManagerInterface
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());
 						fileLedger.setOwnerID(ownerId);
 						fileManager.addFileLedger(fileLedger);
+						file.delete();
+						this.fileLedgers.remove(file.getName());
 					}
 
 				}
@@ -412,6 +414,21 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
+	/**
+	 * Push all your replicated files to your new next neighbour
+	 */
+	public void transferReplicaded ()
+	{
+		File folder = new File(this.getFullPath("",FileType.REPLICATED_FILE));
+
+		File[] fileList = folder.listFiles();
+
+		for(File file: fileList)
+		{
+			sendFile(Node.getInstance().getNextNeighbour(),file.getName(),FileType.REPLICATED_FILE,FileType.REPLICATED_FILE);
+			file.delete();
+		}
+	}
 
 	/**
 	 * Returns the full path of a file.
