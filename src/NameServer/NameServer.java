@@ -91,7 +91,7 @@ public class NameServer
 
 	public static short getHash(String name)
 	{
-		return (short) Math.abs(name.hashCode() % 32768); //todo: CHECK IF FORMULA CORRECT!!!
+		return (short) Math.abs(name.hashCode() % 32768);
 	}
 
 	public void writeMapToFile()
