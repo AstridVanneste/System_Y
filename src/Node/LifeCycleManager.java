@@ -106,6 +106,7 @@ public class LifeCycleManager implements Runnable
 					{
 						// We are a new node, let's start setting neighbours
 						System.out.println("Transaction ID was ours");
+						System.out.println("Transaction ID was ours");
 						System.out.println("We are a new node");
 
 						//check if message contains error message duplicate id from NS
@@ -224,6 +225,9 @@ public class LifeCycleManager implements Runnable
 		/* You're the first node so edit both neighbours of the new node
 		 * OWN ID == NEXT ID && OWN ID == PREVIOUS ID
 		 */
+
+		boolean previous = false;
+
 		if(Node.getInstance().getId() == Node.getInstance().getNextNeighbour() && Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour())
 		{
 			// This means there's now 2 nodes in the network
@@ -233,6 +237,7 @@ public class LifeCycleManager implements Runnable
 			Node.getInstance().setNextNeighbour(newID);
 			Registry reg = null;
 
+			previous = true;
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
@@ -258,6 +263,7 @@ public class LifeCycleManager implements Runnable
 			)
 		{
 			Registry reg = null;
+			previous = true;
 			try
 			{
 				NodeInteractionInterface neighbourInterface = null;
@@ -286,8 +292,13 @@ public class LifeCycleManager implements Runnable
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
 
+
+		}
+		if(previous)
+		{
 			Node.getInstance().getFileManager().transferReplicaded();
 		}
+
 	}
 
 	public boolean isRunning ()
