@@ -296,7 +296,15 @@ public class LifeCycleManager implements Runnable
 		}
 		if(previous)
 		{
-			Node.getInstance().getFileManager().transferReplicaded();
+			try
+			{
+				Node.getInstance().getFileManager().checkFiles(FileType.OWNED_FILE);
+			}
+			catch(RemoteException re)
+			{
+				re.printStackTrace();
+			}
+			//Node.getInstance().getFileManager().transferReplicaded();
 		}
 
 	}
