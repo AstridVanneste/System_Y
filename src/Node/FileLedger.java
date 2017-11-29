@@ -99,4 +99,9 @@ public class FileLedger implements Serializable
 	{
 		return this.copies.size();
 	}
+
+	public short getReplicatedId()
+	{
+		return this.replicatedID;
+	}
 }
