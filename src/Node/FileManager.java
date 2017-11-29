@@ -182,6 +182,16 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
+	@Override
+	public void deleteFile(String filename, FileType type) throws IOException
+	{
+		File file = new File(this.getFullPath(filename,type));
+		if(file.exists())
+		{
+			file.delete();
+		}
+	}
+
 	/**
 	 * Request to download file. The file will be pushed (push()) to the node requesting it.
 	 * @param dstID
@@ -276,6 +286,13 @@ public class FileManager implements FileManagerInterface
 					else if(type == FileType.OWNED_FILE)
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());
+						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))
+						{
+							String IP = Node.getInstance().getResolverStub().getIP(fileLedger.getReplicatedId());
+							Registry reg = LocateRegistry.getRegistry(IP);
+							FileManagerInterface stub = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+							stub.deleteFile(file.getName(), FileType.REPLICATED_FILE);
+						}
 						fileLedger.setOwnerID(ownerId);
 						fileManager.addFileLedger(fileLedger);
 						file.delete();

@@ -236,7 +236,7 @@ public class Server implements Runnable
 			ioe.printStackTrace();
 		}
 
-		this.stopConnectionHandler(remoteHost); //todo: stop connectionhandler
+		this.stopConnectionHandler(remoteHost);
 	}
 
 	@Override
