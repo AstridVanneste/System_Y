@@ -85,7 +85,7 @@ public class Node implements NodeInteractionInterface
 
 			this.lifeCycleManager.start();
 
-			while (this.previousNeighbour == this.nextNeighbour)
+			while (this.previousNeighbour == this.nextNeighbour && this.previousNeighbour == this.id)
 			{
 			//System.out.println("TansactionID = " + this.bootstrapTransactionID);
 			//wait until discovery is finished...
