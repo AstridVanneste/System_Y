@@ -16,7 +16,7 @@ public class Node implements NodeInteractionInterface
 	public static final String FILE_MANAGER_NAME = "FILE_MANAGER";
 
 	private String name;
-	private short id;
+	private Short id;
 	private Short previousNeighbour;
 	private Short nextNeighbour;
 
@@ -85,19 +85,25 @@ public class Node implements NodeInteractionInterface
 
 			this.lifeCycleManager.start();
 
+
+
 			while (this.previousNeighbour == this.nextNeighbour && this.previousNeighbour == this.id)
 			{
-			//System.out.println("TansactionID = " + this.bootstrapTransactionID);
-			//wait until discovery is finished...
+				//System.out.println("TansactionID = " + this.bootstrapTransactionID);
+				//wait until discovery is finished...
 				synchronized (this.nextNeighbour)
 				{
 					synchronized (this.previousNeighbour)
 					{
+						synchronized (this.id)
+						{
 
+						}
 					}
 				}
 
 			}
+
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
