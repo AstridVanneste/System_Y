@@ -100,6 +100,18 @@ public class LifeCycleManager implements Runnable
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
 							this.updateNeighbours(newNodeID);
+							if(numberOfNodes == 2 && !Node.getInstance().getFileManager().isRunning())  //You were alone and have not yet started your filemanager. Now a new node has joined so you can start replicating
+							{
+								try
+								{
+									Node.getInstance().getFileManager().checkFiles(FileType.LOCAL_FILE);
+									Node.getInstance().getUpdateAgent().start();
+								}
+								catch(RemoteException re)
+								{
+									re.printStackTrace();
+								}
+							}
 						}
 					}
 					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)

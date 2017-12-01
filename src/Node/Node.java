@@ -85,9 +85,7 @@ public class Node implements NodeInteractionInterface
 
 			this.lifeCycleManager.start();
 
-
-
-			while (this.previousNeighbour == this.nextNeighbour && this.previousNeighbour == this.id)
+			while(this.nextNeighbour == -1 || this.previousNeighbour == -1)
 			{
 				//System.out.println("TansactionID = " + this.bootstrapTransactionID);
 				//wait until discovery is finished...
@@ -95,17 +93,16 @@ public class Node implements NodeInteractionInterface
 				{
 					synchronized (this.previousNeighbour)
 					{
-						synchronized (this.id)
-						{
 
-						}
 					}
 				}
-
 			}
 
-			this.fileManager.start();
-			this.updateAgent.start();
+			if(this.nextNeighbour != this.id && this.previousNeighbour != this.id)   //only start if there are 2 or more nodes in the system
+			{
+				this.fileManager.start();
+				this.updateAgent.start();
+			}
 		}
 		else
 		{
