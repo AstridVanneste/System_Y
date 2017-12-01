@@ -12,7 +12,7 @@ public class UpdateAgent implements Runnable
 	private WatchService service;
 	private Path LOCAL_DIR;
 	private Thread thread;
-	public boolean running;
+	private boolean running;
 
 	public UpdateAgent()
 	{
