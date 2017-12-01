@@ -35,12 +35,14 @@ public class FileManager implements FileManagerInterface
 	private Server tcpServer;
 	private String rootDirectory;
 	private HashMap <String, FileLedger> fileLedgers;
+	private boolean running;
 
 	public FileManager ()
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
 		this.fileLedgers = new HashMap<>();
+		this.running = false;
 	}
 
 	/**
@@ -50,6 +52,8 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start ()
 	{
+		this.running = true;
+
 		try
 		{
 			this.tcpServer = new Server(IO.Network.Constants.FILE_RECEIVE_PORT);
@@ -164,6 +168,8 @@ public class FileManager implements FileManagerInterface
 				e.printStackTrace();
 			}
 		}
+
+		this.running = false;
 	}
 
 	public void notifyLeaving (String filename)
@@ -552,5 +558,10 @@ public class FileManager implements FileManagerInterface
 		}
 
 		return builder.toString();
+	}
+
+	public boolean isRunning()
+	{
+		return  this.running;
 	}
 }
