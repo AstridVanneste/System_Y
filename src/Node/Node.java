@@ -112,7 +112,7 @@ public class Node implements NodeInteractionInterface
 
 	public void stop ()
 	{
-		this.lifeCycleManager.stop();
+		this.lifeCycleManager.stop(); // stop lifecycle manager first to make sure the neighbours are already changed!!
 		this.fileManager.stop();
 		this.updateAgent.stop();
 
