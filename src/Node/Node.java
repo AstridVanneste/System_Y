@@ -112,8 +112,8 @@ public class Node implements NodeInteractionInterface
 
 	public void stop ()
 	{
-		this.fileManager.stop();
 		this.lifeCycleManager.stop();
+		this.fileManager.stop();
 		this.updateAgent.stop();
 
 		try

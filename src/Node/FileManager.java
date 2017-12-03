@@ -104,9 +104,15 @@ public class FileManager implements FileManagerInterface
 	 * Stop the filemanager:
 	 * - stops TCP server
 	 * - deletes all owned files.
+	 * - deletes all replicated files.
 	 */
 	public void stop ()
 	{
+		if(this.running)
+		{
+			this.shutdown();
+		}
+
 		try
 		{
 			if (this.tcpServer != null)
@@ -129,7 +135,15 @@ public class FileManager implements FileManagerInterface
 		{
 			file.delete();
 		}
-		folder.delete();
+
+
+		folder = new File(getFullPath("",FileType.REPLICATED_FILE));
+
+		for(File file: folder.listFiles())
+		{
+			file.delete();
+		}
+
 	}
 
 	public void shutdown ()
@@ -466,21 +480,7 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
-	/**
-	 * Push all your replicated files to your new next neighbour
-	 */
-	public void transferReplicaded ()
-	{
-		File folder = new File(this.getFullPath("",FileType.REPLICATED_FILE));
 
-		File[] fileList = folder.listFiles();
-
-		for(File file: fileList)
-		{
-			sendFile(Node.getInstance().getNextNeighbour(),file.getName(),FileType.REPLICATED_FILE,FileType.REPLICATED_FILE);
-			file.delete();
-		}
-	}
 
 	/**
 	 * Returns the full path of a file.

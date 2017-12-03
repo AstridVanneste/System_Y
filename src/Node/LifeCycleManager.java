@@ -125,7 +125,7 @@ public class LifeCycleManager implements Runnable
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
 						{
 							System.err.println("[ERROR]\tNameserver detected ID as being a duplicate, please restart the Node and set a unique name.");
-							this.running = true; // Exit the 'inifinite' while loop
+							this.running = true; // Exit the 'inifinite' while loop	todo: ??? je gaat hier niet uit de loop
 							continue;
 						}
 
@@ -328,7 +328,12 @@ public class LifeCycleManager implements Runnable
 
 	public void stop ()
 	{
-		this.running = false;
+		if(this.running)
+		{
+			this.shutdown();
+		}
+
+
 		this.subscriber.stop();
 		// shut ourselves down
 		this.shutdown();
@@ -350,6 +355,8 @@ public class LifeCycleManager implements Runnable
 	{
 		String IPprevious = "";
 		String IPnext = "";
+
+		this.running = false;
 
 		if((Node.getInstance().getId() == Node.getInstance().getPreviousNeighbour()) && (Node.getInstance().getId() == Node.getInstance().getNextNeighbour()))
 		{
