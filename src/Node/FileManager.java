@@ -160,7 +160,31 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				ownerInterface.notifyLeaving(localFile.getName());
+				ownerInterface.notifyLeaving(localFile.getName(), FileType.LOCAL_FILE);
+			}
+			catch (RemoteException | NotBoundException e)
+			{
+				Node.getInstance().getFailureAgent().failure(ownerID);
+				e.printStackTrace();
+			}
+		}
+
+		String replicatedFolder = this.getFolder(FileType.LOCAL_FILE);
+
+		for (File replicatedFile : (new File(localFolder)).listFiles())
+		{
+			// The file is replicated to my system
+			// Find the owner
+			// Notify the owner that I'm leaving
+
+			short ownerID = -1;
+
+			try
+			{
+				ownerID = Node.getInstance().getResolverStub().getOwnerID(replicatedFile.getName());
+				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
+				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+				ownerInterface.notifyLeaving(replicatedFile.getName(), FileType.REPLICATED_FILE);
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -172,11 +196,11 @@ public class FileManager implements FileManagerInterface
 		this.running = false;
 	}
 
-	public void notifyLeaving (String filename)
+	public void notifyLeaving (String filename, FileType type)
 	{
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
-		if (this.fileLedgers.get(fullPath).getNumDownloads() > 0)
+		if ((this.fileLedgers.get(filename).getNumDownloads() > 0) && (type == FileType.LOCAL_FILE))
 		{
 			File fileObj = new File (fullPath);
 			fileObj.delete();
@@ -184,7 +208,12 @@ public class FileManager implements FileManagerInterface
 		}
 		else
 		{
-			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE,FileType.OWNED_FILE);
+			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
+			if(type == FileType.LOCAL_FILE)
+			{
+				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
+			}
+			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE,FileType.REPLICATED_FILE);
 		}
 	}
 

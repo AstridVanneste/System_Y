@@ -104,4 +104,9 @@ public class FileLedger implements Serializable
 	{
 		return this.replicatedID;
 	}
+
+	public void setReplicatedId(short replicatedID)
+	{
+		this.replicatedID = replicatedID;
+	}
 }
