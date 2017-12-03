@@ -118,7 +118,6 @@ public class LifeCycleManager implements Runnable
 					{
 						// We are a new node, let's start setting neighbours
 						System.out.println("Transaction ID was ours");
-						System.out.println("Transaction ID was ours");
 						System.out.println("We are a new node");
 
 						//check if message contains error message duplicate id from NS
