@@ -351,7 +351,6 @@ public class FileManager implements FileManagerInterface
 						file.delete();
 						this.fileLedgers.remove(file.getName());
 					}
-
 				}
 			}
 			catch (RemoteException re)
