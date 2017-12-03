@@ -26,11 +26,12 @@ import java.util.Random;
  */
 public class FileManager implements FileManagerInterface
 {
-	// Please leave the trailing '/' at the end of these constants, it denotes that they are directories
-	private static final String LOCAL_FILE_PREFIX = "Local\\";
-	private static final String OWNED_FILE_PREFIX = "Owned\\";
-	private static final String DOWNLOADED_FILE_PREFIX = "Downloads\\";
-	private static final String REPLICATED_FILE_PREFIX = "Replicated\\";
+	// NOTE: Thomas changed these back to '/' instead of '\\' to make sure our software remains cross-platform
+	// Changing them to be windows-specific might have worked, but it isn't a proper solution
+	private static final String LOCAL_FILE_PREFIX = "Local/";
+	private static final String OWNED_FILE_PREFIX = "Owned/";
+	private static final String DOWNLOADED_FILE_PREFIX = "Downloads/";
+	private static final String REPLICATED_FILE_PREFIX = "Replicated/";
 
 	private Server tcpServer;
 	private String rootDirectory;
@@ -41,7 +42,7 @@ public class FileManager implements FileManagerInterface
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
-		this.fileLedgers = new HashMap<>();
+		this.fileLedgers = new HashMap<String, FileLedger>();
 		this.running = false;
 	}
 
@@ -214,27 +215,41 @@ public class FileManager implements FileManagerInterface
 	{
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
-		if ((this.fileLedgers.get(filename).getNumDownloads() > 0) && (type == FileType.LOCAL_FILE))
+		/* File was never downloaded
+		 * Local file holder is leaving
+		 * Delete file from owner
+		 */
+		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() > 0))
 		{
 			File fileObj = new File (fullPath);
 			fileObj.delete();
 			this.fileLedgers.remove(filename);
 		}
-		else
+		/*
+		 * I have absolutely no idea what's going on here, if this piece of code fails
+		 * I (Thomas) get the exclusive right to an "I told you so"
+		 */
+		else if(type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
 		{
+			/*
+			 *  File was local and downloaded at least once
+			 */
 			if(type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
 			}
 
-			if(type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
-			{
-				this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
-			}
+			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
+			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
 		}
 	}
 
+	/**
+	 * ?
+	 * @param filename
+	 * @param type
+	 * @throws IOException
+	 */
 	@Override
 	public void deleteFile(String filename, FileType type) throws IOException
 	{
@@ -254,7 +269,6 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pullFile(short dstID, String filename) throws IOException
 	{
-
 		IO.File file = new IO.File(OWNED_FILE_PREFIX + filename);
 		if(file.exists())
 		{
@@ -268,12 +282,17 @@ public class FileManager implements FileManagerInterface
 		this.fileLedgers.get(filename).addDownloader(dstID); //add person who requests to downloaders
 	}
 
+	/**
+	 *
+	 * @param fileLedger
+	 * @throws IOException
+	 */
 	@Override
 	public void addFileLedger(FileLedger fileLedger) throws IOException
 	{
 		if(this.fileLedgers.containsKey(fileLedger.getFileName()))
 		{
-			throw new IOException("Already have a fileLedger with filename " + fileLedger.getFileName());
+			throw new IOException("Node " + Short.toString(Node.getInstance().getId()) + " already has a fileLedger with filename " + fileLedger.getFileName());
 		}
 		else
 		{
@@ -310,8 +329,8 @@ public class FileManager implements FileManagerInterface
 
 			try
 			{
-				if(type == FileType.LOCAL_FILE && ownerId == Node.getInstance().getId())
-				{
+				if(type == FileType.LOCAL_FILE && ownerId == Node.getInstance().getId())    // We have the file locally and we are the owner
+				{                                                                           // Replicate it elsewhere
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
 					System.out.println("OWNER IS SAME AS LOCAL");
@@ -323,33 +342,34 @@ public class FileManager implements FileManagerInterface
 					FileLedger fileLedger = new FileLedger(file.getName(),Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour());
 					this.addFileLedger(fileLedger);
 				}
-				else if(ownerId != Node.getInstance().getId())
+				else if(ownerId != Node.getInstance().getId())                              // We aren't the owner, filetype doesn't matter
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
-					this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE );
+					this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE ); // We send any type of file to the owner, claiming it's a local file
 
 					if(type == FileType.LOCAL_FILE)
 					{
-						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);
+						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);   // We have a file locally and are not the owner, for some reason, we create a file ledger
 						fileManager.addFileLedger(fileLedger);
 					}
-					else if(type == FileType.OWNED_FILE)
+					else if(type == FileType.OWNED_FILE)                                // We own the file
 					{
-						FileLedger fileLedger = this.fileLedgers.get(file.getName());
-						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))
+						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
+						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
 						{
 							String IP = Node.getInstance().getResolverStub().getIP(fileLedger.getReplicatedId());
 							Registry reg = LocateRegistry.getRegistry(IP);
 							FileManagerInterface stub = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-							stub.deleteFile(file.getName(), FileType.REPLICATED_FILE);
+							stub.deleteFile(file.getName(), FileType.REPLICATED_FILE);  // Delete the replicated file
 						}
-						fileLedger.setOwnerID(ownerId);
-						fileManager.addFileLedger(fileLedger);
-						file.delete();
-						this.fileLedgers.remove(file.getName());
+						fileLedger.setOwnerID(ownerId);                                 // We set the owner ID to ourselves
+																						// If we have the ledger, we should be the owner, but hey, never hurts to make sure
+						fileManager.addFileLedger(fileLedger);                          // Add the same file ledger without removing the previous one... We basically have 2 copies now
+						file.delete();                                                  // Delete the file?
+						this.fileLedgers.remove(file.getName());                        // Remove one of the ledgers...
 					}
 				}
 			}
@@ -378,7 +398,6 @@ public class FileManager implements FileManagerInterface
 		filename = this.getFullPath(filename, type);
 
 		this.tcpServer.receiveFile(remoteHost, filename);
-
 	}
 
 	/**
@@ -563,7 +582,10 @@ public class FileManager implements FileManagerInterface
 		for(File file: folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
-			builder.append("OWNER: " + fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + fileLedgers.get(file.getName()).getLocalID() + "\n");
+			if(this.fileLedgers.containsKey(file.getName()))
+			{
+				builder.append("OWNER: " + this.fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + this.fileLedgers.get(file.getName()).getLocalID() + "\n");
+			}
 		}
 
 		builder.append("REPLICATED\n");

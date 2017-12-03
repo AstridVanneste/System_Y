@@ -1,28 +1,24 @@
 package Mains.IO;
 
-import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 
 import java.util.Scanner;
 
 public class TCPClientMain
 {
-	private static final String localIP = "192.168.0.247";
-	private static final int localPort = 2002;
-
 	private static final String remoteIP = "192.168.0.247";
-	private static final int remotePort = 2001;
+	private static final int remotePort = 2002;
 
 	public static void main(String args[])
 	{
 		Scanner scanner = new Scanner(System.in);
 
-		Client client = new Client(localIP, localPort);
+		Client client = new Client(remoteIP, remotePort);
 		System.out.println("Press enter to Start TCP client");
 		scanner.nextLine();
 		client.start();
 
-		System.out.println("Started TCP Client on " + localIP + ":" + Integer.toString(localPort));
+		System.out.println("Started TCP Client on " + remoteIP + ":" + Integer.toString(remotePort));
 		System.out.println("Press enter to send file");
 		scanner.nextLine();
 
