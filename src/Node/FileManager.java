@@ -222,12 +222,16 @@ public class FileManager implements FileManagerInterface
 		}
 		else
 		{
-			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
 			if(type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
 			}
-			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE,FileType.REPLICATED_FILE);
+
+			if(type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
+			{
+				this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
+			}
 		}
 	}
 
