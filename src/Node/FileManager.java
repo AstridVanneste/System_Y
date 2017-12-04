@@ -186,7 +186,7 @@ public class FileManager implements FileManagerInterface
 
 		String replicatedFolder = this.getFolder(FileType.LOCAL_FILE);
 
-		for (File replicatedFile : (new File(localFolder)).listFiles())
+		for (File replicatedFile : (new File(replicatedFolder)).listFiles())
 		{
 			// The file is replicated to my system
 			// Find the owner
@@ -245,7 +245,7 @@ public class FileManager implements FileManagerInterface
 	}
 
 	/**
-	 * ?
+	 * Deletes a file on a remote.
 	 * @param filename
 	 * @param type
 	 * @throws IOException
@@ -395,7 +395,15 @@ public class FileManager implements FileManagerInterface
 		System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
-		this.tcpServer.receiveFile(remoteHost, filename);
+		if(type == FileType.OWNED_FILE)
+		{
+			if(this.hasFile(filename, type))
+			{
+				this.sendFile(Node.getInstance().getPreviousNeighbour(),filename, FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
+			}
+		}
+
+		this.tcpServer.receiveFile(remoteHost, filename); //todo: think about copying the file in the owner folder as well when replicating
 	}
 
 	/**
@@ -629,5 +637,11 @@ public class FileManager implements FileManagerInterface
 	public boolean isRunning()
 	{
 		return  this.running;
+	}
+
+	public boolean hasFile(String filename, FileType type)
+	{
+		File file = new File(this.getFullPath(filename, type));
+		return file.exists();
 	}
 }
