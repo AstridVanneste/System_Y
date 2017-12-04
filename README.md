@@ -6,8 +6,8 @@
 
 ## To-Do
 - [x] Add hasFile() method to FileManager
-- [ ] Change dodgy `while(){synchronized}` construction in Node to spin-lock that's locked in the node and unlocked remotely (Java Semaphores)
-- [ ] Clean 'owned' and 'replicated' folders when node shuts down
+- [x] Change dodgy `while(){synchronized}` construction in Node to spin-lock that's locked in the node and unlocked remotely (Java Semaphores)
+- [x] Clean 'owned' and 'replicated' folders when node shuts down
 
 ### Opdracht 5
 #### Replicatie (Sessie 1)
