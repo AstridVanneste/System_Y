@@ -47,7 +47,7 @@ public class LifeCycleManager implements Runnable
 		this.running = true;
 
 		this.thread = new Thread(this);
-		this.thread.setName("Thread - Node.LifeCycleManager Thread");
+		this.thread.setName("Thread - Node.LifeCycleManager Thread, Node: " + Node.getInstance().getName());
 		this.thread.start();
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;

@@ -184,7 +184,7 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		String replicatedFolder = this.getFolder(FileType.LOCAL_FILE);
+		String replicatedFolder = this.getFolder(FileType.REPLICATED_FILE);
 
 		for (File replicatedFile : (new File(replicatedFolder)).listFiles())
 		{
@@ -213,6 +213,7 @@ public class FileManager implements FileManagerInterface
 
 	public void notifyLeaving (String filename, FileType type)
 	{
+		System.out.println("Node is leaving with file " + filename + ", type: " + type);
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
 		/* File was never downloaded
@@ -221,6 +222,7 @@ public class FileManager implements FileManagerInterface
 		 */
 		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() > 0))
 		{
+			System.out.println("File was local and downloaded at least once.");
 			File fileObj = new File (fullPath);
 			fileObj.delete();
 			this.fileLedgers.remove(filename);
@@ -340,6 +342,7 @@ public class FileManager implements FileManagerInterface
 					String replicatedIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+					this.fileLedgers.put(file.getName(), new FileLedger(file.getName(), Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 				}
@@ -349,10 +352,14 @@ public class FileManager implements FileManagerInterface
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
 
 
-
 					if(type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
+
+						for (String filenameStr : this.fileLedgers.keySet())
+						{
+							System.out.println("File " + filenameStr + " is present");
+						}
 
 						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
 						{
