@@ -5,7 +5,7 @@
 **Local File Holder** = The person who controls a local copy of a file (and who isn't the owner of the file)
 
 ## To-Do
-- [ ] Add hasFile() method to FileManager
+- [x] Add hasFile() method to FileManager
 - [ ] Change dodgy `while(){synchronized}` construction in Node to spin-lock that's locked in the node and unlocked remotely (Java Semaphores)
 
 ### Opdracht 5
