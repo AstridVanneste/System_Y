@@ -251,10 +251,11 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getId());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
+				neighbourInterface.indicateNeighboursSet(); // New node's neighbours are set, allow him to continue his bootstrap sequence
 			}
 			catch (RemoteException | NotBoundException e)
 			{
-				e.printStackTrace(); //todo: failure
+				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
 		}
@@ -278,6 +279,7 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
+				neighbourInterface.indicateNeighboursSet(); // New node's neighbours are set, allow him to continue his bootstrap sequence
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -298,9 +300,8 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
-
-
 		}
+
 		if(previous)
 		{
 			try
@@ -313,7 +314,6 @@ public class LifeCycleManager implements Runnable
 			}
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
-
 	}
 
 	public boolean isRunning ()
