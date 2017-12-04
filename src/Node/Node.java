@@ -65,6 +65,7 @@ public class Node implements NodeInteractionInterface
 			{
 				System.setSecurityManager(new SecurityManager());
 			}
+			
 
 			try
 			{
