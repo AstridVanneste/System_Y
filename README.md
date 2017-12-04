@@ -85,6 +85,7 @@ It continuously circulates through the network by all nodes calling RMI methods 
 - [ ] Update Serializer to use ByteBuffers
 - [x] Remove unnecessary println()'s from all code
 - [ ] Fix concurrency issues in Network Classes MOET GETEST WORDEN, Fergan
+- [ ] Add hasFile() method to FileManager
 
 ### Opdracht 4
 #### Failure

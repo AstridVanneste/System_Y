@@ -50,4 +50,6 @@ public interface FileManagerInterface extends Remote
 	public void notifyLeaving (String filename, FileType type) throws RemoteException;
 
 	public void deleteFile(String filename, FileType type) throws IOException;
+
+
 }

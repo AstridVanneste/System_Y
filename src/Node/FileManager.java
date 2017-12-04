@@ -342,34 +342,32 @@ public class FileManager implements FileManagerInterface
 					FileLedger fileLedger = new FileLedger(file.getName(),Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour());
 					this.addFileLedger(fileLedger);
 				}
-				else if(ownerId != Node.getInstance().getId())                              // We aren't the owner, filetype doesn't matter
+				else if((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
 					Registry registry = LocateRegistry.getRegistry(ownerIP);
-					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+					FileManagerInterface remoteFileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
-					this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE ); // We send any type of file to the owner, claiming it's a local file
+					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);	// todo: Check if receiver has file
 
 					if(type == FileType.LOCAL_FILE)
 					{
-						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);   // We have a file locally and are not the owner, for some reason, we create a file ledger
-						fileManager.addFileLedger(fileLedger);
+						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);           // We have a file locally and are not the owner, for some reason, we create a file ledger
+						remoteFileManager.addFileLedger(fileLedger);                    // Add file
 					}
 					else if(type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
+
 						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
 						{
-							String IP = Node.getInstance().getResolverStub().getIP(fileLedger.getReplicatedId());
-							Registry reg = LocateRegistry.getRegistry(IP);
+							String replicaIP = Node.getInstance().getResolverStub().getIP(fileLedger.getReplicatedId());
+							Registry reg = LocateRegistry.getRegistry(replicaIP);
 							FileManagerInterface stub = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 							stub.deleteFile(file.getName(), FileType.REPLICATED_FILE);  // Delete the replicated file
 						}
-						fileLedger.setOwnerID(ownerId);                                 // We set the owner ID to ourselves
-																						// If we have the ledger, we should be the owner, but hey, never hurts to make sure
-						fileManager.addFileLedger(fileLedger);                          // Add the same file ledger without removing the previous one... We basically have 2 copies now
+
 						file.delete();                                                  // Delete the file?
-						this.fileLedgers.remove(file.getName());                        // Remove one of the ledgers...
 					}
 				}
 			}
@@ -431,7 +429,6 @@ public class FileManager implements FileManagerInterface
 
 			remoteHost = socket.toString();
 		}
-
 		catch (UnknownHostException uhe)
 		{
 			uhe.printStackTrace();
@@ -440,10 +437,25 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface fileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
+			FileManagerInterface remoteFileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
 			File file = new File(this.getFullPath(filename,srcType));
-			fileManager.pushFile(filename,file.length(),dstType,remoteHost);
+			remoteFileManager.pushFile(filename,file.length(),dstType,remoteHost);
+
+			if(dstType == FileType.OWNED_FILE)
+			{
+				if(srcType == FileType.LOCAL_FILE)
+				{
+					remoteFileManager.addFileLedger(new FileLedger(filename, Node.getInstance().getId(), dstID, Node.DEFAULT_ID));
+				}
+				else if(srcType == FileType.OWNED_FILE)
+				{
+					FileLedger ledger = this.fileLedgers.get(filename);
+					ledger.setOwnerID(dstID);
+					remoteFileManager.addFileLedger(ledger);
+					this.fileLedgers.remove(filename);
+				}
+			}
 		}
 		catch(RemoteException re)
 		{
