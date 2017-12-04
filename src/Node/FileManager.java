@@ -242,7 +242,15 @@ public class FileManager implements FileManagerInterface
 			}
 
 			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
-			this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
+
+			if(fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
+			{
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+			}
+			else
+			{
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
+			}
 		}
 	}
 
