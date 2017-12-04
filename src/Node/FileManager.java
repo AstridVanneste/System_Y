@@ -341,23 +341,15 @@ public class FileManager implements FileManagerInterface
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
-					FileLedger fileLedger = new FileLedger(file.getName(),Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour());
-					this.addFileLedger(fileLedger);
 				}
 				else if((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
-					Registry registry = LocateRegistry.getRegistry(ownerIP);
-					FileManagerInterface remoteFileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
-					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);	// todo: Check if receiver has file
+					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);
 
-					if(type == FileType.LOCAL_FILE)
-					{
-						FileLedger fileLedger = new FileLedger(file.getName(), Node.getInstance().getId(), ownerId, Node.DEFAULT_ID);           // We have a file locally and are not the owner, for some reason, we create a file ledger
-						remoteFileManager.addFileLedger(fileLedger);                    // Add file
-					}
-					else if(type == FileType.OWNED_FILE)                                // We own the file
+
+					if(type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
 
