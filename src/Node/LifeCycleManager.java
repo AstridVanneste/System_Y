@@ -102,15 +102,8 @@ public class LifeCycleManager implements Runnable
 							this.updateNeighbours(newNodeID);
 							if(numberOfNodes == 2 && !Node.getInstance().getFileManager().isRunning())  //You were alone and have not yet started your filemanager. Now a new node has joined so you can start replicating
 							{
-								try
-								{
-									Node.getInstance().getFileManager().checkFiles(FileType.LOCAL_FILE);
-									Node.getInstance().getUpdateAgent().start();
-								}
-								catch(RemoteException re)
-								{
-									re.printStackTrace();
-								}
+								Node.getInstance().getFileManager().start();
+								Node.getInstance().getUpdateAgent().start();
 							}
 						}
 					}
@@ -141,13 +134,15 @@ public class LifeCycleManager implements Runnable
 						{
 							System.out.println("succesfully added to system");
 							Node.getInstance().setId(newNodeID);
+							System.out.println("setting nodeID " + Node.getInstance().getId() );
 							String nsIp = packet.getAddress().getHostAddress();
 
 							// Set up connection(s) to NameServer
 							this.bindNameserverStubs(nsIp);
 
 							//nameserver sends the amount of nodes in the tree
-							if (numberOfNodes == 0)
+
+							if (numberOfNodes == 1)
 							{
 								Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 								Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
@@ -267,6 +262,7 @@ public class LifeCycleManager implements Runnable
 		// The node will change the previous and next id of the new node in following cases:
 		//you are the previous of the new node and need to change the neighbours of the new node and your old next neighbour
 		if (
+
 				(		(newID > Node.getInstance().getId() && newID > Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() < Node.getInstance().getId()) ||
 						(newID > Node.getInstance().getId() && newID < Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() > Node.getInstance().getId()) ||
 						(newID < Node.getInstance().getId() && newID < Node.getInstance().getNextNeighbour() && Node.getInstance().getNextNeighbour() < Node.getInstance().getId())
