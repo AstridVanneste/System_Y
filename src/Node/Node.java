@@ -7,6 +7,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.Semaphore;
 
 
 public class Node implements NodeInteractionInterface
@@ -27,6 +28,8 @@ public class Node implements NodeInteractionInterface
 
 	private ResolverInterface resolverStub;
 
+	private Semaphore neighbourSetSemaphore;
+
 	private static Node instance;
 
 	public Node()
@@ -40,6 +43,7 @@ public class Node implements NodeInteractionInterface
 		this.fileManager = new FileManager();
 		this.resolverStub = null;
 		this.updateAgent = new UpdateAgent();
+		this.neighbourSetSemaphore = new Semaphore(1, true);
 	}
 
 	/**
@@ -59,16 +63,18 @@ public class Node implements NodeInteractionInterface
 	public void start()
 	{
 		Thread.currentThread().setName("Main - " + Node.getInstance().getName());
+
 		if (!this.lifeCycleManager.isRunning())
 		{
 			if (System.getSecurityManager() == null)
 			{
 				System.setSecurityManager(new SecurityManager());
 			}
-			
 
 			try
 			{
+				this.neighbourSetSemaphore.acquire(this.neighbourSetSemaphore.availablePermits());
+
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
 				Registry registry = LocateRegistry.createRegistry(1099);
@@ -84,11 +90,27 @@ public class Node implements NodeInteractionInterface
 			{
 				e.printStackTrace();
 			}
+			catch (InterruptedException ie)
+			{
+				System.err.println("Exception was thrown while trying to lock neighbour-semaphore");
+				ie.printStackTrace();
+			}
 
 			this.lifeCycleManager.start();
 
 			boolean exit = false;
 
+			try
+			{
+				this.neighbourSetSemaphore.acquire(this.neighbourSetSemaphore.availablePermits());  // Blocks until (a) permit(s) become available
+			}
+			catch (InterruptedException ie)
+			{
+				System.err.println("Exception was thrown while trying to lock neighbour-semaphore");
+				ie.printStackTrace();
+			}
+
+			/*
 			while(!exit)
 			{
 				//wait until discovery is finished...
@@ -115,6 +137,7 @@ public class Node implements NodeInteractionInterface
 					}
 				}
 			}
+			*/
 			if((!this.nextNeighbour.equals(this.id)) && (!this.previousNeighbour.equals(this.id)))   //only start if there are 2 or more nodes in the system
 			{
 				System.out.println("starting filemanager");
@@ -158,6 +181,8 @@ public class Node implements NodeInteractionInterface
 		{
 			e.printStackTrace();
 		}
+
+		this.neighbourSetSemaphore.release(this.neighbourSetSemaphore.availablePermits());
 	}
 
 	public String getName()
@@ -264,5 +289,11 @@ public class Node implements NodeInteractionInterface
 	public boolean isRunning() throws RemoteException
 	{
 		return this.lifeCycleManager.isRunning();
+	}
+
+	@Override
+	public void indicateNeighboursSet() throws RemoteException
+	{
+		this.neighbourSetSemaphore.release(this.neighbourSetSemaphore.availablePermits());
 	}
 }
