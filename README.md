@@ -78,46 +78,45 @@ It continuously circulates through the network by all nodes calling RMI methods 
 `void update (List<String> fileList)`
 
 ## TO-DO
-- [x] Write Unit Test for Hash function
-- [x] Expand Unit Tests for Protocol Header
-- [x] Check Unit Tests for Serializer
-- [ ] Check if ProtocolHeader and Datagram need to be updated for the use of ByteBuffers?
-- [ ] Update Serializer to use ByteBuffers
-- [x] Remove unnecessary println()'s from all code
-- [ ] Fix concurrency issues in Network Classes MOET GETEST WORDEN, Fergan
 - [ ] Add hasFile() method to FileManager
-
-### Opdracht 4
-#### Failure
-- [ ] Provide centralized interface (Static/Singleton?) for handling exceptions
+- [ ] Change dodgy `while(){synchronized}` construction in Node to spin-lock that's locked in the node and unlocked remotely (Java Semaphores)
 
 ### Opdracht 5
 #### Replicatie (Sessie 1)
-- [ ] Node moet start methodes door-callen
-- [ ] `FileLedger` klasse:
+- [x] Node moet start methodes door-callen
+- [x] `FileLedger` klasse:
 ```
   private short ownerID;
   private short localID;
   private List<Short> copies; 
 ```
 
-- [ ] `FileType enum {OWNER, LOCAL, DOWNLOAD}`
+- [x] `FileType enum {OWNER, LOCAL, DOWNLOAD}`
 
-- [ ] `FileManagerInterface` interface:
+- [x] `FileManagerInterface` interface:
 ```
   public void refresh()
   public void pushFile(String filename, int fileSize, FileType type)
   public void pullFile(short dst, String filename) (Push doorcallen)
 ```
-- [ ] `FileManager` klasse:
+- [x] `FileManager` klasse:
 ```
   implements FileManagerInterface
   TCPSocket, continu luisteren op vaste poort (Zie Network.Constants)
   start() methode (TCP starten)
   stop() methode
   RMIServer draaien (binden op Node poort)
-  
 ```
+
+### Opdracht 6
+#### FileAgent & RecoveryAgent
+- [ ] Brainstorm about FileAgent
+- [ ] Brainstorm about RecoveryAgent
+
+### Opdracht 7
+#### GUI
+- [ ] Create General UI design
+- [ ] Implement UI in Java FX
 
 ## Design Decisions
 - Security?
