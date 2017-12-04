@@ -58,6 +58,7 @@ public class Node implements NodeInteractionInterface
 
 	public void start()
 	{
+		Thread.currentThread().setName("Main - " + Node.getInstance().getName());
 		if (!this.lifeCycleManager.isRunning())
 		{
 			if (System.getSecurityManager() == null)

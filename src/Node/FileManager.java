@@ -329,7 +329,6 @@ public class FileManager implements FileManagerInterface
 
 			System.out.println("Checking " + file.toString());
 
-
 			try
 			{
 				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
