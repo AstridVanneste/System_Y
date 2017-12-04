@@ -10,13 +10,13 @@ import java.rmi.registry.Registry;
 public class UpdateAgent implements Runnable
 {
 	private WatchService service;
-	private Path LOCAL_DIR;
+	private Path localDir;
 	private Thread thread;
 	private boolean running;
 
 	public UpdateAgent()
 	{
-		this.LOCAL_DIR = null;
+		this.localDir = null;
 	}
 
 	/**
@@ -24,7 +24,7 @@ public class UpdateAgent implements Runnable
 	 */
 	public void start()
 	{
-		LOCAL_DIR = Paths.get(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
+		this.localDir = Paths.get(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 
 		try
 		{
@@ -32,10 +32,10 @@ public class UpdateAgent implements Runnable
 			this.service = FileSystems.getDefault().newWatchService();
 
 			//specify which entries should be watched. in this case only the creation of  a file will be watched.
-			LOCAL_DIR.register(service, StandardWatchEventKinds.ENTRY_CREATE);
+			this.localDir.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			this.thread = new Thread(this);
-			this.thread.setName("Thread - Node.UpdateAgent Thread");
+			this.thread.setName("Thread - Node.UpdateAgent Thread: " + Node.getInstance().getName());
 			this.thread.start();
 
 		}
@@ -43,15 +43,14 @@ public class UpdateAgent implements Runnable
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	public void run()
 	{
 		while(this.running)
 		{
-			watcher();
-
+			this.watcher(); //todo: Move watcher method into running thread
+			/*
 			try
 			{
 				Thread.sleep(100);
@@ -60,6 +59,7 @@ public class UpdateAgent implements Runnable
 			{
 				e.printStackTrace();
 			}
+			*/
 		}
 	}
 
@@ -71,8 +71,7 @@ public class UpdateAgent implements Runnable
 	{
 		try
 		{
-
-			WatchKey watchkey = service.take();
+			WatchKey watchkey = this.service.take();
 
 			//events will in THIS case always return a path, so it can be cast as one
 			Path eventDir = (Path)watchkey.watchable();
@@ -80,24 +79,24 @@ public class UpdateAgent implements Runnable
 			//iterate over all possible events
 			for(WatchEvent<?> event : watchkey.pollEvents())
 			{
-				WatchEvent.Kind<?> kind = event.kind();
+				WatchEvent.Kind<?> kind = event.kind(); // todo: Shouldn't we check the type of event?
 				Path eventPath = (Path)event.context();
 
-				short idFileOwner = Node.DEFAULT_ID;
+				short ownerId = Node.DEFAULT_ID;
 
 				try
 				{
-					idFileOwner = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
+					ownerId = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
 
 					//when owner is different from own id, no changes need to be made
-					if(idFileOwner != Node.getInstance().getId())
+					if(ownerId != Node.getInstance().getId())   //todo: A file is modified locally, shouldn't we warn other people (replica's, owners, nodes)
 					{
-						Node.getInstance().getFileManager().sendFile(idFileOwner,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
+						Node.getInstance().getFileManager().sendFile(ownerId,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
 					}
 
 					//when owner is the same as your own id
 					//You are the owner, but the local file should be held by the previous neighbour
-					if(idFileOwner == Node.getInstance().getId())
+					if(ownerId == Node.getInstance().getId())
 					{
 						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
 					}
@@ -105,7 +104,7 @@ public class UpdateAgent implements Runnable
 				catch (RemoteException e)
 				{
 					e.printStackTrace();
-					Node.getInstance().getFailureAgent().failure(idFileOwner);
+					Node.getInstance().getFailureAgent().failure(ownerId);
 				}
 				catch (IOException e)
 				{
