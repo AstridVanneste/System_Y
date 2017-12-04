@@ -319,6 +319,7 @@ public class FileManager implements FileManagerInterface
 
 			System.out.println("Checking " + file.toString());
 
+
 			try
 			{
 				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
@@ -346,7 +347,7 @@ public class FileManager implements FileManagerInterface
 				{
 
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
-					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);
+
 
 
 					if(type == FileType.OWNED_FILE)                                // We own the file
@@ -360,8 +361,13 @@ public class FileManager implements FileManagerInterface
 							FileManagerInterface stub = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 							stub.deleteFile(file.getName(), FileType.REPLICATED_FILE);  // Delete the replicated file
 						}
+					}
 
-						file.delete();                                                  // Delete the file?
+					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);
+
+					if(type == FileType.OWNED_FILE)
+					{
+						file.delete();
 					}
 				}
 			}
