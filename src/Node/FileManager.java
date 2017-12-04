@@ -317,6 +317,8 @@ public class FileManager implements FileManagerInterface
 			short ownerId = Node.DEFAULT_ID;
 			String ownerIP = "";
 
+			System.out.println("Checking " + file.toString());
+
 			try
 			{
 				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());

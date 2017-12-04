@@ -85,21 +85,37 @@ public class Node implements NodeInteractionInterface
 
 			this.lifeCycleManager.start();
 
-			while(this.nextNeighbour == -1 || this.previousNeighbour == -1)
-			{
-				//System.out.println("TansactionID = " + this.bootstrapTransactionID);
-				//wait until discovery is finished...
-				synchronized (this.nextNeighbour)
-				{
-					synchronized (this.previousNeighbour)
-					{
+			boolean exit = false;
 
+			while(!exit)
+			{
+				//wait until discovery is finished...
+				synchronized (this.id)
+				{
+					if(this.id != Node.DEFAULT_ID)
+					{
+						//System.out.println("id changed");
+						synchronized (this.previousNeighbour)
+						{
+							if(this.previousNeighbour != Node.DEFAULT_ID)
+							{
+								//System.out.println("prev changed");
+								synchronized (this.nextNeighbour)
+								{
+									if(this.nextNeighbour != Node.DEFAULT_ID)
+									{
+										//System.out.println("next changed");
+										exit = true;
+									}
+								}
+							}
+						}
 					}
 				}
 			}
-
-			if(this.nextNeighbour != this.id && this.previousNeighbour != this.id)   //only start if there are 2 or more nodes in the system
+			if((!this.nextNeighbour.equals(this.id)) && (!this.previousNeighbour.equals(this.id)))   //only start if there are 2 or more nodes in the system
 			{
+				System.out.println("starting filemanager");
 				this.fileManager.start();
 				this.updateAgent.start();
 			}
