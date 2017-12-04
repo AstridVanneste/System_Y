@@ -330,8 +330,7 @@ public class LifeCycleManager implements Runnable
 
 
 		this.subscriber.stop();
-		// shut ourselves down
-		this.shutdown();
+
 		try
 		{
 			this.thread.join();
