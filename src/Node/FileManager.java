@@ -476,22 +476,24 @@ public class FileManager implements FileManagerInterface
 		}
 
 		FileManagerInterface remoteFileManager = null;
+		Client client = null;
+
+
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager  = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.lockSlot();
+
+			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
+			client.start();
+
+			remoteFileManager.unlockSlot();
 		}
 		catch (RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
 		}
-
-		remoteFileManager.lockSlot();
-
-		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
-		client.start();
-
-		remoteFileManager.unlockSlot();
 
 		client.sendFile(this.getFullPath(filename, srcType));
 		int localPort = client.getLocalPort();
@@ -511,7 +513,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
 			File file = new File(this.getFullPath(filename, srcType));
 			remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
@@ -535,10 +537,6 @@ public class FileManager implements FileManagerInterface
 		{
 			re.printStackTrace();
 			Node.getInstance().getFailureAgent().failure(dstID);
-		}
-		catch (NotBoundException nbe)
-		{
-			nbe.printStackTrace();
 		}
 		catch (IOException ioe)
 		{
