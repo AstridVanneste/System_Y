@@ -110,11 +110,12 @@ public class DiscoveryAgent implements Runnable
 						// Return succes
 
 						short nodeId = NameServer.getHash(nodeName);
-						short numNodes = (short) NameServer.getInstance().map.size();
+
 
 						System.out.println("Name: " + nodeName + ", IP: " + unicastIp + ", ID: " + Short.toString(nodeId));
 
 						NameServer.getInstance().map.put(nodeId, unicastIp);
+						short numNodes = (short) NameServer.getInstance().map.size();
 						NameServer.getInstance().writeMapToFile();
 
 						byte[] replyData = new byte[4];

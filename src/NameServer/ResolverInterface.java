@@ -39,4 +39,12 @@ public interface ResolverInterface extends Remote
 	 */
 	public short getNext(short ID) throws RemoteException;
 
+	/**
+	 * returns the hash of a given String
+	 * @param name
+	 * @return
+	 * @throws RemoteException
+	 */
+	public short getHash(String name) throws RemoteException;
+
 }
