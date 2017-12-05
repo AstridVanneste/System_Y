@@ -478,6 +478,7 @@ public class FileManager implements FileManagerInterface
 		FileManagerInterface remoteFileManager = null;
 		Client client = null;
 
+
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
