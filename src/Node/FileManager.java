@@ -17,6 +17,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * This class will handle everything concerning the files.
@@ -24,6 +25,7 @@ import java.util.*;
  */
 public class FileManager implements FileManagerInterface
 {
+	private static final int MAX_PERMITS = Integer.MAX_VALUE;
 	// NOTE: Thomas changed these back to '/' instead of '\\' to make sure our software remains cross-platform
 	// Changing them to be windows-specific might have worked, but it isn't a proper solution
 	private static final String LOCAL_FILE_PREFIX = "Local/";
@@ -35,6 +37,7 @@ public class FileManager implements FileManagerInterface
 	private String rootDirectory;
 	private HashMap<String, FileLedger> fileLedgers;
 	private boolean running;
+	private Semaphore sendSemaphore;
 
 	public FileManager()
 	{
@@ -42,6 +45,7 @@ public class FileManager implements FileManagerInterface
 		this.rootDirectory = System.getProperty("user.home");
 		this.fileLedgers = new HashMap<String, FileLedger>();
 		this.running = false;
+		this.sendSemaphore = new Semaphore(MAX_PERMITS, true);
 	}
 
 	/**
@@ -51,6 +55,15 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
+		try
+		{
+			this.sendSemaphore.acquire(this.sendSemaphore.availablePermits());
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
+
 		this.running = true;
 
 		try
@@ -86,6 +99,8 @@ public class FileManager implements FileManagerInterface
 		{
 			folder.mkdir();
 		}
+
+		this.sendSemaphore.release(MAX_PERMITS);
 
 		//start replicating files.
 		System.out.println("Starting to replicate files");
@@ -269,6 +284,25 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
+	@Override
+	public void lockSlot()
+	{
+		try
+		{
+			this.sendSemaphore.acquire(1);
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
+	}
+
+	@Override
+	public void unlockSlot()
+	{
+		this.sendSemaphore.release(1);
+	}
+
 	/**
 	 * Request to download file. The file will be pushed (push()) to the node requesting it.
 	 *
@@ -377,6 +411,7 @@ public class FileManager implements FileManagerInterface
 						}
 					}
 
+
 					this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
 
 					if (type == FileType.OWNED_FILE)
@@ -440,8 +475,24 @@ public class FileManager implements FileManagerInterface
 			re.printStackTrace();
 		}
 
+		FileManagerInterface remoteFileManager = null;
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(dstIP);
+			remoteFileManager  = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+		}
+		catch (RemoteException | NotBoundException re)
+		{
+			re.printStackTrace();
+		}
+
+		remoteFileManager.lockSlot();
+
 		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 		client.start();
+
+		remoteFileManager.unlockSlot();
+
 		client.sendFile(this.getFullPath(filename, srcType));
 		int localPort = client.getLocalPort();
 		String remoteHost = "";
