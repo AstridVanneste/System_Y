@@ -44,7 +44,7 @@ public class Main
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | [F]ailure | Print [I]D | List Files [o]n this Node | List All [F]iles | [D]ownload File");
+			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | [D]ownload File");
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
@@ -70,7 +70,7 @@ public class Main
 				    System.out.println("Starting Node...");
 				    Node.getInstance().start();
 			    }
-			    else if (next.equals("F") || next.equals("f"))
+			    else if (next.equals("U") || next.equals("u"))
 			    {
 				    System.out.println("Please enter the ID of the node you wish to indicate for failure: ");
 				    short failID = scanner.nextShort();
