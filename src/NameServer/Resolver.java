@@ -142,4 +142,10 @@ public class Resolver implements ResolverInterface
 
 		return id;
 	}
+
+	@Override
+	public short getHash(String name) throws RemoteException
+	{
+		return NameServer.getHash(name);
+	}
 }

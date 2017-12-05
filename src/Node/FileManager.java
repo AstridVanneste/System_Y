@@ -544,7 +544,7 @@ public class FileManager implements FileManagerInterface
 	 * @param type
 	 * @return
 	 */
-	private String getFullPath(String filename, FileType type)
+	public String getFullPath(String filename, FileType type)
 	{
 		return this.getFolder(type) + filename;
 	}
@@ -657,5 +657,20 @@ public class FileManager implements FileManagerInterface
 	{
 		File file = new File(this.getFullPath(filename, type));
 		return file.exists();
+	}
+
+	public HashMap<String, FileLedger> getFileLedgers()
+	{
+		return this.fileLedgers;
+	}
+
+	/**
+	 * replaces the current ledger for a file with a new one
+	 * @warning THE CURRENT LEDGER WILL BE REPLACED AND LOST! if you do not want this use addFileLedger()
+	 * @param ledger
+	 */
+	public void replaceFileLedger(FileLedger ledger)
+	{
+		this.fileLedgers.put(ledger.getFileName(),ledger);
 	}
 }
