@@ -44,7 +44,7 @@ public class Main
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | [S]how neighbours | Shu[T]down | St[A]rt | [F]ailure | [P]rint ID | [L]ist Files");
+			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | [F]ailure | Print [I]D | List Files [o]n this Node | List All [F]iles | [D]ownload File");
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
@@ -54,7 +54,7 @@ public class Main
 				    quit = true;
 				    continue;
 			    }
-			    else if (next.equals("S") || next.equals("s"))
+			    else if (next.equals("N") || next.equals("n"))
 			    {
 				    System.out.println("Checking Next and Previous Nodes...");
 				    System.out.println("Next: " + Integer.toString(Node.getInstance().getNextNeighbour()));
@@ -77,11 +77,11 @@ public class Main
 				    System.out.println("Starting failure for node " + Short.toString(failID));
 				    Node.getInstance().getFailureAgent().failure(failID);
 			    }
-			    else if (next.equals("P") || next.equals("p"))
+			    else if (next.equals("I") || next.equals("i"))
 			    {
 				    System.out.println("ID: " + Short.toString(Node.getInstance().getId()));
 			    }
-			    else if (next.equals("L") || next.equals("l"))
+			    else if (next.equals("O") || next.equals("o"))
 				{
 					System.out.println(Node.getInstance().getFileManager().toString());
 				}

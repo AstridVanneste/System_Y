@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Created by Astrid on 04/12/2017.
  */
-public class RecoveryAgent implements Serializable, Runnable
+public class RecoveryAgent extends Agent
 {
 	private short failedId;
 	private short callerId;
