@@ -15,9 +15,12 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.Semaphore;
+
+import static java.rmi.server.RemoteServer.getClientHost;
 
 /**
  * This class will handle everything concerning the files.
@@ -289,6 +292,14 @@ public class FileManager implements FileManagerInterface
 	{
 		try
 		{
+			System.out.println("lock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
+		}
+		catch(ServerNotActiveException	snae)
+		{
+			snae.printStackTrace();
+		}
+		try
+		{
 			this.sendSemaphore.acquire(1);
 		}
 		catch (InterruptedException ie)
@@ -300,6 +311,15 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void unlockSlot()
 	{
+		try
+		{
+			System.out.println("unlock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
+		}
+		catch(ServerNotActiveException	snae)
+		{
+			snae.printStackTrace();
+		}
+
 		this.sendSemaphore.release(1);
 	}
 
