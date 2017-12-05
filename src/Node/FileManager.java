@@ -49,6 +49,15 @@ public class FileManager implements FileManagerInterface
 		this.fileLedgers = new HashMap<String, FileLedger>();
 		this.running = false;
 		this.sendSemaphore = new Semaphore(MAX_PERMITS, true);
+
+		try
+		{
+			this.sendSemaphore.acquire(this.sendSemaphore.availablePermits());
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
 	}
 
 	/**
@@ -58,15 +67,6 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
-		try
-		{
-			this.sendSemaphore.acquire(this.sendSemaphore.availablePermits());
-		}
-		catch (InterruptedException ie)
-		{
-			ie.printStackTrace();
-		}
-
 		this.running = true;
 
 		try
