@@ -45,80 +45,60 @@ public class UpdateAgent implements Runnable
 		}
 	}
 
+	/**
+	 * If a file is added, watcher will be notified.
+	 * Then it will handle a new file using the correct procedure
+	 */
 	public void run()
 	{
 		while(this.running)
 		{
-			this.watcher(); //todo: Move watcher method into running thread
-			/*
 			try
 			{
-				Thread.sleep(100);
+				WatchKey watchkey = this.service.take();
+
+				//events will in THIS case always return a path, so it can be cast as one
+				Path eventDir = (Path)watchkey.watchable();
+
+				//iterate over all possible events
+				for(WatchEvent<?> event : watchkey.pollEvents())
+				{
+					WatchEvent.Kind<?> kind = event.kind(); // todo: Shouldn't we check the type of event?
+					Path eventPath = (Path)event.context();
+
+					short ownerId = Node.DEFAULT_ID;
+
+					try
+					{
+						ownerId = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
+
+						//when owner is different from own id, no changes need to be made
+						if(ownerId != Node.getInstance().getId())   //todo: A file is modified locally, shouldn't we warn other people (replica's, owners, nodes)
+						{
+							Node.getInstance().getFileManager().sendFile(ownerId,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
+						}
+
+						//when owner is the same as your own id
+						//You are the owner, but the local file should be held by the previous neighbour
+						if(ownerId == Node.getInstance().getId())
+						{
+							Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
+						}
+					}
+					catch (RemoteException e)
+					{
+						e.printStackTrace();
+						Node.getInstance().getFailureAgent().failure(ownerId);
+					}
+				}
+
+				watchkey.reset();
+
 			}
 			catch (InterruptedException e)
 			{
 				e.printStackTrace();
 			}
-			*/
-		}
-	}
-
-	/**
-	 * If a file is added, watcher will be notified.
-	 * Then it will handle a new file using the correct procedure
-	 */
-	public void watcher()
-	{
-		try
-		{
-			WatchKey watchkey = this.service.take();
-
-			//events will in THIS case always return a path, so it can be cast as one
-			Path eventDir = (Path)watchkey.watchable();
-
-			//iterate over all possible events
-			for(WatchEvent<?> event : watchkey.pollEvents())
-			{
-				WatchEvent.Kind<?> kind = event.kind(); // todo: Shouldn't we check the type of event?
-				Path eventPath = (Path)event.context();
-
-				short ownerId = Node.DEFAULT_ID;
-
-				try
-				{
-					ownerId = Node.getInstance().getResolverStub().getOwnerID(eventPath.toString());
-
-					//when owner is different from own id, no changes need to be made
-					if(ownerId != Node.getInstance().getId())   //todo: A file is modified locally, shouldn't we warn other people (replica's, owners, nodes)
-					{
-						Node.getInstance().getFileManager().sendFile(ownerId,eventPath.toString(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
-					}
-
-					//when owner is the same as your own id
-					//You are the owner, but the local file should be held by the previous neighbour
-					if(ownerId == Node.getInstance().getId())
-					{
-						Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),eventPath.toString(),FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
-					}
-				}
-				catch (RemoteException e)
-				{
-					e.printStackTrace();
-					Node.getInstance().getFailureAgent().failure(ownerId);
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-
-			}
-
-			watchkey.reset();
-
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
 		}
 	}
 

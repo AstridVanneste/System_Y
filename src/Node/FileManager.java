@@ -16,9 +16,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * This class will handle everything concerning the files.
@@ -35,10 +33,10 @@ public class FileManager implements FileManagerInterface
 
 	private Server tcpServer;
 	private String rootDirectory;
-	private HashMap <String, FileLedger> fileLedgers;
+	private HashMap<String, FileLedger> fileLedgers;
 	private boolean running;
 
-	public FileManager ()
+	public FileManager()
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
@@ -51,7 +49,7 @@ public class FileManager implements FileManagerInterface
 	 * - starts TCP server
 	 * - creates all necessary folders for the filemanager functions (/LOCAL, /OWNED and /DOWNLOADS)
 	 */
-	public void start ()
+	public void start()
 	{
 		this.running = true;
 
@@ -65,26 +63,26 @@ public class FileManager implements FileManagerInterface
 			ioe.printStackTrace();
 		}
 
-		File folder = new File(getFullPath("",FileType.LOCAL_FILE));
-		if(!folder.exists())
+		File folder = new File(getFullPath("", FileType.LOCAL_FILE));
+		if (!folder.exists())
 		{
 			folder.mkdir();
 		}
 
-		folder = new File(getFullPath("",FileType.OWNED_FILE));
-		if(!folder.exists())
+		folder = new File(getFullPath("", FileType.OWNED_FILE));
+		if (!folder.exists())
 		{
 			folder.mkdir();
 		}
 
-		folder = new File(getFullPath("",FileType.DOWNLOADED_FILE));
-		if(!folder.exists())
+		folder = new File(getFullPath("", FileType.DOWNLOADED_FILE));
+		if (!folder.exists())
 		{
 			folder.mkdir();
 		}
 
-		folder = new File(getFullPath("",FileType.REPLICATED_FILE));
-		if(!folder.exists())
+		folder = new File(getFullPath("", FileType.REPLICATED_FILE));
+		if (!folder.exists())
 		{
 			folder.mkdir();
 		}
@@ -107,9 +105,9 @@ public class FileManager implements FileManagerInterface
 	 * - deletes all owned files.
 	 * - deletes all replicated files.
 	 */
-	public void stop ()
+	public void stop()
 	{
-		if(this.running)
+		if (this.running)
 		{
 			this.shutdown();
 		}
@@ -130,24 +128,24 @@ public class FileManager implements FileManagerInterface
 			ioe.printStackTrace();
 		}
 
-		File folder = new File(getFullPath("",FileType.OWNED_FILE));
+		File folder = new File(getFullPath("", FileType.OWNED_FILE));
 
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			file.delete();
 		}
 
 
-		folder = new File(getFullPath("",FileType.REPLICATED_FILE));
+		folder = new File(getFullPath("", FileType.REPLICATED_FILE));
 
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			file.delete();
 		}
 
 	}
 
-	public void shutdown ()
+	public void shutdown()
 	{
 		for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
 		{
@@ -211,7 +209,7 @@ public class FileManager implements FileManagerInterface
 		this.running = false;
 	}
 
-	public void notifyLeaving (String filename, FileType type)
+	public void notifyLeaving(String filename, FileType type)
 	{
 		System.out.println("Node is leaving with file " + filename + ", type: " + type);
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
@@ -223,7 +221,7 @@ public class FileManager implements FileManagerInterface
 		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() > 0))
 		{
 			System.out.println("File was local and downloaded at least once.");
-			File fileObj = new File (fullPath);
+			File fileObj = new File(fullPath);
 			fileObj.delete();
 			this.fileLedgers.remove(filename);
 		}
@@ -231,19 +229,19 @@ public class FileManager implements FileManagerInterface
 		 * I have absolutely no idea what's going on here, if this piece of code fails
 		 * I (Thomas) get the exclusive right to an "I told you so"
 		 */
-		else if(type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
+		else if (type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
 		{
 			/*
 			 *  File was local and downloaded at least once
 			 */
-			if(type == FileType.LOCAL_FILE)
+			if (type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
 			}
 
 			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
 
-			if(fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
+			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
 				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 			}
@@ -256,6 +254,7 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Deletes a file on a remote.
+	 *
 	 * @param filename
 	 * @param type
 	 * @throws IOException
@@ -263,8 +262,8 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void deleteFile(String filename, FileType type) throws IOException
 	{
-		File file = new File(this.getFullPath(filename,type));
-		if(file.exists())
+		File file = new File(this.getFullPath(filename, type));
+		if (file.exists())
 		{
 			file.delete();
 		}
@@ -272,6 +271,7 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Request to download file. The file will be pushed (push()) to the node requesting it.
+	 *
 	 * @param dstID
 	 * @param filename
 	 * @throws IOException
@@ -280,7 +280,7 @@ public class FileManager implements FileManagerInterface
 	public void pullFile(short dstID, String filename) throws IOException
 	{
 		IO.File file = new IO.File(OWNED_FILE_PREFIX + filename);
-		if(file.exists())
+		if (file.exists())
 		{
 			this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
 		}
@@ -293,14 +293,13 @@ public class FileManager implements FileManagerInterface
 	}
 
 	/**
-	 *
 	 * @param fileLedger
 	 * @throws IOException
 	 */
 	@Override
 	public void addFileLedger(FileLedger fileLedger) throws IOException
 	{
-		if(this.fileLedgers.containsKey(fileLedger.getFileName()))
+		if (this.fileLedgers.containsKey(fileLedger.getFileName()))
 		{
 			throw new IOException("Node " + Short.toString(Node.getInstance().getId()) + " already has a fileLedger with filename " + fileLedger.getFileName());
 		}
@@ -312,17 +311,18 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Checks the owner of the files of a given type. When necessary it will push a file to the owner.
+	 *
 	 * @param type
 	 * @throws RemoteException
 	 */
 	@Override
 	public void checkFiles(FileType type) throws RemoteException
 	{
-		File folder = new File(this.getFullPath("",type));
+		File folder = new File(this.getFullPath("", type));
 
 		File[] fileList = folder.listFiles();
 
-		for(File file: fileList)
+		for (File file : fileList)
 		{
 			short ownerId = Node.DEFAULT_ID;
 			String ownerIP = "";
@@ -334,14 +334,14 @@ public class FileManager implements FileManagerInterface
 				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
 				ownerIP = Node.getInstance().getResolverStub().getIP(ownerId);
 			}
-			catch(RemoteException re)
+			catch (RemoteException re)
 			{
 				re.printStackTrace();
 			}
 
 			try
 			{
-				if(type == FileType.LOCAL_FILE && ownerId == Node.getInstance().getId())    // We have the file locally and we are the owner
+				if (type == FileType.LOCAL_FILE && ownerId == Node.getInstance().getId())    // We have the file locally and we are the owner
 				{                                                                           // Replicate it elsewhere
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
@@ -351,15 +351,15 @@ public class FileManager implements FileManagerInterface
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					this.fileLedgers.put(file.getName(), new FileLedger(file.getName(), Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
 
-					this.sendFile(Node.getInstance().getPreviousNeighbour(),file.getName(),FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+					this.sendFile(Node.getInstance().getPreviousNeighbour(), file.getName(), FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 				}
-				else if((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
+				else if ((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
 
 					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
 
 
-					if(type == FileType.OWNED_FILE)                                // We own the file
+					if (type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
 
@@ -368,7 +368,7 @@ public class FileManager implements FileManagerInterface
 							System.out.println("File " + filenameStr + " is present");
 						}
 
-						if(!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
+						if (!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
 						{
 							String replicaIP = Node.getInstance().getResolverStub().getIP(fileLedger.getReplicatedId());
 							Registry reg = LocateRegistry.getRegistry(replicaIP);
@@ -377,9 +377,9 @@ public class FileManager implements FileManagerInterface
 						}
 					}
 
-					this.sendFile(ownerId,file.getName(), type, FileType.OWNED_FILE);
+					this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
 
-					if(type == FileType.OWNED_FILE)
+					if (type == FileType.OWNED_FILE)
 					{
 						file.delete();
 					}
@@ -390,7 +390,7 @@ public class FileManager implements FileManagerInterface
 				re.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(ownerId);
 			}
-			catch(IOException ioe)
+			catch (IOException ioe)
 			{
 				ioe.printStackTrace();
 			}
@@ -409,11 +409,11 @@ public class FileManager implements FileManagerInterface
 		System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
-		if(type == FileType.OWNED_FILE)
+		if (type == FileType.OWNED_FILE)
 		{
-			if(this.hasFile(filename, type))
+			if (this.hasFile(filename, type))
 			{
-				this.sendFile(Node.getInstance().getPreviousNeighbour(),filename, FileType.LOCAL_FILE,FileType.REPLICATED_FILE);
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 			}
 		}
 
@@ -422,6 +422,7 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Sends a file to a certain node.
+	 *
 	 * @param dstID
 	 * @param filename
 	 * @param srcType
@@ -434,20 +435,20 @@ public class FileManager implements FileManagerInterface
 		{
 			dstIP = Node.getInstance().getResolverStub().getIP(dstID);
 		}
-		catch(RemoteException re)
+		catch (RemoteException re)
 		{
 			re.printStackTrace();
 		}
 
-		Client client = new Client(dstIP,Constants.FILE_RECEIVE_PORT);
+		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 		client.start();
-		client.sendFile(this.getFullPath(filename,srcType));
-		int localPort =  client.getLocalPort();
+		client.sendFile(this.getFullPath(filename, srcType));
+		int localPort = client.getLocalPort();
 		String remoteHost = "";
 
 		try
 		{
-			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(),localPort);
+			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
 
 			remoteHost = socket.toString();
 		}
@@ -459,18 +460,18 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface remoteFileManager = (FileManagerInterface)reg.lookup(Node.FILE_MANAGER_NAME);
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
-			File file = new File(this.getFullPath(filename,srcType));
-			remoteFileManager.pushFile(filename,file.length(),dstType,remoteHost);
+			File file = new File(this.getFullPath(filename, srcType));
+			remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
 
-			if(dstType == FileType.OWNED_FILE)
+			if (dstType == FileType.OWNED_FILE)
 			{
-				if(srcType == FileType.LOCAL_FILE)
+				if (srcType == FileType.LOCAL_FILE)
 				{
 					remoteFileManager.addFileLedger(new FileLedger(filename, Node.getInstance().getId(), dstID, Node.DEFAULT_ID));
 				}
-				else if(srcType == FileType.OWNED_FILE)
+				else if (srcType == FileType.OWNED_FILE)
 				{
 					FileLedger ledger = this.fileLedgers.get(filename);
 					ledger.setOwnerID(dstID);
@@ -479,12 +480,12 @@ public class FileManager implements FileManagerInterface
 				}
 			}
 		}
-		catch(RemoteException re)
+		catch (RemoteException re)
 		{
 			re.printStackTrace();
 			Node.getInstance().getFailureAgent().failure(dstID);
 		}
-		catch(NotBoundException nbe)
+		catch (NotBoundException nbe)
 		{
 			nbe.printStackTrace();
 		}
@@ -496,6 +497,7 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Requests a certain file from the owner.
+	 *
 	 * @param filename
 	 */
 	public void requestFile(String filename)
@@ -516,7 +518,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
-			FileManagerInterface fileManager =(FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+			FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 			fileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
 			the owner will later call a push() method on this node to actually receive the file.
@@ -536,10 +538,9 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
-
-
 	/**
 	 * Returns the full path of a file.
+	 *
 	 * @param filename
 	 * @param type
 	 * @return
@@ -551,10 +552,11 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Return the folder for the specified file type
+	 *
 	 * @param type
 	 * @return
 	 */
-	public String getFolder (FileType type)
+	public String getFolder(FileType type)
 	{
 		switch (type)
 		{
@@ -571,7 +573,7 @@ public class FileManager implements FileManagerInterface
 				return this.rootDirectory + REPLICATED_FILE_PREFIX;
 
 			default:
-				throw new InvalidParameterException ("File Type " + type.toString() +  " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
+				throw new InvalidParameterException("File Type " + type.toString() + " is not a valid filetype, possibilities are LOCAL_FILE, OWNED_FILE and DOWNLOADED_FILE.");
 		}
 	}
 
@@ -579,7 +581,7 @@ public class FileManager implements FileManagerInterface
 	{
 		File folder = new File(rootDirectory);
 
-		if(!folder.exists())
+		if (!folder.exists())
 		{
 			folder.mkdir();
 		}
@@ -593,6 +595,7 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * Returns a clear readable list of all the files of the node.
+	 *
 	 * @return
 	 */
 	public String toString()
@@ -604,19 +607,19 @@ public class FileManager implements FileManagerInterface
 
 		File folder = new File(this.getFullPath("", FileType.LOCAL_FILE));
 
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName());
 			builder.append('\n');
 		}
 
 		builder.append("OWNED:\n");
-		folder = new File(this.getFolder( FileType.OWNED_FILE));
+		folder = new File(this.getFolder(FileType.OWNED_FILE));
 
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
-			if(this.fileLedgers.containsKey(file.getName()))
+			if (this.fileLedgers.containsKey(file.getName()))
 			{
 				builder.append("OWNER: " + this.fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + this.fileLedgers.get(file.getName()).getLocalID() + "\n");
 			}
@@ -624,7 +627,7 @@ public class FileManager implements FileManagerInterface
 
 		builder.append("REPLICATED\n");
 		folder = new File(this.getFolder(FileType.REPLICATED_FILE));
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
 		}
@@ -632,14 +635,14 @@ public class FileManager implements FileManagerInterface
 		builder.append("DOWNLOADS:\n");
 		folder = new File(this.getFullPath("", FileType.DOWNLOADED_FILE));
 
-		for(File file: folder.listFiles())
+		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
 			try
 			{
 				builder.append("OWNER: " + Node.getInstance().getResolverStub().getOwnerID(file.getName()) + "\n");
 			}
-			catch(RemoteException re)
+			catch (RemoteException re)
 			{
 				re.printStackTrace();
 			}
@@ -650,7 +653,7 @@ public class FileManager implements FileManagerInterface
 
 	public boolean isRunning()
 	{
-		return  this.running;
+		return this.running;
 	}
 
 	public boolean hasFile(String filename, FileType type)
@@ -666,11 +669,21 @@ public class FileManager implements FileManagerInterface
 
 	/**
 	 * replaces the current ledger for a file with a new one
-	 * @warning THE CURRENT LEDGER WILL BE REPLACED AND LOST! if you do not want this use addFileLedger()
+	 *
 	 * @param ledger
+	 * @warning THE CURRENT LEDGER WILL BE REPLACED AND LOST! if you do not want this use addFileLedger()
 	 */
 	public void replaceFileLedger(FileLedger ledger)
 	{
-		this.fileLedgers.put(ledger.getFileName(),ledger);
+		this.fileLedgers.put(ledger.getFileName(), ledger);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public Set<String> getOwnedFiles()
+	{
+		return this.fileLedgers.keySet();
 	}
 }
