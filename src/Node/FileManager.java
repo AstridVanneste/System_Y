@@ -476,22 +476,23 @@ public class FileManager implements FileManagerInterface
 		}
 
 		FileManagerInterface remoteFileManager = null;
+		Client client = null;
+
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager  = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.lockSlot();
+
+			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
+			client.start();
+
+			remoteFileManager.unlockSlot();
 		}
 		catch (RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
 		}
-
-		remoteFileManager.lockSlot();
-
-		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
-		client.start();
-
-		remoteFileManager.unlockSlot();
 
 		client.sendFile(this.getFullPath(filename, srcType));
 		int localPort = client.getLocalPort();
