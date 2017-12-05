@@ -511,7 +511,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
 			File file = new File(this.getFullPath(filename, srcType));
 			remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
@@ -535,10 +535,6 @@ public class FileManager implements FileManagerInterface
 		{
 			re.printStackTrace();
 			Node.getInstance().getFailureAgent().failure(dstID);
-		}
-		catch (NotBoundException nbe)
-		{
-			nbe.printStackTrace();
 		}
 		catch (IOException ioe)
 		{

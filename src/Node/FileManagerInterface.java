@@ -51,7 +51,7 @@ public interface FileManagerInterface extends Remote
 
 	public void deleteFile(String filename, FileType type) throws IOException;
 
-	public void lockSlot();
+	public void lockSlot() throws RemoteException;
 
-	public void unlockSlot();
+	public void unlockSlot() throws RemoteException;
 }
