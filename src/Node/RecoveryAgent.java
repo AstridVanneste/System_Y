@@ -222,6 +222,7 @@ public class RecoveryAgent extends Agent
 		return false;
 	}
 
+	@Override
 	public boolean isFinished()
 	{
 		return this.finished;

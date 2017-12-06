@@ -102,8 +102,15 @@ public class LifeCycleManager implements Runnable
 							this.updateNeighbours(newNodeID);
 							if(numberOfNodes == 2 && !Node.getInstance().getFileManager().isRunning())  //You were alone and have not yet started your filemanager. Now a new node has joined so you can start replicating
 							{
-								Node.getInstance().getFileManager().start();
-								Node.getInstance().getUpdateAgent().start();
+								try
+								{
+									Node.getInstance().indicateNeighboursSet();
+								}
+								catch (RemoteException re)
+								{
+									re.printStackTrace();
+								}
+
 							}
 						}
 					}
@@ -217,8 +224,7 @@ public class LifeCycleManager implements Runnable
 		}
 		catch (RemoteException | NotBoundException e)
 		{
-			e.printStackTrace(); // Failure?
-			// todo: Implement some sort of failure mechanism
+			e.printStackTrace();
 		}
 	}
 
