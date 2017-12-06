@@ -76,7 +76,9 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				this.neighbourSetSemaphore.acquire(this.neighbourSetSemaphore.availablePermits());
+				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				this.neighbourSetSemaphore.acquire(1);
+				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
@@ -105,7 +107,10 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				this.neighbourSetSemaphore.acquire(this.neighbourSetSemaphore.availablePermits());  // Blocks until (a) permit(s) become available
+				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				this.neighbourSetSemaphore.acquire(1);  // Blocks until (a) permit(s) become available
+				System.out.println("Passed Spinlock");
+				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 			}
 			catch (InterruptedException ie)
 			{
@@ -142,7 +147,7 @@ public class Node implements NodeInteractionInterface
 			}
 			*/
 
-			DownloadManager.getInstance().start();
+			//DownloadManager.getInstance().start();
 
 			System.out.println("starting filemanager");
 			this.fileManager.start();
@@ -297,6 +302,7 @@ public class Node implements NodeInteractionInterface
 	@Override
 	public void indicateNeighboursSet() throws RemoteException
 	{
-		this.neighbourSetSemaphore.release(this.neighbourSetSemaphore.availablePermits());
+		System.out.println("Got indication that neighbours are set");
+		this.neighbourSetSemaphore.release(1);
 	}
 }
