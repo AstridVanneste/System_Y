@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class Client implements Runnable
+public class Client //implements Runnable
 {
 	private static long TIMEOUT = 50000; //TIMEOUT IN MS (50 seconds)
 
@@ -43,8 +43,8 @@ public class Client implements Runnable
 			this.clientSocket = new Socket(this.IP, this.portNum);
 			this.in = new DataInputStream(clientSocket.getInputStream());
 			this.out = new DataOutputStream(clientSocket.getOutputStream());
-			Thread ownThread = new Thread(this);
-			ownThread.start();
+			//Thread ownThread = new Thread(this);
+			//ownThread.start();
 		}
 		catch(IOException e)
 		{
@@ -188,6 +188,7 @@ public class Client implements Runnable
 	}
 
 
+	/*
 	public void run()
 	{
 		while (!this.stop)
@@ -211,6 +212,7 @@ public class Client implements Runnable
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Returns the local port from where the client will send data
