@@ -480,6 +480,7 @@ public class FileManager implements FileManagerInterface
 		System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
+		/*
 		if (type == FileType.OWNED_FILE)
 		{
 			if (this.hasFile(filename, type))
@@ -491,6 +492,7 @@ public class FileManager implements FileManagerInterface
 				System.out.println("File was supposed to be present, but it wasn't");
 			}
 		}
+		*/
 
 		this.tcpServer.receiveFile(remoteHost, filename); //todo: think about copying the file in the owner folder as well when replicating
 	}
