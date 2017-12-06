@@ -2,31 +2,60 @@ package Node;
 
 import java.util.LinkedList;
 import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
 
 public class FileAgent extends Agent
 {
-	private LinkedList<String> fileQueue;
+	TreeMap<String, DownloadPair> fileMap;
+
+	public FileAgent ()
+	{
+		this.fileMap = new TreeMap<String, DownloadPair>();
+	}
 
 	@Override
 	public void run()
 	{
-		TreeMap <String, Semaphore> fileMap = new TreeMap<String, Semaphore>();
+		//todo: Request list of all files on this node and merge fileMap with this
+		//todo: Request list of all files that need to be removed from fileMap
 
-		// 1.) Update the file-list
-		for (String file : Node.getInstance().getFileManager().getOwnedFiles())
+		//todo: Request file queue from Node.AgentHandler
+		LinkedList<String> queuedFiles = new LinkedList<String>();
+
+		for (String filename : queuedFiles)
 		{
-			if (!fileMap.containsKey(file))
+			if (this.fileMap.containsKey(filename))
 			{
-				fileMap.put(file, new Semaphore(1, true));
+				if (this.fileMap.get(filename).availablePermits() >= 1)
+				{
+					try
+					{
+						this.fileMap.get(filename).acquire(this.fileMap.get(filename).availablePermits());
+						DownloadManager.getInstance().submit(filename);
+					}
+					catch (InterruptedException ie)
+					{
+						System.err.println("An exception was thrown while trying to acquire" + Integer.toString(this.fileMap.get(filename).availablePermits()) + " locks on file '" + filename + "'");
+						ie.printStackTrace();
+					}
+				}
+				else
+				{
+					System.err.println("No permits left for file '" + filename + "'");
+				}
+			}
+			else
+			{
+				System.err.println("Requested non-existant file for download: '" + filename + "'");
+				queuedFiles.remove(filename);
 			}
 		}
 
-		this.fileQueue.clear();
+		//todo: Handle downloads that are done
 	}
 
-	public void queueFile (String filename)
+	@Override
+	public boolean isFinished()
 	{
-		this.fileQueue.addLast(filename);
+		return false;
 	}
 }

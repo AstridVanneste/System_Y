@@ -17,6 +17,7 @@ public class Node implements NodeInteractionInterface
 	public static final short DEFAULT_ID = -1;
 	public static final String NODE_INTERACTION_NAME = "NODE_INTERACTION";
 	public static final String FILE_MANAGER_NAME = "FILE_MANAGER";
+	public static final String AGENT_HANDLER_NAME = "AGENT_HANDLER";
 
 	private String name;
 	private Short id;
@@ -140,12 +141,12 @@ public class Node implements NodeInteractionInterface
 				}
 			}
 			*/
-			if((!this.nextNeighbour.equals(this.id)) && (!this.previousNeighbour.equals(this.id)))   //only start if there are 2 or more nodes in the system
-			{
-				System.out.println("starting filemanager");
-				this.fileManager.start();
-				this.updateAgent.start();
-			}
+
+			DownloadManager.getInstance().start();
+
+			System.out.println("starting filemanager");
+			this.fileManager.start();
+			this.updateAgent.start();
 		}
 		else
 		{

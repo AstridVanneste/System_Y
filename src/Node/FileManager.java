@@ -503,7 +503,10 @@ public class FileManager implements FileManagerInterface
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager  = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+
+			System.out.println("Locking a slot on " + dstIP);
 			remoteFileManager.lockSlot();
+			System.out.println("Progressed past lock");
 
 			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 			client.start();
