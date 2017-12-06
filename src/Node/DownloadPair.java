@@ -18,6 +18,11 @@ public class DownloadPair
 		return this.requestID;
 	}
 
+	public synchronized void setID (short newID)
+	{
+		this.requestID = newID;
+	}
+
 	public int availablePermits ()
 	{
 		return this.lock.availablePermits();
