@@ -236,7 +236,7 @@ public class FileManager implements FileManagerInterface
 		 * Local file holder is leaving
 		 * Delete file from owner
 		 */
-		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() > 0))
+		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() == 0))
 		{
 			System.out.println("File was local and downloaded at least once.");
 			File fileObj = new File(fullPath);
@@ -252,19 +252,26 @@ public class FileManager implements FileManagerInterface
 			/*
 			 *  File was local and downloaded at least once
 			 */
+			System.out.println("notifyLeaving, file was local or replicated with no downloads");
+
 			if (type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
+				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString());
 			}
 
 			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
 
+			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString());
+
 			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
+				System.out.println("Local and owner are equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
 				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 			}
 			else
 			{
+				System.out.println("Local and owner aren't equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
 				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
 			}
 		}
