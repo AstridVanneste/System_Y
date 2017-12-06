@@ -693,7 +693,7 @@ public class FileManager implements FileManagerInterface
 			builder.append(file.getName() + "\n");
 			if (this.fileLedgers.containsKey(file.getName()))
 			{
-				builder.append("OWNER: " + this.fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + this.fileLedgers.get(file.getName()).getLocalID() + "\n");
+				builder.append("OWNER: " + this.fileLedgers.get(file.getName()).getOwnerID() + "	LOCAL: " + this.fileLedgers.get(file.getName()).getLocalID() +"		REPLICATED: " + this.fileLedgers.get(file.getName()).getReplicatedId() + "\n");
 			}
 		}
 
