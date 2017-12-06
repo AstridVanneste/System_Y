@@ -110,7 +110,6 @@ public class LifeCycleManager implements Runnable
 								{
 									re.printStackTrace();
 								}
-
 							}
 						}
 					}
