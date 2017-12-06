@@ -85,6 +85,12 @@ public class Main
 				{
 					System.out.println(Node.getInstance().getFileManager().toString());
 				}
+				else if(next.equals("D") || next.equals("d"))
+				{
+					System.out.println("Type the filename of the file you want to download...");
+					String filename = scanner.nextLine();
+					Node.getInstance().getFileManager().requestFile(filename);
+				}
 			    else
 			    {
 				    System.err.println("[ERROR]\tInvalid input: '" + next + "'");

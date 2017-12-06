@@ -90,6 +90,10 @@ public class FileManager implements FileManagerInterface
 		{
 			folder.mkdir();
 		}
+		for(File file: folder.listFiles())
+		{
+			file.delete();
+		}
 
 		folder = new File(getFullPath("", FileType.DOWNLOADED_FILE));
 		if (!folder.exists())
@@ -101,6 +105,10 @@ public class FileManager implements FileManagerInterface
 		if (!folder.exists())
 		{
 			folder.mkdir();
+		}
+		for(File file: folder.listFiles())
+		{
+			file.delete();
 		}
 
 		this.sendSemaphore.release(MAX_PERMITS);
