@@ -348,7 +348,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pullFile(short dstID, String filename) throws IOException
 	{
-		IO.File file = new IO.File(OWNED_FILE_PREFIX + filename);
+		IO.File file = new IO.File(getFullPath(filename, FileType.OWNED_FILE));
 		if (file.exists())
 		{
 			this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
