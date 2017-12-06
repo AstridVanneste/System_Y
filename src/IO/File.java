@@ -195,7 +195,7 @@ public class File
 
 	public boolean exists ()
 	{
-		return (new File(this.filename)).exists();
+		return (new java.io.File(this.filename)).exists();
 	}
 
 	public String toString ()
