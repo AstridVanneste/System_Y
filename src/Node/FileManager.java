@@ -349,6 +349,7 @@ public class FileManager implements FileManagerInterface
 	public void pullFile(short dstID, String filename) throws IOException
 	{
 		IO.File file = new IO.File(getFullPath(filename, FileType.OWNED_FILE));
+
 		if (file.exists())
 		{
 			this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
@@ -483,7 +484,11 @@ public class FileManager implements FileManagerInterface
 		{
 			if (this.hasFile(filename, type))
 			{
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+				//this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+			}
+			else
+			{
+				System.out.println("File was supposed to be present, but it wasn't");
 			}
 		}
 

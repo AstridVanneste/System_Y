@@ -197,12 +197,12 @@ public class Server implements Runnable
 							{
 								file.append(datagram.getData());
 								//packets++;
-								//System.out.println("packet " + packets + " appended");
+								System.out.println("packet appended");
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 							{
-								//System.out.println("last packet received");
+								System.out.println("last packet received");
 								quit = true;
 							}
 							timer = 0;
@@ -223,7 +223,7 @@ public class Server implements Runnable
 					{
 						timer = System.nanoTime();
 					}
-					else if(((System.nanoTime() - timer)/1000000) > TIMEOUT)
+					else if(((System.nanoTime() - timer) / 1000000) > TIMEOUT)
 					{
 						throw new IOException("Timeout when receiving '" + filename + "' from " + remoteHost);
 					}
