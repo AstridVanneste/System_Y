@@ -64,7 +64,8 @@ public class Resolver implements ResolverInterface
 		}
 
 		Util.General.printLineSep();
-		System.out.println("Resolver.getOwnerIP(" + filename + ") = " + id);
+		System.out.println("Resolver.getOwnerID(" + filename + ") = " + id);
+		System.out.println("Hash of file = " + hash);
 		try
 		{
 			System.out.println("Called by: " + getClientHost());
