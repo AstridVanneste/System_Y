@@ -506,86 +506,89 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
-		String dstIP = "";
-
-		try
+		if ((new java.io.File(filename).length()) > 0)
 		{
-			dstIP = Node.getInstance().getResolverStub().getIP(dstID);
-		}
-		catch (RemoteException re)
-		{
-			re.printStackTrace();
-		}
+			String dstIP = "";
 
-		FileManagerInterface remoteFileManager = null;
-		Client client = null;
-
-
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(dstIP);
-			remoteFileManager  = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-
-			System.out.println("Locking a slot on " + dstIP);
-			remoteFileManager.lockSlot();
-			System.out.println("Progressed past lock");
-
-			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
-			client.start();
-
-			remoteFileManager.unlockSlot();
-		}
-		catch (RemoteException | NotBoundException re)
-		{
-			re.printStackTrace();
-		}
-
-		client.sendFile(this.getFullPath(filename, srcType));
-		int localPort = client.getLocalPort();
-		String remoteHost = "";
-
-		try
-		{
-			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
-
-			remoteHost = socket.toString();
-		}
-		catch (UnknownHostException uhe)
-		{
-			uhe.printStackTrace();
-		}
-
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(dstIP);
-			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			//IO.File file = new IO.File(this.getFullPath(filename,type));
-			File file = new File(this.getFullPath(filename, srcType));
-			remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
-
-			if (dstType == FileType.OWNED_FILE)
+			try
 			{
-				if (srcType == FileType.LOCAL_FILE)
+				dstIP = Node.getInstance().getResolverStub().getIP(dstID);
+			}
+			catch (RemoteException re)
+			{
+				re.printStackTrace();
+			}
+
+			FileManagerInterface remoteFileManager = null;
+			Client client = null;
+
+
+			try
+			{
+				Registry reg = LocateRegistry.getRegistry(dstIP);
+				remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+
+				System.out.println("Locking a slot on " + dstIP);
+				remoteFileManager.lockSlot();
+				System.out.println("Progressed past lock");
+
+				client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
+				client.start();
+
+				remoteFileManager.unlockSlot();
+			}
+			catch (RemoteException | NotBoundException re)
+			{
+				re.printStackTrace();
+			}
+
+			client.sendFile(this.getFullPath(filename, srcType));
+			int localPort = client.getLocalPort();
+			String remoteHost = "";
+
+			try
+			{
+				SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
+
+				remoteHost = socket.toString();
+			}
+			catch (UnknownHostException uhe)
+			{
+				uhe.printStackTrace();
+			}
+
+			try
+			{
+				Registry reg = LocateRegistry.getRegistry(dstIP);
+				//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+				//IO.File file = new IO.File(this.getFullPath(filename,type));
+				File file = new File(this.getFullPath(filename, srcType));
+				remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
+
+				if (dstType == FileType.OWNED_FILE)
 				{
-					remoteFileManager.addFileLedger(new FileLedger(filename, Node.getInstance().getId(), dstID, Node.DEFAULT_ID));
-				}
-				else if (srcType == FileType.OWNED_FILE)
-				{
-					FileLedger ledger = this.fileLedgers.get(filename);
-					ledger.setOwnerID(dstID);
-					remoteFileManager.addFileLedger(ledger);
-					this.fileLedgers.remove(filename);
+					if (srcType == FileType.LOCAL_FILE)
+					{
+						remoteFileManager.addFileLedger(new FileLedger(filename, Node.getInstance().getId(), dstID, Node.DEFAULT_ID));
+					}
+					else if (srcType == FileType.OWNED_FILE)
+					{
+						FileLedger ledger = this.fileLedgers.get(filename);
+						ledger.setOwnerID(dstID);
+						remoteFileManager.addFileLedger(ledger);
+						this.fileLedgers.remove(filename);
+					}
 				}
 			}
-		}
-		catch (RemoteException re)
-		{
-			re.printStackTrace();
-			Node.getInstance().getFailureAgent().failure(dstID);
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
+			catch (RemoteException re)
+			{
+				re.printStackTrace();
+				Node.getInstance().getFailureAgent().failure(dstID);
+			}
+			catch (IOException ioe)
+			{
+				ioe.printStackTrace();
+			}
 		}
 	}
 
