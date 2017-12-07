@@ -506,7 +506,8 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
-		if ((new java.io.File(filename).length()) > 0)
+		System.out.println("File: '" + filename + "', length: " + (new java.io.File(this.getFullPath(filename, srcType)).length()));
+		if ((new java.io.File(this.getFullPath(filename, srcType)).length()) > 0)
 		{
 			String dstIP = "";
 
