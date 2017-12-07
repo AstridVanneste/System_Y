@@ -524,6 +524,8 @@ public class FileManager implements FileManagerInterface
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
 		System.out.println("File: '" + filename + "', length: " + (new java.io.File(this.getFullPath(filename, srcType)).length()));
+
+
 		String dstIP = "";
 
 		try
@@ -534,6 +536,7 @@ public class FileManager implements FileManagerInterface
 		{
 			re.printStackTrace();
 		}
+
 
 		FileManagerInterface remoteFileManager = null;
 		Client client = null;
@@ -595,6 +598,8 @@ public class FileManager implements FileManagerInterface
 					this.fileLedgers.remove(filename);
 				}
 			}
+
+
 		}
 		catch (RemoteException re)
 		{
@@ -605,6 +610,7 @@ public class FileManager implements FileManagerInterface
 		{
 			ioe.printStackTrace();
 		}
+
 	}
 
 	/**
