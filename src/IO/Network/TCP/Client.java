@@ -159,6 +159,13 @@ public class Client //implements Runnable
 
 
 			}
+
+			if(file.size() == 0)
+			{
+				header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
+				Datagram data = new Datagram(header,new byte[0]);
+				this.send(data.serialize());
+			}
 		}
 		catch(IOException ioe)
 		{

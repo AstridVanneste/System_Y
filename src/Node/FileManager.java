@@ -481,6 +481,7 @@ public class FileManager implements FileManagerInterface
 		filename = this.getFullPath(filename, type);
 
 		/*
+		/*
 		if (type == FileType.OWNED_FILE)
 		{
 			if (this.hasFile(filename, type))
@@ -616,6 +617,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
+			System.out.println("Downloading " + filename + " owner = " + ownerIP);
 			FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 			fileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
@@ -711,7 +713,7 @@ public class FileManager implements FileManagerInterface
 			builder.append('\n');
 		}
 
-		builder.append("OWNED:\n");
+		builder.append("\nOWNED:\n");
 		folder = new File(this.getFolder(FileType.OWNED_FILE));
 
 		for (File file : folder.listFiles())
@@ -723,27 +725,19 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		builder.append("REPLICATED\n");
+		builder.append("\nREPLICATED\n");
 		folder = new File(this.getFolder(FileType.REPLICATED_FILE));
 		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
 		}
 
-		builder.append("DOWNLOADS:\n");
+		builder.append("\nDOWNLOADS:\n");
 		folder = new File(this.getFullPath("", FileType.DOWNLOADED_FILE));
 
 		for (File file : folder.listFiles())
 		{
 			builder.append(file.getName() + "\n");
-			try
-			{
-				builder.append("OWNER: " + Node.getInstance().getResolverStub().getOwnerID(file.getName()) + "\n");
-			}
-			catch (RemoteException re)
-			{
-				re.printStackTrace();
-			}
 		}
 
 		return builder.toString();
