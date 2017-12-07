@@ -136,7 +136,7 @@ public class Client //implements Runnable
 		try
 		{
 			int length = 0;
-			while(file.available() >= 0)
+			while(file.available() > 0)
 			{
 
 				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
