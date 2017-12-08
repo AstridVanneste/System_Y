@@ -371,7 +371,15 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pullFile(short dstID, String filename) throws IOException
 	{
-		IO.File file = new IO.File(getFullPath(filename, FileType.OWNED_FILE));
+		IO.File file;
+		if(this.fileLedgers.get(filename).getReplicatedId() == Node.DEFAULT_ID)
+		{
+			file = new IO.File(getFullPath(filename, FileType.OWNED_FILE));
+		}
+		else
+		{
+			file = new IO.File(getFullPath(filename, FileType.LOCAL_FILE));
+		}
 
 		if (file.exists())
 		{
@@ -631,7 +639,7 @@ public class FileManager implements FileManagerInterface
 	 *
 	 * @param filename
 	 */
-	public void requestFile(String filename)
+	public void requestFile(String filename) //todo: make sure you don't download files you already have
 	{
 		String ownerIP = "";
 
