@@ -13,13 +13,11 @@ import Util.Serializer;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Random;
-import java.util.Scanner;
 
 /**
  * Created by Astrid on 07/11/2017.
@@ -61,7 +59,7 @@ public class LifeCycleManager implements Runnable
 
 		}*/
 
-		System.out.println("Finishing discovery ResolverStub: " + Node.getInstance().getResolverStub());
+		System.out.println(Thread.currentThread().getName() + " LifeCycleManager.start() " + Node.getInstance().getResolverStub());
 
 		//System.out.println("Finished discovery");
 	}
@@ -106,7 +104,7 @@ public class LifeCycleManager implements Runnable
 							{
 								try
 								{
-									Node.getInstance().indicateNeighboursSet();
+									Node.getInstance().releaseStartupSlot();
 								}
 								catch (RemoteException re)
 								{
@@ -149,7 +147,7 @@ public class LifeCycleManager implements Runnable
 
 							this.bindNameserverStubs(nsIp);
 
-							System.out.println("bindNameserverStubs POST ResolverStub: " + Node.getInstance().getResolverStub());
+							System.out.println(Thread.currentThread().getName() + " LifeCycleManager.run() " + Node.getInstance().getResolverStub());
 
 							//nameserver sends the amount of nodes in the tree
 
@@ -161,6 +159,16 @@ public class LifeCycleManager implements Runnable
 
 							this.bootstrapTransactionID = -1;
 							//System.out.println("transactionID = " + this.bootstrapTransactionID);
+
+							try
+							{
+								Node.getInstance().releaseStartupSlot();
+							}
+							catch (RemoteException re)
+							{
+								System.err.println("Fake Remote Exception, this call was local");
+								re.printStackTrace();
+							}
 						}
 					}
 				}
@@ -224,7 +232,8 @@ public class LifeCycleManager implements Runnable
 		{
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
-			System.out.println("POST setResolverStub: " + Node.getInstance().getResolverStub());
+
+			System.out.println(Thread.currentThread().getName() + " LifeCycleManager.bindNameserverStubs() " + Node.getInstance().getResolverStub());
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		}
 		catch (RemoteException | NotBoundException e)
@@ -262,7 +271,7 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getId());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
-				neighbourInterface.indicateNeighboursSet(); // New node's neighbours are set, allow him to continue his bootstrap sequence
+				neighbourInterface.releaseStartupSlot(); // New node's neighbours are set, allow him to continue his bootstrap sequence
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -290,7 +299,7 @@ public class LifeCycleManager implements Runnable
 				neighbourInterface = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
 				neighbourInterface.setNextNeighbourRemote(Node.getInstance().getNextNeighbour());
 				neighbourInterface.setPreviousNeighbourRemote(Node.getInstance().getId());
-				neighbourInterface.indicateNeighboursSet(); // New node's neighbours are set, allow him to continue his bootstrap sequence
+				neighbourInterface.releaseStartupSlot(); // New node's neighbours are set, allow him to continue his bootstrap sequence
 			}
 			catch (RemoteException | NotBoundException e)
 			{

@@ -68,7 +68,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
-		System.out.println("FileManager start");
+		System.out.println(Thread.currentThread().getName() + " FileManager.start() 1 " + Node.getInstance().getResolverStub());
 		this.running = true;
 
 		try
@@ -116,7 +116,8 @@ public class FileManager implements FileManagerInterface
 		this.sendSemaphore.release(MAX_PERMITS);
 
 		//start replicating files.
-		System.out.println("Starting to replicate files");
+		//System.out.println("Starting to replicate files");
+		System.out.println(Thread.currentThread().getName() + " FileManager.start() 2 " + Node.getInstance().getResolverStub());
 		try
 		{
 			this.checkFiles(FileType.LOCAL_FILE);
@@ -418,7 +419,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void checkFiles(FileType type) throws RemoteException
 	{
-		System.out.println("Calling Check files, prepare for NullPointerException");
+		System.out.println(Thread.currentThread().getName() + " FileManager.checkFiles(" + type + ") " + Node.getInstance().getResolverStub());
 		File folder = new File(this.getFullPath("", type));
 
 		File[] fileList = folder.listFiles();

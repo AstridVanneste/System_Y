@@ -2,7 +2,7 @@ package Util;
 
 public class General
 {
-	private static final int LINE_SEP_LENGTH = 128;
+	private static final int LINE_SEP_LENGTH = 160;
 
 	public static void printLineSep ()
 	{

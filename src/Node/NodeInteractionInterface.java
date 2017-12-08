@@ -15,5 +15,5 @@ public interface NodeInteractionInterface extends Remote
 
 	public boolean isRunning () throws RemoteException;
 
-	public void indicateNeighboursSet () throws RemoteException;
+	public void releaseStartupSlot() throws RemoteException;
 }
