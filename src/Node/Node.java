@@ -107,9 +107,9 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 				this.neighbourSetSemaphore.acquire(1);  // Blocks until (a) permit(s) become available
-				//System.out.println("Passed Spinlock");
+				System.out.println("Passed Spinlock");
 				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 			}
 			catch (InterruptedException ie)
@@ -151,7 +151,7 @@ public class Node implements NodeInteractionInterface
 
 			//System.out.println("ResolverStub: " + Node.getInstance().getResolverStub());
 
-			//System.out.println("starting filemanager");
+			System.out.println("starting filemanager");
 			this.fileManager.start();
 			this.updateAgent.start();
 		}

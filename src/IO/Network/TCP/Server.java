@@ -124,7 +124,7 @@ public class Server implements Runnable
 		}
 		else
 		{
-			System.out.println("No remote connection on " + remoteHost);
+			//System.err.println("No remote connection on " + remoteHost);
 			return false;
 		}
 	}
