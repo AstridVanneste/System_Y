@@ -518,7 +518,6 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException
 	{
-		/
 		filename = this.getFullPath(filename, type);
 
 		/*
