@@ -173,7 +173,7 @@ public class Server implements Runnable
 				//System.out.println("quit: " + Boolean.toString(quit));
 				if (this.hasData(remoteHost))
 				{
-					System.out.println("System has data for remote host");
+					//System.out.println("System has data for remote host");
 					Datagram datagram = new Datagram(this.receive(remoteHost));
 
 					if (datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
@@ -197,12 +197,12 @@ public class Server implements Runnable
 							{
 								file.append(datagram.getData());
 								//packets++;
-								System.out.println("packet appended");
+								//System.out.println("packet appended");
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 							{
-								System.out.println("last packet received");
+								//System.out.println("last packet received");
 								quit = true;
 							}
 							timer = 0;

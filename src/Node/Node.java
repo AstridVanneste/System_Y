@@ -76,9 +76,9 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 				this.neighbourSetSemaphore.acquire(1);
-				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
@@ -107,10 +107,10 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 				this.neighbourSetSemaphore.acquire(1);  // Blocks until (a) permit(s) become available
-				System.out.println("Passed Spinlock");
-				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				//System.out.println("Passed Spinlock");
+				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 			}
 			catch (InterruptedException ie)
 			{
@@ -149,7 +149,9 @@ public class Node implements NodeInteractionInterface
 
 			//DownloadManager.getInstance().start();
 
-			System.out.println("starting filemanager");
+			//System.out.println("ResolverStub: " + Node.getInstance().getResolverStub());
+
+			//System.out.println("starting filemanager");
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
@@ -255,6 +257,7 @@ public class Node implements NodeInteractionInterface
 
 	public ResolverInterface getResolverStub()
 	{
+		//System.out.println("getResolverStub: " + this.resolverStub);
 		return this.resolverStub;
 	}
 
@@ -302,7 +305,7 @@ public class Node implements NodeInteractionInterface
 	@Override
 	public void indicateNeighboursSet() throws RemoteException
 	{
-		System.out.println("Got indication that neighbours are set");
+		//System.out.println("Got indication that neighbours are set");
 		this.neighbourSetSemaphore.release(1);
 	}
 }

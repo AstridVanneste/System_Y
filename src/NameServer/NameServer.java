@@ -23,13 +23,17 @@ public class NameServer
 	private static NameServer instance;	//singleton instance of nameserver
 
 	TreeMap<Short,String> map;			//can be accessed throughout entire NameServer package
-	private ShutdownAgentInterface shutdownAgentStub;
-	public ResolverInterface resolverStub;  // todo: temporary, move back to private when RMI testing is complete
+	private ShutdownAgent shutdownAgent;
+	private Resolver resolver;
 	private DiscoveryAgent discoveryAgent;
+	private ShutdownAgentInterface shutdownAgentStub;
+	private ResolverInterface resolverStub;
 
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
+		this.shutdownAgent = new ShutdownAgent();
+		this.resolver = new Resolver();
 		this.discoveryAgent = new DiscoveryAgent();
     }
 
@@ -54,8 +58,8 @@ public class NameServer
 
 	    try
 	    {
-	    	this.shutdownAgentStub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(new ShutdownAgent(), 0);
-		    this.resolverStub = (ResolverInterface) UnicastRemoteObject.exportObject(new Resolver(), 0);
+	    	this.shutdownAgentStub = (ShutdownAgentInterface) UnicastRemoteObject.exportObject(this.shutdownAgent, 0);
+		    this.resolverStub = (ResolverInterface) UnicastRemoteObject.exportObject(this.resolver, 0);
 		    this.discoveryAgent.init();
             this.bind();
         }
@@ -156,6 +160,5 @@ public class NameServer
 		{
 			nbe.printStackTrace();
 		}
-
 	}
 }
