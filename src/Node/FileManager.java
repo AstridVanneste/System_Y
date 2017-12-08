@@ -311,6 +311,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	@Override
 	public void deleteFile(String filename, FileType type) throws IOException
+
 	{
 		File file = new File(this.getFullPath(filename, type));
 		if (file.exists())
@@ -373,7 +374,15 @@ public class FileManager implements FileManagerInterface
 
 		if (file.exists())
 		{
-			this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
+			if(this.fileLedgers.get(filename).getReplicatedId() == Node.DEFAULT_ID)
+			{
+				this.sendFile(dstID, filename, FileType.OWNED_FILE, FileType.DOWNLOADED_FILE);
+			}
+			else
+			{
+				this.sendFile(dstID, filename, FileType.LOCAL_FILE, FileType.DOWNLOADED_FILE);
+			}
+
 		}
 		else
 		{
@@ -571,7 +580,7 @@ public class FileManager implements FileManagerInterface
 
 		try
 		{
-			SocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
+			InetSocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
 
 			remoteHost = socket.toString();
 		}
@@ -614,7 +623,6 @@ public class FileManager implements FileManagerInterface
 		{
 			ioe.printStackTrace();
 		}
-
 	}
 
 	/**
