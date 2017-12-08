@@ -68,6 +68,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
+		System.out.println("FileManager start");
 		this.running = true;
 
 		try
@@ -321,14 +322,16 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void lockSlot()
 	{
+		/*
 		try
 		{
-			System.out.println("lock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
+			//System.out.println("lock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
 		}
 		catch(ServerNotActiveException	snae)
 		{
 			snae.printStackTrace();
 		}
+		*/
 		try
 		{
 			this.sendSemaphore.acquire(1);
@@ -342,6 +345,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void unlockSlot()
 	{
+		/*
 		try
 		{
 			System.out.println("unlock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
@@ -350,6 +354,7 @@ public class FileManager implements FileManagerInterface
 		{
 			snae.printStackTrace();
 		}
+		*/
 
 		this.sendSemaphore.release(1);
 	}
@@ -404,6 +409,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void checkFiles(FileType type) throws RemoteException
 	{
+		System.out.println("Calling Check files, prepare for NullPointerException");
 		File folder = new File(this.getFullPath("", type));
 
 		File[] fileList = folder.listFiles();
@@ -413,7 +419,7 @@ public class FileManager implements FileManagerInterface
 			short ownerId = Node.DEFAULT_ID;
 			String ownerIP = "";
 
-			System.out.println("Checking " + file.toString());
+			//System.out.println("Checking " + file.toString());
 
 			try
 			{
@@ -431,7 +437,7 @@ public class FileManager implements FileManagerInterface
 				{                                                                           // Replicate it elsewhere
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
-					System.out.println("OWNER IS SAME AS LOCAL");
+					//System.out.println("OWNER IS SAME AS LOCAL");
 					String replicatedIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
@@ -442,17 +448,19 @@ public class FileManager implements FileManagerInterface
 				else if ((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
 
-					System.out.println("sending file to " + ownerId + " filename: " + file.getName());
+					//System.out.println("sending file to " + ownerId + " filename: " + file.getName());
 
 
 					if (type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
 
+						/*
 						for (String filenameStr : this.fileLedgers.keySet())
 						{
 							System.out.println("File " + filenameStr + " is present");
 						}
+						*/
 
 						if (!(fileLedger.getReplicatedId() == Node.DEFAULT_ID))          // The file is replicated somewhere
 						{
@@ -489,11 +497,10 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
-
 	@Override
 	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException
 	{
-		System.out.println("receiving file of type " + type);
+		///System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
 		/*
@@ -523,8 +530,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
-		System.out.println("File: '" + filename + "', length: " + (new java.io.File(this.getFullPath(filename, srcType)).length()));
-
+		//System.out.println("File: '" + filename + "', length: " + (new java.io.File(this.getFullPath(filename, srcType)).length()));
 
 		String dstIP = "";
 
@@ -537,19 +543,17 @@ public class FileManager implements FileManagerInterface
 			re.printStackTrace();
 		}
 
-
 		FileManagerInterface remoteFileManager = null;
 		Client client = null;
-
 
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 
-			System.out.println("Locking a slot on " + dstIP);
+			//System.out.println("Locking a slot on " + dstIP);
 			remoteFileManager.lockSlot();
-			System.out.println("Progressed past lock");
+			//System.out.println("Progressed past lock");
 
 			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 			client.start();
@@ -636,7 +640,7 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
-			System.out.println("Downloading " + filename + " owner = " + ownerIP);
+			//System.out.println("Downloading " + filename + " owner = " + ownerIP);
 			FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 			fileManager.pullFile(Node.getInstance().getId(), filename);
 			/*

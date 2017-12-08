@@ -148,13 +148,13 @@ public class Client //implements Runnable
 				}
 				else
 				{
-					System.out.println("setting end reply code");
+					//System.out.println("setting end reply code");
 					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
 					Datagram data = new Datagram(header,file.read((int) file.available()));
 
 					this.send(data.serialize());
 					length++;
-					System.out.println(length + " packets send");
+					//System.out.println(length + " packets sent");
 				}
 
 
