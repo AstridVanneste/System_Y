@@ -46,7 +46,7 @@ public class Node implements NodeInteractionInterface
 		this.fileManager = new FileManager();
 		this.resolverStub = null;
 		this.updateAgent = new UpdateAgent();
-		this.neighbourSetSemaphore = new Semaphore(1, true);
+		this.neighbourSetSemaphore = new Semaphore(2, true);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class Node implements NodeInteractionInterface
 
 	public void start()
 	{
-		Thread.currentThread().setName("Main - " + Node.getInstance().getName());
+		Thread.currentThread().setName("Thread, Main - " + Node.getInstance().getName());
 
 		if (!this.lifeCycleManager.isRunning())
 		{
@@ -77,7 +77,7 @@ public class Node implements NodeInteractionInterface
 			try
 			{
 				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
-				this.neighbourSetSemaphore.acquire(1);
+				this.neighbourSetSemaphore.acquire(2);
 				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
 
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -101,16 +101,19 @@ public class Node implements NodeInteractionInterface
 				ie.printStackTrace();
 			}
 
+			System.out.println(Thread.currentThread() + " Node.start() 1 " + Node.getInstance().getResolverStub());
+
 			this.lifeCycleManager.start();
+
+			System.out.println(Thread.currentThread() + " Node.start() 2 " + Node.getInstance().getResolverStub());
 
 			boolean exit = false;
 
 			try
 			{
-				System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
-				this.neighbourSetSemaphore.acquire(1);  // Blocks until (a) permit(s) become available
-				System.out.println("Passed Spinlock");
-				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+				System.out.println(Thread.currentThread() + " Node.start() 3 " + Node.getInstance().getResolverStub());
+				this.neighbourSetSemaphore.acquire(2);  // Blocks until (a) permit(s) become available
+				System.out.println(Thread.currentThread() + " Node.start() 4 " + Node.getInstance().getResolverStub());
 			}
 			catch (InterruptedException ie)
 			{
@@ -151,7 +154,7 @@ public class Node implements NodeInteractionInterface
 
 			//System.out.println("ResolverStub: " + Node.getInstance().getResolverStub());
 
-			System.out.println("starting filemanager");
+			System.out.println(Thread.currentThread() + " Node.start() 5 " + Node.getInstance().getResolverStub());
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
@@ -303,7 +306,7 @@ public class Node implements NodeInteractionInterface
 	}
 
 	@Override
-	public void indicateNeighboursSet() throws RemoteException
+	public void releaseStartupSlot() throws RemoteException
 	{
 		//System.out.println("Got indication that neighbours are set");
 		this.neighbourSetSemaphore.release(1);
