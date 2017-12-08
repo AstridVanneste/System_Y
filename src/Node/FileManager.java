@@ -68,7 +68,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
-		System.out.println(Thread.currentThread().getName() + " FileManager.start() 1 " + Node.getInstance().getResolverStub());
+		//System.out.println(Thread.currentThread().getName() + " FileManager.start() 1 " + Node.getInstance().getResolverStub());
 		this.running = true;
 
 		try
@@ -117,7 +117,7 @@ public class FileManager implements FileManagerInterface
 
 		//start replicating files.
 		//System.out.println("Starting to replicate files");
-		System.out.println(Thread.currentThread().getName() + " FileManager.start() 2 " + Node.getInstance().getResolverStub());
+		//System.out.println(Thread.currentThread().getName() + " FileManager.start() 2 " + Node.getInstance().getResolverStub());
 		try
 		{
 			this.checkFiles(FileType.LOCAL_FILE);
@@ -658,8 +658,8 @@ public class FileManager implements FileManagerInterface
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
 			//System.out.println("Downloading " + filename + " owner = " + ownerIP);
-			FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
-			fileManager.pullFile(Node.getInstance().getId(), filename);
+			FileManagerInterface remoteFileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
 			the owner will later call a push() method on this node to actually receive the file.
 			 */

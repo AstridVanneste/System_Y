@@ -59,7 +59,7 @@ public class LifeCycleManager implements Runnable
 
 		}*/
 
-		System.out.println(Thread.currentThread().getName() + " LifeCycleManager.start() " + Node.getInstance().getResolverStub());
+		//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.start() " + Node.getInstance().getResolverStub());
 
 		//System.out.println("Finished discovery");
 	}
@@ -147,7 +147,7 @@ public class LifeCycleManager implements Runnable
 
 							this.bindNameserverStubs(nsIp);
 
-							System.out.println(Thread.currentThread().getName() + " LifeCycleManager.run() " + Node.getInstance().getResolverStub());
+							//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.run() " + Node.getInstance().getResolverStub());
 
 							//nameserver sends the amount of nodes in the tree
 
@@ -233,7 +233,7 @@ public class LifeCycleManager implements Runnable
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 
-			System.out.println(Thread.currentThread().getName() + " LifeCycleManager.bindNameserverStubs() " + Node.getInstance().getResolverStub());
+			//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.bindNameserverStubs() " + Node.getInstance().getResolverStub());
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		}
 		catch (RemoteException | NotBoundException e)

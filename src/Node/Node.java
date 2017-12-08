@@ -101,19 +101,19 @@ public class Node implements NodeInteractionInterface
 				ie.printStackTrace();
 			}
 
-			System.out.println(Thread.currentThread() + " Node.start() 1 " + Node.getInstance().getResolverStub());
+			//System.out.println(Thread.currentThread() + " Node.start() 1 " + Node.getInstance().getResolverStub());
 
 			this.lifeCycleManager.start();
 
-			System.out.println(Thread.currentThread() + " Node.start() 2 " + Node.getInstance().getResolverStub());
+			//System.out.println(Thread.currentThread() + " Node.start() 2 " + Node.getInstance().getResolverStub());
 
 			boolean exit = false;
 
 			try
 			{
-				System.out.println(Thread.currentThread() + " Node.start() 3 " + Node.getInstance().getResolverStub());
+				//System.out.println(Thread.currentThread() + " Node.start() 3 " + Node.getInstance().getResolverStub());
 				this.neighbourSetSemaphore.acquire(2);  // Blocks until (a) permit(s) become available
-				System.out.println(Thread.currentThread() + " Node.start() 4 " + Node.getInstance().getResolverStub());
+				//System.out.println(Thread.currentThread() + " Node.start() 4 " + Node.getInstance().getResolverStub());
 			}
 			catch (InterruptedException ie)
 			{
@@ -154,7 +154,7 @@ public class Node implements NodeInteractionInterface
 
 			//System.out.println("ResolverStub: " + Node.getInstance().getResolverStub());
 
-			System.out.println(Thread.currentThread() + " Node.start() 5 " + Node.getInstance().getResolverStub());
+			//System.out.println(Thread.currentThread() + " Node.start() 5 " + Node.getInstance().getResolverStub());
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
