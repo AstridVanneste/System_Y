@@ -89,7 +89,7 @@ public class Server implements Runnable
 			e.printStackTrace();
 		}
 		//Publisher.printByteArray(data);
-		//System.out.println("");
+
 	}
 
 	/**

@@ -76,9 +76,9 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+
 				this.neighbourSetSemaphore.acquire(2);
-				//System.out.println("#Permits: " + Integer.toString(this.neighbourSetSemaphore.availablePermits()));
+
 
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
@@ -101,19 +101,19 @@ public class Node implements NodeInteractionInterface
 				ie.printStackTrace();
 			}
 
-			System.out.println(Thread.currentThread() + " Node.start() 1 " + Node.getInstance().getResolverStub());
+
 
 			this.lifeCycleManager.start();
 
-			System.out.println(Thread.currentThread() + " Node.start() 2 " + Node.getInstance().getResolverStub());
+
 
 			boolean exit = false;
 
 			try
 			{
-				System.out.println(Thread.currentThread() + " Node.start() 3 " + Node.getInstance().getResolverStub());
+
 				this.neighbourSetSemaphore.acquire(2);  // Blocks until (a) permit(s) become available
-				System.out.println(Thread.currentThread() + " Node.start() 4 " + Node.getInstance().getResolverStub());
+
 			}
 			catch (InterruptedException ie)
 			{
@@ -129,17 +129,17 @@ public class Node implements NodeInteractionInterface
 				{
 					if(this.id != Node.DEFAULT_ID)
 					{
-						//System.out.println("id changed");
+
 						synchronized (this.previousNeighbour)
 						{
 							if(this.previousNeighbour != Node.DEFAULT_ID)
 							{
-								//System.out.println("prev changed");
+
 								synchronized (this.nextNeighbour)
 								{
 									if(this.nextNeighbour != Node.DEFAULT_ID)
 									{
-										//System.out.println("next changed");
+
 										exit = true;
 									}
 								}
@@ -152,9 +152,9 @@ public class Node implements NodeInteractionInterface
 
 			//DownloadManager.getInstance().start();
 
-			//System.out.println("ResolverStub: " + Node.getInstance().getResolverStub());
 
-			System.out.println(Thread.currentThread() + " Node.start() 5 " + Node.getInstance().getResolverStub());
+
+
 			this.fileManager.start();
 			this.updateAgent.start();
 		}
@@ -260,7 +260,7 @@ public class Node implements NodeInteractionInterface
 
 	public ResolverInterface getResolverStub()
 	{
-		//System.out.println("getResolverStub: " + this.resolverStub);
+
 		return this.resolverStub;
 	}
 
@@ -308,7 +308,7 @@ public class Node implements NodeInteractionInterface
 	@Override
 	public void releaseStartupSlot() throws RemoteException
 	{
-		//System.out.println("Got indication that neighbours are set");
+
 		this.neighbourSetSemaphore.release(1);
 	}
 }

@@ -61,7 +61,7 @@ public class Client //implements Runnable
 	{
 		try
 		{
-			//System.out.println("writing " + data.length + " bytes to outputStream");
+
 			this.out.write(data);
 		}
 		catch(IOException e)
@@ -148,13 +148,13 @@ public class Client //implements Runnable
 				}
 				else
 				{
-					//System.out.println("setting end reply code");
+
 					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
 					Datagram data = new Datagram(header,file.read((int) file.available()));
 
 					this.send(data.serialize());
 					length++;
-					//System.out.println(length + " packets sent");
+
 				}
 
 

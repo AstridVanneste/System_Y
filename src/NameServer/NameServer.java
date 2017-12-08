@@ -100,7 +100,7 @@ public class NameServer
 
 	public void writeMapToFile()
 	{
-		//System.out.println("WRITING TO FILE");
+
 		File file = new File(MAP_FILE_NAME);
 
 		try

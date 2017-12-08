@@ -170,17 +170,17 @@ public class Server implements Runnable
 		{
 			while (!quit)
 			{
-				//System.out.println("quit: " + Boolean.toString(quit));
+
 				if (this.hasData(remoteHost))
 				{
-					//System.out.println("System has data for remote host");
+
 					Datagram datagram = new Datagram(this.receive(remoteHost));
 
 					if (datagram.getHeader().getRequestCode() == ProtocolHeader.REQUEST_FILE)
 					{
 						if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE || datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 						{
-							//System.out.println("Datagram with reply code: " + datagram.getHeader().getReplyCode());
+
 							if (firstSegment)
 							{
 								transactionID = datagram.getHeader().getTransactionID();
@@ -197,12 +197,12 @@ public class Server implements Runnable
 							{
 								file.append(datagram.getData());
 								//packets++;
-								//System.out.println("packet appended");
+
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 							{
-								//System.out.println("last packet received");
+
 								quit = true;
 							}
 							timer = 0;
@@ -229,7 +229,7 @@ public class Server implements Runnable
 					}
 				}
 			}
-			//System.out.println(packets + " packets written");
+
 		}
 		catch (IOException ioe)
 		{
@@ -248,15 +248,15 @@ public class Server implements Runnable
 			{
 				//synchronized (this.stop)
 				//{
-				//System.out.println("Pre-Accept");
+
 				Socket clientSocket = this.socket.accept();
-				//System.out.println("Creating ConnectionHandler");
+
 				ConnectionHandler ch = new ConnectionHandler(clientSocket);
 				ch.start();
 
 				this.incomingConnections.put(clientSocket.getRemoteSocketAddress().toString(), ch);
 				//}
-				//System.out.println("Server loop");
+
 			}
 		}
 		catch (IOException ioe)
@@ -265,12 +265,12 @@ public class Server implements Runnable
 			ioe.printStackTrace();
 		}
 
-		//System.out.println("Returning from Server.run()");
+
 	}
 
 	private void stopConnectionHandler (String remoteHost)
 	{
-		//System.out.println("Stopping connection with " + remoteHost);
+
 		this.incomingConnections.get(remoteHost).stop();
 		this.incomingConnections.remove(remoteHost);
 	}
@@ -279,20 +279,20 @@ public class Server implements Runnable
 	{
 		try
 		{
-			//System.out.println("Removing ConnectionHandlers");
+
 			for (String remoteHost : this.incomingConnections.keySet())
 			{
-				//System.out.println("Stopping Connection to " + remoteHost);
+
 				this.stopConnectionHandler(remoteHost);
 			}
 
-			//System.out.println("Closed all ConnectionHandlers");
+
 			this.stop = true;
-			//System.out.println("Set stop to true, stop: " + Boolean.toString(this.stop));
+
 			this.socket.close();
-			//System.out.println("Closed ServerSocket");
+
 			this.thread.join();
-			//System.out.println("Joined Thread");
+
 		}
 		catch (InterruptedException ie)
 		{

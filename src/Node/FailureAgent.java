@@ -21,7 +21,7 @@ public class FailureAgent
 	 */
 	private void failure(short firstID, short lastID)
 	{
-		System.out.println("failure(" + Short.toString(firstID) + "," + Short.toString(lastID) + ")");
+
 		String IPprev = "";
 		String IPnext = "";
 		short nextID = -1;
@@ -37,8 +37,8 @@ public class FailureAgent
 			nextID = Node.getInstance().getResolverStub().getNext(lastID);
 			IPprev = Node.getInstance().getResolverStub().getIP(prevID);
 			IPnext = Node.getInstance().getResolverStub().getIP(nextID);
-			System.out.println("PREV: " + Short.toString(prevID));
-			System.out.println("NEXT: " + Short.toString(nextID));
+
+
 		}
 		catch(RemoteException re)
 		{
@@ -79,21 +79,21 @@ public class FailureAgent
 		// Handling Recursion
 		if (prevFailed && nextFailed)
 		{
-			System.out.println("Next and previous failed");
+
 			this.failure(prevID, nextID);
 		}
 		else if (prevFailed)
 		{
-			System.out.println("Previous failed");
+
 			this.failure(prevID, lastID);
 		}
 		else if (nextFailed)
 		{
-			System.out.println("Next failed");
+
 			this.failure(firstID, nextID);
 		}
 
-		System.out.println("No Recursion");
+
 
 		// No recursion occurred or we're the last level of recursion
 		// first and last become eachothers neighbours
@@ -123,9 +123,9 @@ public class FailureAgent
 				while (tmpID != nextID)
 				{
 					Util.General.printLineSep();
-					System.out.println("Tmp: " + Short.toString(tmpID));
-					System.out.println("PrevID: " + Short.toString(prevID));
-					System.out.println("NextID: " + Short.toString(nextID));
+
+
+
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
@@ -179,7 +179,6 @@ public class FailureAgent
 			{
 				prevNodeStr = prevNode.toString();
 			}
-
 
 			System.err.println("[ERROR]\tNext (" + nextNodeStr + ") or Previous (" + prevNodeStr + ") stub was NULL when trying to set neighbours from FailureAgent");
 			npe.printStackTrace();

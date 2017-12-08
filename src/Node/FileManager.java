@@ -68,7 +68,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void start()
 	{
-		System.out.println(Thread.currentThread().getName() + " FileManager.start() 1 " + Node.getInstance().getResolverStub());
+
 		this.running = true;
 
 		try
@@ -116,8 +116,8 @@ public class FileManager implements FileManagerInterface
 		this.sendSemaphore.release(MAX_PERMITS);
 
 		//start replicating files.
-		//System.out.println("Starting to replicate files");
-		System.out.println(Thread.currentThread().getName() + " FileManager.start() 2 " + Node.getInstance().getResolverStub());
+
+
 		try
 		{
 			this.checkFiles(FileType.LOCAL_FILE);
@@ -327,7 +327,7 @@ public class FileManager implements FileManagerInterface
 		/*
 		try
 		{
-			//System.out.println("lock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
+
 		}
 		catch(ServerNotActiveException	snae)
 		{
@@ -437,7 +437,7 @@ public class FileManager implements FileManagerInterface
 			short ownerId = Node.DEFAULT_ID;
 			String ownerIP = "";
 
-			//System.out.println("Checking " + file.toString());
+
 
 			try
 			{
@@ -455,7 +455,7 @@ public class FileManager implements FileManagerInterface
 				{                                                                           // Replicate it elsewhere
 					//you become the new owner of the file...
 					//send replication to your previous neighbour. this node becomes the owner of the file
-					//System.out.println("OWNER IS SAME AS LOCAL");
+
 					String replicatedIP = Node.getInstance().getResolverStub().getIP(Node.getInstance().getPreviousNeighbour());
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
@@ -466,7 +466,7 @@ public class FileManager implements FileManagerInterface
 				else if ((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
 
-					//System.out.println("sending file to " + ownerId + " filename: " + file.getName());
+
 
 
 					if (type == FileType.OWNED_FILE)                                // We own the file
@@ -518,10 +518,8 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException
 	{
-		///System.out.println("receiving file of type " + type);
 		filename = this.getFullPath(filename, type);
 
-		/*
 		/*
 		if (type == FileType.OWNED_FILE)
 		{
@@ -548,7 +546,7 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
-		//System.out.println("File: '" + filename + "', length: " + (new java.io.File(this.getFullPath(filename, srcType)).length()));
+
 
 		String dstIP = "";
 
@@ -569,9 +567,9 @@ public class FileManager implements FileManagerInterface
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 
-			//System.out.println("Locking a slot on " + dstIP);
+
 			remoteFileManager.lockSlot();
-			//System.out.println("Progressed past lock");
+
 
 			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 			client.start();
@@ -657,9 +655,9 @@ public class FileManager implements FileManagerInterface
 		try
 		{
 			Registry registry = LocateRegistry.getRegistry(ownerIP);
-			//System.out.println("Downloading " + filename + " owner = " + ownerIP);
-			FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
-			fileManager.pullFile(Node.getInstance().getId(), filename);
+
+			FileManagerInterface remoteFileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.pullFile(Node.getInstance().getId(), filename);
 			/*
 			the owner will later call a push() method on this node to actually receive the file.
 			 */

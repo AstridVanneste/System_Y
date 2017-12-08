@@ -118,7 +118,7 @@ public class File
 	 */
 	public void append (byte[] data) throws IOException
 	{
-		//System.out.println("APPENDING FILE");
+
 
 		FileOutputStream outputStream = new FileOutputStream(this.filename, true);
 
