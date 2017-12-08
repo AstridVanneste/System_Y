@@ -233,6 +233,7 @@ public class LifeCycleManager implements Runnable
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 
+
 			//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.bindNameserverStubs() " + Node.getInstance().getResolverStub());
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		}
