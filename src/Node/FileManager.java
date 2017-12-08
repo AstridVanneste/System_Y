@@ -521,7 +521,6 @@ public class FileManager implements FileManagerInterface
 		filename = this.getFullPath(filename, type);
 
 		/*
-		/*
 		if (type == FileType.OWNED_FILE)
 		{
 			if (this.hasFile(filename, type))
