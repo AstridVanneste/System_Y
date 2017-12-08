@@ -54,14 +54,14 @@ public class LifeCycleManager implements Runnable
 
 		/*while (Node.getInstance().getPreviousNeighbour() == -1 || Node.getInstance().getNextNeighbour() == -1)
 		{
-			//System.out.println("TansactionID = " + this.bootstrapTransactionID);
+
 			//wait until discovery is finished...
 
 		}*/
 
-		//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.start() " + Node.getInstance().getResolverStub());
 
-		//System.out.println("Finished discovery");
+
+
 	}
 
 	/**
@@ -78,14 +78,14 @@ public class LifeCycleManager implements Runnable
 			{
 				if(this.subscriber.hasData())
 				{
-					//System.out.println("Got Data");
+
 
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
 
 					Datagram request = new Datagram(packet.getData());
-					//System.out.println("Reply code" + request.getHeader().getReplyCode());
+
 
 					byte[] data = request.getData();
 
@@ -95,7 +95,7 @@ public class LifeCycleManager implements Runnable
 					if (Node.getInstance().getId() != Node.DEFAULT_ID)
 					{
 						// We're not a new node, check and if needed update neighbours
-						//System.out.println("We're not a new node");
+
 
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
@@ -116,8 +116,8 @@ public class LifeCycleManager implements Runnable
 					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
 						// We are a new node, let's start setting neighbours
-						//System.out.println("Transaction ID was ours");
-						//System.out.println("We are a new node");
+
+
 
 						//check if message contains error message duplicate id from NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)
@@ -138,16 +138,16 @@ public class LifeCycleManager implements Runnable
 						//check if successfully added to NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
-							//System.out.println("succesfully added to system");
+
 							Node.getInstance().setId(newNodeID);
-							//System.out.println("setting nodeID " + Node.getInstance().getId() );
+
 							String nsIp = packet.getAddress().getHostAddress();
 
 							// Set up connection(s) to NameServer
 
 							this.bindNameserverStubs(nsIp);
 
-							//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.run() " + Node.getInstance().getResolverStub());
+
 
 							//nameserver sends the amount of nodes in the tree
 
@@ -158,7 +158,7 @@ public class LifeCycleManager implements Runnable
 							}
 
 							this.bootstrapTransactionID = -1;
-							//System.out.println("transactionID = " + this.bootstrapTransactionID);
+
 
 							try
 							{
@@ -233,8 +233,6 @@ public class LifeCycleManager implements Runnable
 			reg = LocateRegistry.getRegistry(nsIp);
 			Node.getInstance().setResolverStub((ResolverInterface) reg.lookup(NameServer.RESOLVER_NAME));
 
-
-			//System.out.println(Thread.currentThread().getName() + " LifeCycleManager.bindNameserverStubs() " + Node.getInstance().getResolverStub());
 			this.shutdownStub = (ShutdownAgentInterface) reg.lookup((NameServer.SHUTDOWN_AGENT_NAME));
 		}
 		catch (RemoteException | NotBoundException e)

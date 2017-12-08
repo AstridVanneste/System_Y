@@ -96,15 +96,15 @@ public class Subscriber implements Runnable
 	{
 		while (!this.socket.isClosed())
 		{
-			//System.out.println("Socket isn't closed, packetbuffer size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
+
 			byte[] buffer = new byte[500];
 			DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
 			try
 			{
 				this.socket.receive(incomingPacket);
-				//System.out.println("Received incoming packet, size: "  + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
+
 				//this.packetBuffer.add(incomingPacket);
-				//System.out.println("Added to buffer, size: " + Integer.toString(this.packetBuffer.size()) + " Received on " + this.ip + ":" + this.portNum);
+
 
 				byte[] actualData = new byte[incomingPacket.getLength()];
 				System.arraycopy(incomingPacket.getData(), 0, actualData, 0, incomingPacket.getLength());
@@ -112,7 +112,7 @@ public class Subscriber implements Runnable
 				DatagramPacket trimmedPacket = incomingPacket;
 				trimmedPacket.setData(actualData);
 
-				//System.out.println("Received UDP pakcet with a size of " + Integer.toString(actualData.length));
+
 
 				this.packetBuffer.add(trimmedPacket);
 			}

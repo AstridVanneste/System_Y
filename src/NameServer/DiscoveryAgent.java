@@ -26,8 +26,8 @@ public class DiscoveryAgent implements Runnable
 
 	public void init ()
 	{
-		//System.out.println("Init discovery Agent");
-		//System.out.println("'" + NameServer.getInstance().toString() + "'");
+
+
 		multicastSub.start();
 		Thread t = new Thread (this);
 		t.start();

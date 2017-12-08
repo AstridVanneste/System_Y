@@ -109,7 +109,7 @@ public class Client implements Runnable
 	 */
 	public DatagramPacket receivePacket()
 	{
-		//System.out.println("BUFFERLENGTH" + packetBuffer.size());
+
 		if(!this.packetBuffer.isEmpty())
 		{
 			DatagramPacket packet = this.packetBuffer.get(0);
@@ -147,9 +147,9 @@ public class Client implements Runnable
 				try
 				{
 					this.socket.receive(incomingPacket);
-					//System.out.println("Received " + incomingPacket.getData().length + " Bytes");
+
 					this.packetBuffer.add(incomingPacket);
-					//System.out.println("Packetbuffer size " + this.packetBuffer.size());
+
 				}
 				catch (SocketException se)
 				{
