@@ -430,7 +430,29 @@ public class FileManager implements FileManagerInterface
 		System.out.println(Thread.currentThread().getName() + " FileManager.checkFiles(" + type + ") " + Node.getInstance().getResolverStub());
 		File folder = new File(this.getFullPath("", type));
 
-		File[] fileList = folder.listFiles();
+		File[] fileList;
+
+		if(type != FileType.OWNED_FILE)
+		{
+			fileList = folder.listFiles();
+		}
+		else //in case of owned files it is important to use the fileLedgers instead of list of files in owned folder because this does not take into account the owned files in the local folder
+		{
+			fileList = new File[this.fileLedgers.size()];
+
+			int i = 0;
+			for(String filename: this.fileLedgers.keySet())
+			{
+				if(this.fileLedgers.get(filename).getReplicatedId() == Node.DEFAULT_ID)
+				{
+					fileList[i] = new File(getFullPath(filename, FileType.OWNED_FILE));
+				}
+				else
+				{
+					fileList[i] = new File(getFullPath(filename, FileType.LOCAL_FILE));
+				}
+			}
+		}
 
 		for (File file : fileList)
 		{
