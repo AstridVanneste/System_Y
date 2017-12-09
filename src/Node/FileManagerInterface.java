@@ -55,4 +55,20 @@ public interface FileManagerInterface extends Remote
 	public void lockSlot() throws RemoteException;
 
 	public void unlockSlot() throws RemoteException;
+
+	/**
+	 * use a filename to get the fileledger remotely.
+	 * @param name
+	 * @return the fileledger corresponding with the received filename
+	 * @throws RemoteException
+	 */
+	public FileLedger getFileLedger(String name) throws RemoteException;
+
+	/**
+	 * Remove a fileLedger from the list remotely.
+	 * The input parameter is the name of the file that has to be deleted.
+	 * @param fileName
+	 * @throws RemoteException
+	 */
+	public void deleteFileLedgerRemote(String fileName) throws RemoteException;
 }

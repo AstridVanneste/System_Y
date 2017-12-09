@@ -138,7 +138,6 @@ public class Client //implements Runnable
 			int length = 0;
 			while(file.available() > 0)
 			{
-
 				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
 				{
 					Datagram data = new Datagram(header, file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE));

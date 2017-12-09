@@ -312,7 +312,6 @@ public class FileManager implements FileManagerInterface
 	 */
 	@Override
 	public void deleteFile(String filename, FileType type) throws IOException
-
 	{
 		File file = new File(this.getFullPath(filename, type));
 		if (file.exists())
@@ -748,6 +747,47 @@ public class FileManager implements FileManagerInterface
 		this.rootDirectory = rootDirectory;
 	}
 
+	public void deleteFileRemote(short id, String filename, FileType filetype)
+	{
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.deleteFile(filename, filetype);
+		}
+		catch (NotBoundException | IOException re)
+		{
+			re.printStackTrace();
+		}
+	}
+
+	public FileLedger getFileLedgerRemote(short id, String fileName)
+	{
+		FileLedger fileLedger = null;
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			fileLedger = remoteFileManager.getFileLedger(fileName);
+		}
+		catch (NotBoundException | IOException re)
+		{
+			re.printStackTrace();
+		}
+		return fileLedger;
+	}
+
+	public void deleteFileLedger(String fileName)
+	{
+		fileLedgers.remove(fileName);
+	}
+
+	public void deleteFileLedgerRemote(String fileName) throws RemoteException
+	{
+		fileLedgers.remove(fileName);
+	}
+
+
 	public String getRootDirectory()
 	{
 		return this.rootDirectory;
@@ -837,5 +877,10 @@ public class FileManager implements FileManagerInterface
 	public Set<String> getOwnedFiles()
 	{
 		return this.fileLedgers.keySet();
+	}
+
+	public FileLedger getFileLedger(String name) throws RemoteException
+	{
+		return fileLedgers.get(name);
 	}
 }

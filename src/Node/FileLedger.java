@@ -109,4 +109,9 @@ public class FileLedger implements Serializable
 	{
 		this.replicatedID = replicatedID;
 	}
+
+	public Set<Short> getCopies()
+	{
+		return copies;
+	}
 }
