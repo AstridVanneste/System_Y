@@ -24,7 +24,7 @@ public class Controller {
 
 	public void openFile(String fileName)
 	{
-		
+
 	}
 
 	public void deleteLocal(String fileName)
