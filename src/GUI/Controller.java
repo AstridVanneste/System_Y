@@ -2,7 +2,9 @@ package GUI;
 
 import Node.Node;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Set;
@@ -12,6 +14,9 @@ import Node.FileLedger;
 import static Node.FileType.*;
 
 public class Controller {
+
+	private static final String PREFIX = "/";
+
 	public Controller()
 	{
 
@@ -22,9 +27,69 @@ public class Controller {
 
 	}
 
-	public void openFile(String fileName)
+	public boolean openFile(String fileName)
 	{
-		
+		if(Node.getInstance().getFileManager().hasFile(fileName, LOCAL_FILE))
+		{
+			if (Desktop.isDesktopSupported()) {
+				try {
+					File myFile = new File(Node.getInstance().getFileManager().getFolder(LOCAL_FILE) + PREFIX + fileName);
+					Desktop.getDesktop().open(myFile);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			return true;
+		}
+		else if(Node.getInstance().getFileManager().hasFile(fileName, REPLICATED_FILE))
+		{
+			if (Desktop.isDesktopSupported()) {
+				try {
+					File myFile = new File(Node.getInstance().getFileManager().getFolder(REPLICATED_FILE) + PREFIX + fileName);
+					Desktop.getDesktop().open(myFile);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			return true;
+		}
+		else if(Node.getInstance().getFileManager().hasFile(fileName, DOWNLOADED_FILE))
+		{
+			if (Desktop.isDesktopSupported()) {
+				try {
+					File myFile = new File(Node.getInstance().getFileManager().getFolder(DOWNLOADED_FILE) + PREFIX + fileName);
+					Desktop.getDesktop().open(myFile);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			return true;
+		}
+		else if(Node.getInstance().getFileManager().hasFile(fileName, OWNED_FILE))
+		{
+			if (Desktop.isDesktopSupported()) {
+				try {
+					File myFile = new File(Node.getInstance().getFileManager().getFolder(OWNED_FILE) + PREFIX + fileName);
+					Desktop.getDesktop().open(myFile);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			return true;
+		}
+		else
+		{
+			Node.getInstance().getFileManager().requestFile(fileName);
+			if (Desktop.isDesktopSupported()) {
+				try {
+					File myFile = new File(Node.getInstance().getFileManager().getFolder(DOWNLOADED_FILE) + PREFIX + fileName);
+					Desktop.getDesktop().open(myFile);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+			return true;
+		}
 	}
 
 	public void deleteLocal(String fileName)
