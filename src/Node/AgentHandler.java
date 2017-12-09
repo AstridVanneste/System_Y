@@ -64,6 +64,11 @@ public class AgentHandler implements AgentHandlerInterface
 		return this.advertiseQueue;
 	}
 
+	public synchronized  LinkedList<String> getAllFiles ()
+	{
+		return this.allFiles;
+	}
+
 	public synchronized void clearDownloadQueue ()
 	{
 		this.downloadQueue.clear();
