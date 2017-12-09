@@ -31,7 +31,7 @@ public class ConnectionHandler implements Runnable
 			this.in = new DataInputStream(this.socket.getInputStream());
 			this.out = new DataOutputStream(this.socket.getOutputStream());
 			this.thread = new Thread(this);
-			this.thread.setName("Thread - ConnectionHandler to " + this.socket.getRemoteSocketAddress().toString());
+			this.thread.setName("ConnectionHandler to " + this.socket.getRemoteSocketAddress().toString());
 			this.thread.start();
 		}
 		catch (IOException ioe)

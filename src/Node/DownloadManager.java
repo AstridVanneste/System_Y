@@ -16,7 +16,7 @@ public class DownloadManager implements Runnable
 	private DownloadManager ()
 	{
 		this.thread = new Thread(this);
-		this.thread.setName("Thread - DownloadManager Thread, Node: " + Node.getInstance().getName());
+		this.thread.setName("DownloadManager Thread, Node: " + Node.getInstance().getName());
 	}
 
 	public static DownloadManager getInstance ()

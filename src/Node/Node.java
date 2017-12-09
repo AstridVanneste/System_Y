@@ -28,6 +28,7 @@ public class Node implements NodeInteractionInterface
 	private FailureAgent failureAgent;
 	private FileManager fileManager;
 	private UpdateAgent updateAgent;
+	//private AgentHandler agentHandler;
 
 	private ResolverInterface resolverStub;
 
@@ -47,6 +48,7 @@ public class Node implements NodeInteractionInterface
 		this.resolverStub = null;
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
+		//this.agentHandler = new AgentHandler();
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class Node implements NodeInteractionInterface
 
 	public void start()
 	{
-		Thread.currentThread().setName("Thread, Main - " + Node.getInstance().getName());
+		Thread.currentThread().setName("Main - " + Node.getInstance().getName());
 
 		if (!this.lifeCycleManager.isRunning())
 		{
@@ -157,6 +159,7 @@ public class Node implements NodeInteractionInterface
 
 			this.fileManager.start();
 			this.updateAgent.start();
+			//this.agentHandler.start();
 		}
 		else
 		{
@@ -311,4 +314,11 @@ public class Node implements NodeInteractionInterface
 
 		this.neighbourSetSemaphore.release(1);
 	}
+
+	/*
+	public AgentHandler getAgentHandler ()
+	{
+		return this.agentHandler;
+	}
+	*/
 }

@@ -35,7 +35,7 @@ public class UpdateAgent implements Runnable
 			this.localDir.register(service, StandardWatchEventKinds.ENTRY_CREATE);
 
 			this.thread = new Thread(this);
-			this.thread.setName("Thread - Node.UpdateAgent Thread: " + Node.getInstance().getName());
+			this.thread.setName("Node.UpdateAgent Thread: " + Node.getInstance().getName());
 			this.thread.start();
 
 		}

@@ -11,7 +11,7 @@ public class DownloadThread implements Runnable
 		this.done = false;
 		this.filename = filename;
 		this.thread = new Thread (this);
-		this.thread.setName("Thread - DownloadThread, file: " + this.filename);
+		this.thread.setName("DownloadThread, file: " + this.filename);
 	}
 
 	public void start ()
