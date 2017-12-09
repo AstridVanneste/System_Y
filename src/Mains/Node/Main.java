@@ -15,8 +15,9 @@ public class Main
     {
 	    if ((args.length < 1) ||  (args.length > 2))
 	    {
-		    System.err.println("[ERROR]\tInvalid number of command line arguments: " + Integer.toString(args.length) + ", should be 1");
-		    return;
+		    System.err.println("[ERROR]\tInvalid number of command line arguments: " + Integer.toString(args.length) + ", should be at least 1 and at most 2");
+		    System.err.println("USAGE: java -jar Node.jar NODENAME [SYSTEM Y ROOT DIRECTORY]");
+		    System.exit(-1);
 	    }
 	    else
 	    {
@@ -24,7 +25,7 @@ public class Main
 		    printLineSep();
 
 		    System.out.println("INSTRUCTIONS:\n1.) DO TESTING\n2.) STOP NODE (Can be done via quit, which causes an ungraceful end, or via shutdown, which is a graceful stop)");
-		    System.out.println("Press any key to continue...");
+		    System.out.println("Press return to continue...");
 		    scanner.nextLine();
 
 		    printLineSep();
@@ -37,64 +38,75 @@ public class Main
 				Node.getInstance().getFileManager().setRootDirectory(args[1]);
 			}
 			Node.getInstance().start();
-		    System.out.println("Started Node...");
+		    System.out.println("Starting Node...");
 
-			
 		    boolean quit = false;
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | [D]ownload File");
+			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | Manually [D]ownload File"/* | Do[w]nload file through FileAgent"*/);
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
-			    if (next.equals("Q") || next.equals("q"))
+			    switch (next)
 			    {
-				    System.out.println("Quitting...");
-				    quit = true;
-				    continue;
-			    }
-			    else if (next.equals("N") || next.equals("n"))
-			    {
-				    System.out.println("Checking Next and Previous Nodes...");
-				    System.out.println("Next: " + Integer.toString(Node.getInstance().getNextNeighbour()));
-				    System.out.println("Previous: " + Integer.toString(Node.getInstance().getPreviousNeighbour()));
-			    }
-			    else if (next.equals("T") || next.equals("t"))
-			    {
-				    System.out.println("Stopping Node...");
-				    Node.getInstance().stop();
-			    }
-			    else if (next.equals("A") || next.equals("a"))
-			    {
-				    System.out.println("Starting Node...");
-				    Node.getInstance().start();
-			    }
-			    else if (next.equals("U") || next.equals("u"))
-			    {
-				    System.out.println("Please enter the ID of the node you wish to indicate for failure: ");
-				    short failID = scanner.nextShort();
-				    System.out.println("Starting failure for node " + Short.toString(failID));
-				    Node.getInstance().getFailureAgent().failure(failID);
-			    }
-			    else if (next.equals("I") || next.equals("i"))
-			    {
-				    System.out.println("ID: " + Short.toString(Node.getInstance().getId()));
-			    }
-			    else if (next.equals("O") || next.equals("o"))
-				{
-					System.out.println(Node.getInstance().getFileManager().toString());
-				}
-				else if(next.equals("D") || next.equals("d"))
-				{
-					System.out.println("Type the filename of the file you want to download...");
-					String filename = scanner.nextLine();
-					Node.getInstance().getFileManager().requestFile(filename);
-				}
-			    else
-			    {
-				    System.err.println("[ERROR]\tInvalid input: '" + next + "'");
-				    continue;
+				    case "Q":
+				    case "q":
+					    System.out.println("Quitting...");
+					    quit = true;
+					    continue;
+				    case "N":
+				    case "n":
+					    System.out.println("Checking Next and Previous Nodes...");
+					    System.out.println("Next: " + Integer.toString(Node.getInstance().getNextNeighbour()));
+					    System.out.println("Previous: " + Integer.toString(Node.getInstance().getPreviousNeighbour()));
+					    break;
+				    case "T":
+				    case "t":
+					    System.out.println("Stopping Node...");
+					    Node.getInstance().stop();
+					    break;
+				    case "A":
+				    case "a":
+					    System.out.println("Starting Node...");
+					    Node.getInstance().start();
+					    break;
+				    case "U":
+				    case "u":
+					    System.out.println("Please enter the ID of the node you wish to indicate for failure: ");
+					    short failID = scanner.nextShort();
+					    System.out.println("Starting failure for node " + Short.toString(failID));
+					    Node.getInstance().getFailureAgent().failure(failID);
+					    break;
+				    case "I":
+				    case "i":
+					    System.out.println("ID: " + Short.toString(Node.getInstance().getId()));
+					    break;
+				    case "O":
+				    case "o":
+					    System.out.println(Node.getInstance().getFileManager().toString());
+					    break;
+				    case "D":
+				    case "d":
+				    {
+					    System.out.println("Type the filename of the file you want to download...");
+					    String filename = scanner.nextLine();
+					    Node.getInstance().getFileManager().requestFile(filename);
+					    break;
+				    }
+				    /*
+				    case "W":
+				    case "w":
+				    {
+					    System.out.println("Type the filename of the file you want to download...");
+					    String filename = scanner.nextLine();
+					    Node.getInstance().getAgentHandler().download(filename);
+					    break;
+				    }
+					    */
+				    default:
+					    System.err.println("[ERROR]\tInvalid input: '" + next + "'");
+					    continue;
 			    }
 
 			    printLineSep();

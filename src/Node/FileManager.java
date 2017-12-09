@@ -269,10 +269,6 @@ public class FileManager implements FileManagerInterface
 				}
 			}
 		}
-		/*
-		 * I have absolutely no idea what's going on here, if this piece of code fails
-		 * I (Thomas) get the exclusive right to an "I told you so"
-		 */
 		else if (type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
 		{
 			/*
@@ -426,7 +422,7 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void checkFiles(FileType type) throws RemoteException
 	{
-		System.out.println(Thread.currentThread().getName() + " FileManager.checkFiles(" + type + ") " + Node.getInstance().getResolverStub());
+		//System.out.println(Thread.currentThread().getName() + " FileManager.checkFiles(" + type + ") " + Node.getInstance().getResolverStub());
 		File folder = new File(this.getFullPath("", type));
 
 		File[] fileList;
@@ -825,7 +821,7 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		builder.append("\nREPLICATED\n");
+		builder.append("\nREPLICATED:\n");
 		folder = new File(this.getFolder(FileType.REPLICATED_FILE));
 		for (File file : folder.listFiles())
 		{

@@ -9,6 +9,7 @@ import NameServer.NameServer;
 import NameServer.ResolverInterface;
 import NameServer.ShutdownAgentInterface;
 import Util.Serializer;
+import com.sun.istack.internal.NotNull;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -45,7 +46,7 @@ public class LifeCycleManager implements Runnable
 		this.running = true;
 
 		this.thread = new Thread(this);
-		this.thread.setName("Thread - Node.LifeCycleManager Thread, Node: " + Node.getInstance().getName());
+		this.thread.setName("Node.LifeCycleManager Thread, Node: " + Node.getInstance().getName());
 		this.thread.start();
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
@@ -95,21 +96,41 @@ public class LifeCycleManager implements Runnable
 					if (Node.getInstance().getId() != Node.DEFAULT_ID)
 					{
 						// We're not a new node, check and if needed update neighbours
-
-
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
 							this.updateNeighbours(newNodeID);
-							if(numberOfNodes == 2 && !Node.getInstance().getFileManager().isRunning())  //You were alone and have not yet started your filemanager. Now a new node has joined so you can start replicating
+
+							// You were alone, now there's 2 of you
+							// Now a new node has joined so you can start replicating
+							// You can also start circulating the FileAgent
+							if(numberOfNodes == 2)
 							{
+								//You were alone and have not yet started your filemanager.
+								if (!Node.getInstance().getFileManager().isRunning())
+								{
+									try
+									{
+										Node.getInstance().releaseStartupSlot();
+									}
+									catch (RemoteException re)
+									{
+										re.printStackTrace();
+									}
+								}
+
+								/*
 								try
 								{
-									Node.getInstance().releaseStartupSlot();
+									// Get the remote node's AgentHandler
+									Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newNodeID));
+									AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
+									remoteAgentHandler.runAgent(new FileAgent());
 								}
-								catch (RemoteException re)
+								catch (RemoteException | NotBoundException re)
 								{
 									re.printStackTrace();
 								}
+								*/
 							}
 						}
 					}

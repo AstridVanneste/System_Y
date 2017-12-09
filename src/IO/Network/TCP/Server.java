@@ -40,7 +40,7 @@ public class Server implements Runnable
 		this.socket = new ServerSocket(this.portNum);
 
 		this.thread = new Thread(this);
-		this.thread.setName("Thread - TCP Server on " + InetAddress.getLocalHost().toString());
+		this.thread.setName("TCP Server on " + InetAddress.getLocalHost().toString());
 		this.thread.start();
 	}
 
