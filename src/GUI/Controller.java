@@ -7,25 +7,72 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.LinkedList;
 import java.util.Set;
-
+import static Node.FileType.*;
 import Node.FileLedger;
 
-import static Node.FileType.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 
-public class Controller {
+import javafx.scene.control.TableView;
+import javafx.scene.image.ImageView;
+
+
+
+public class Controller
+{
 
 	private static final String PREFIX = "/";
+	private ObservableList<TableFile> data;
+
+	@FXML
+	private ImageView shutdownButton;
+	private TableView TableView;
+	private Label nodeName;
+	private Label nodeID;
 
 	public Controller()
 	{
-
+		this.data = FXCollections.observableArrayList();
 	}
 
-	public void updateFiles()
+	/**
+	 *  This function is called to create a new fileEntry in the TableView. The user is now able to download or delete the file
+	 * @param fileName
+	 */
+	public void addFile(String fileName)
 	{
-
+		TableFile tableFile = new TableFile(fileName, "Not supported yet");
+		ObservableList<TableFile> data = TableView.getItems();
+		data.add(tableFile);
+		//TableView.setItems(data);
 	}
+
+	/**
+	 *  Has to be called everywhere new files are found or created in the node OR we work with only the addFile-method???
+	 *
+	 *  Compares the list of the files in the network vs the files in the tableView
+	 *  Adds a file in the tableView if necessary.
+	 */
+//	public void updateFiles()
+//	{
+//		LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
+//
+//		ObservableList<TableFile> data = TableView.getItems();
+//
+//		for(String file : files)
+//		{
+//			TableFile newFile = new TableFile(file, "Not supported yet");
+//
+//			if (!data.contains(newFile))
+//			{
+//				addFile(newFile);
+//			}
+//		}
+//	}
 
 	public boolean openFile(String fileName)
 	{
@@ -213,11 +260,8 @@ public class Controller {
 
 	public void shutdown()
 	{
+		System.out.println("Shutting down...");
 		Node.getInstance().stop();
 	}
 
-	/*
-	public void pressButton (ActionEvent event) {
-		System.out.println("Hello world");
-	}*/
 }

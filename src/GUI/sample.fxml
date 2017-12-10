@@ -1,18 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.collections.FXCollections?>
+<?import GUI.TableFile?>
 
-<GridPane alignment="center" hgap="10" prefHeight="300.0" prefWidth="300.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controller">
-   <children>
-      <Button fx:id="btn_msg" mnemonicParsing="false" prefHeight="58.0" prefWidth="83.0" text="Button" />
-   </children>
-   <columnConstraints>
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-   </rowConstraints>
-</GridPane>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.Controller">
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="20.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <children>
+            <Label text="Node Name" />
+            <Label text="Node ID" />
+            <Region visible="false" HBox.hgrow="ALWAYS" />
+            <ImageView fx:id="ShutdownButton" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#shutdown" pickOnBounds="true" HBox.hgrow="ALWAYS">
+               <image>
+                  <Image url="@exit_image.jpg" />
+               </image>
+            </ImageView>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="10.0" right="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
+   <top>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label id="HeadLabel" alignment="CENTER" text="SYSTEM Y">
+               <font>
+                  <Font size="30.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="50.0" left="50.0" right="50.0" top="20.0" />
+         </BorderPane.margin>
+         <content>
+            <TableView id="TableView">
+              <columns>
+                 <TableColumn fx:id="fileNameColumn" editable="false" prefWidth="75.0" text="FileName">
+                    <cellValueFactory><PropertyValueFactory property="fileName" />
+                    </cellValueFactory>
+                 </TableColumn>
+                 <TableColumn fx:id="sizeColumn" editable="false" prefWidth="75.0" text="Size">
+                    <cellValueFactory><PropertyValueFactory property="size" />
+                    </cellValueFactory>
+                 </TableColumn>
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+
+            <!-- <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <TableFile fileName="Jacob" size="Smith"/>
+                     <TableFile fileName="Isabella" size="Johnson"/>
+                     <TableFile fileName="Ethan" size="Williams"/>
+                     <TableFile fileName="Emma" size="Jones"/>
+                     <TableFile fileName="Michael" size="Brown"/>
+                  </FXCollections>
+               </items>-->
+
+              <sortOrder>
+                  <fx:reference source="fileNameColumn"/>
+               </sortOrder>
+
+            </TableView>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
