@@ -1,5 +1,6 @@
 package Node;
 
+import GUI.TableFile;
 import IO.Network.Constants;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
@@ -454,7 +455,7 @@ public class FileManager implements FileManagerInterface
 			short ownerId = Node.DEFAULT_ID;
 			String ownerIP = "";
 
-
+			//Node.getInstance().getController().addFile(new TableFile(file.getName(), "Not supported yet"));
 
 			try
 			{

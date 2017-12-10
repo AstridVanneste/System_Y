@@ -1,5 +1,7 @@
 package Node;
 
+import GUI.TableFile;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.rmi.NotBoundException;
@@ -65,6 +67,8 @@ public class UpdateAgent implements Runnable
 				{
 					WatchEvent.Kind<?> kind = event.kind(); // todo: Shouldn't we check the type of event?
 					Path eventPath = (Path)event.context();
+
+					//Node.getInstance().getController().addFile(new TableFile(eventPath.toString(), "Not supported yet"));
 
 					short ownerId = Node.DEFAULT_ID;
 
