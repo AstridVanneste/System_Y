@@ -5,6 +5,7 @@ import IO.Network.Constants;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
+import com.sun.tools.corba.se.idl.constExpr.Not;
 
 import java.io.File;
 import java.io.IOException;
@@ -546,7 +547,7 @@ public class FileManager implements FileManagerInterface
 	}
 
 	@Override
-	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException
+	public void pushFile(String filename, FileType type, String remoteHost) throws IOException
 	{
 		filename = this.getFullPath(filename, type);
 
@@ -564,11 +565,11 @@ public class FileManager implements FileManagerInterface
 		}
 		*/
 
-		this.tcpServer.receiveFile(remoteHost, filename); //todo: think about copying the file in the owner folder as well when replicating
+		this.tcpServer.receiveFile(remoteHost, filename);
 	}
 
 	/**
-	 * Sends a file to a certain node.
+	 * Sends a file to a certain node. It will also send the ledgers via the standard rules.
 	 *
 	 * @param dstID
 	 * @param filename
@@ -632,7 +633,7 @@ public class FileManager implements FileManagerInterface
 			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
 			File file = new File(this.getFullPath(filename, srcType));
-			remoteFileManager.pushFile(filename, file.length(), dstType, remoteHost);
+			remoteFileManager.pushFile(filename, dstType, remoteHost);
 
 			if (dstType == FileType.OWNED_FILE)
 			{
@@ -796,6 +797,50 @@ public class FileManager implements FileManagerInterface
 		fileLedgers.remove(fileName);
 	}
 
+	@Override
+	public void copyFile(String filename,short dstID, FileType srcType, FileType dstType) throws RemoteException
+	{
+		String dstIP = "";
+		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
+
+		int localPort = client.getLocalPort();
+		String remoteHost = "";
+
+		try
+		{
+			InetSocketAddress socket = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), localPort);
+
+			remoteHost = socket.toString();
+		}
+		catch (UnknownHostException uhe)
+		{
+			uhe.printStackTrace();
+		}
+
+		try
+		{
+			dstIP = Node.getInstance().getResolverStub().getIP(dstID);
+
+			client.sendFile(this.getFullPath(filename, srcType));
+		}
+		catch(RemoteException re)
+		{
+			re.printStackTrace();
+		}
+
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(dstIP);
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.pushFile(filename,dstType, remoteHost);
+		}
+		catch(NotBoundException | IOException nbe)
+		{
+			nbe.printStackTrace();
+			Node.getInstance().getFailureAgent().failure(dstID);
+		}
+	}
+
 
 	public String getRootDirectory()
 	{
@@ -892,4 +937,6 @@ public class FileManager implements FileManagerInterface
 	{
 		return fileLedgers.get(name);
 	}
+
+
 }

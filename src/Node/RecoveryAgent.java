@@ -61,6 +61,9 @@ public class RecoveryAgent extends Agent
 		}
 
 
+		//For files of which te failed node was owner we will need to do the entire circle to recreate the original fileledger.
+		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
+
 		//LOCAL FILES
 
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
@@ -74,15 +77,6 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					try
-					{
-						short owner = Node.getInstance().getResolverStub().getOwnerID(file.getName());
-						Node.getInstance().getFileManager().sendFile(owner, file.getName(), FileType.LOCAL_FILE, FileType.OWNED_FILE); //todo: sendfile fixes ledgers... in this case we need to send it afterwards... will this generate errors in the filemanager???
-					} catch (RemoteException re)
-					{
-						re.printStackTrace();
-					}
-
 					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.getInstance().getId(),Node.DEFAULT_ID,Node.DEFAULT_ID)); //file was not yet detected => we need to create a ledger!
 				}
 			}
@@ -102,15 +96,6 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					try
-					{
-						short owner = Node.getInstance().getResolverStub().getOwnerID(file.getName());
-						Node.getInstance().getFileManager().sendFile(owner, file.getName(), FileType.REPLICATED_FILE, FileType.OWNED_FILE); //todo: sendfile fixes ledgers... in this case we need to send it afterwards... will this generate errors in the filemanager???
-					} catch (RemoteException re)
-					{
-						re.printStackTrace();
-					}
-
 					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.DEFAULT_ID,Node.DEFAULT_ID,Node.getInstance().getId())); //file was not yet detected => we need to create a ledger!
 				}
 			}
@@ -130,15 +115,6 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					try
-					{
-						short owner = Node.getInstance().getResolverStub().getOwnerID(file.getName());
-						Node.getInstance().getFileManager().sendFile(owner, file.getName(), FileType.DOWNLOADED_FILE, FileType.OWNED_FILE); //todo: sendfile fixes ledgers... in this case we need to send it afterwards... will this generate errors in the filemanager???
-					} catch (RemoteException re)
-					{
-						re.printStackTrace();
-					}
-
 					FileLedger ledger = new FileLedger(file.getName(),Node.DEFAULT_ID,Node.DEFAULT_ID,Node.DEFAULT_ID);
 					ledger.addDownloader(Node.getInstance().getId());
 					this.ledgers.put(file.getName(),ledger); //file was not yet detected => we need to create a ledger!
@@ -177,14 +153,36 @@ public class RecoveryAgent extends Agent
 					re.printStackTrace();
 					Node.getInstance().getFailureAgent().failure(owner);
 				}
-				catch (NotBoundException nbi)
+				catch (NotBoundException | IOException nbi)
 				{
 					nbi.printStackTrace();
 				}
-				catch (IOException ioe)
+
+
+				short localID = this.ledgers.get(filename).getLocalID();
+				String localIP = "";
+				try
 				{
-					ioe.printStackTrace();
+					localIP = Node.getInstance().getResolverStub().getIP(localID);
 				}
+				catch(RemoteException re)
+				{
+					re.printStackTrace();
+				}
+
+				try
+				{
+					Registry reg = LocateRegistry.getRegistry(localIP);
+					FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+					remoteFileManager.copyFile(filename,this.ledgers.get(filename).getOwnerID(),FileType.LOCAL_FILE, FileType.OWNED_FILE);
+
+				}
+				catch(RemoteException | NotBoundException re)
+				{
+					re.printStackTrace();
+					Node.getInstance().getFailureAgent().failure(localID);
+				}
+
 			}
 
 

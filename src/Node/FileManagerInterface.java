@@ -18,11 +18,10 @@ public interface FileManagerInterface extends Remote
 	 * Caller = Node that's about to send a file.
 	 * Callee = Node that's about to receive a file.
 	 * @param filename      The filename used to retrieve and store the file.
-	 * @param fileSize      The size of the file in bytes.
 	 * @param type          The type of file (local, owner or download)
 	 * @param remoteHost    The port that the caller will use to send the file.
 	 */
-	public void pushFile(String filename, long fileSize, FileType type, String remoteHost) throws IOException;
+	public void pushFile(String filename, FileType type, String remoteHost) throws IOException;
 
 	/**
 	 * Remote method.
@@ -71,4 +70,15 @@ public interface FileManagerInterface extends Remote
 	 * @throws RemoteException
 	 */
 	public void deleteFileLedgerRemote(String fileName) throws RemoteException;
+
+	/**
+	 * Copies a file from a node to another. This method does not take into account any responsibility of ledgers.
+	 * Use this method as the most basic way to copy a file between nodes.
+	 * @param filename
+	 * @param dstID
+	 * @param srcType
+	 * @param dstType
+	 * @throws RemoteException
+	 */
+	public void copyFile(String filename, short dstID, FileType srcType, FileType dstType) throws RemoteException;
 }
