@@ -434,19 +434,20 @@ public class FileManager implements FileManagerInterface
 		}
 		else //in case of owned files it is important to use the fileLedgers instead of list of files in owned folder because this does not take into account the owned files in the local folder
 		{
-			fileList = new File[this.fileLedgers.size()];
+			fileList = new java.io.File[this.fileLedgers.size()];
 
 			int i = 0;
 			for(String filename: this.fileLedgers.keySet())
 			{
 				if(this.fileLedgers.get(filename).getReplicatedId() == Node.DEFAULT_ID)
 				{
-					fileList[i] = new File(getFullPath(filename, FileType.OWNED_FILE));
+					fileList[i] = new java.io.File(getFullPath(filename, FileType.OWNED_FILE));
 				}
 				else
 				{
-					fileList[i] = new File(getFullPath(filename, FileType.LOCAL_FILE));
+					fileList[i] = new java.io.File(getFullPath(filename, FileType.LOCAL_FILE));
 				}
+				i++;
 			}
 		}
 
@@ -456,10 +457,12 @@ public class FileManager implements FileManagerInterface
 			String ownerIP = "";
 
 			//Node.getInstance().getController().addFile(new TableFile(file.getName(), "Not supported yet"));
+			String filename = file.getName();
+			System.out.println("checking file: " + filename + " File.exists() " + file.exists());
 
 			try
 			{
-				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
+				ownerId = Node.getInstance().getResolverStub().getOwnerID(filename);
 				ownerIP = Node.getInstance().getResolverStub().getIP(ownerId);
 			}
 			catch (RemoteException re)
@@ -507,12 +510,21 @@ public class FileManager implements FileManagerInterface
 						}
 					}
 
-
-					this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
-
-					if (type == FileType.OWNED_FILE)
+					if(type == FileType.OWNED_FILE)
 					{
-						file.delete();
+						if(this.fileLedgers.get(file.getName()).getReplicatedId() != Node.DEFAULT_ID)
+						{
+							this.sendFile(ownerId,file.getName(),FileType.LOCAL_FILE,FileType.OWNED_FILE);
+						}
+						else
+						{
+							this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
+							file.delete();
+						}
+					}
+					else
+					{
+						this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
 					}
 				}
 			}
