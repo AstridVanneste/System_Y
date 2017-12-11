@@ -1,6 +1,7 @@
 package Mains.Node;
 
 import Node.Node;
+import Node.DownloadManager;
 
 import java.util.Scanner;
 
@@ -99,7 +100,7 @@ public class Main
 				    {
 					    System.out.println("Type the filename of the file you want to download...");
 					    String filename = scanner.nextLine();
-					    Node.DownloadManager.getInstance().submit(filename);
+					    DownloadManager.getInstance().submit(filename);
 					    break;
 				    }
 				    case "F":
