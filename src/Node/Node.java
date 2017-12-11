@@ -81,15 +81,17 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-
 				this.neighbourSetSemaphore.acquire(2);
 
 
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
+				AgentHandlerInterface agentHandlerInterface = (AgentHandlerInterface) UnicastRemoteObject.exportObject(this.agentHandler, 0);
+
 				Registry registry = LocateRegistry.createRegistry(1099);
 				registry.bind(Node.NODE_INTERACTION_NAME, nodeInteractionStub);
 				registry.bind(Node.FILE_MANAGER_NAME, fileInteractionStub);
+				registry.bind(Node.AGENT_HANDLER_NAME, agentHandlerInterface);
 			}
 			catch (RemoteException re)
 			{
