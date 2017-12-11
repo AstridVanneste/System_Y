@@ -5,7 +5,6 @@ import IO.Network.Constants;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
-import com.sun.tools.corba.se.idl.constExpr.Not;
 
 import java.io.File;
 import java.io.IOException;
@@ -242,7 +241,15 @@ public class FileManager implements FileManagerInterface
 
 	public void notifyLeaving(String filename, FileType type)
 	{
-		System.out.println("Node is leaving with file " + filename + ", type: " + type);
+		try
+		{
+			System.out.println("Node is leaving with file " + filename + ", type: " + type + " called by " + getClientHost());
+		}
+		catch (ServerNotActiveException snae)
+		{
+			snae.printStackTrace();
+		}
+
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
 		/* File was never downloaded
@@ -254,7 +261,6 @@ public class FileManager implements FileManagerInterface
 			System.out.println("File was local and downloaded at least once.");
 			File fileObj = new File(fullPath);
 			fileObj.delete();
-			this.fileLedgers.remove(filename);
 
 			// If a file that needs to be deleted has been replicated, delete the replica
 			if (this.fileLedgers.get(filename).getReplicatedId() != Node.DEFAULT_ID)
@@ -270,8 +276,10 @@ public class FileManager implements FileManagerInterface
 					re.printStackTrace();
 				}
 			}
+
+			this.fileLedgers.remove(filename);  // todo: Remove ledger first, then fetch ledger and use it to delete replicas!!!!!!!!!
 		}
-		else if (type == FileType.LOCAL_FILE || type == FileType.REPLICATED_FILE)
+		else if ((type == FileType.LOCAL_FILE) || (type == FileType.REPLICATED_FILE))
 		{
 			/*
 			 *  File was local and downloaded at least once
@@ -298,6 +306,10 @@ public class FileManager implements FileManagerInterface
 				System.out.println("Local and owner aren't equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
 				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
 			}
+		}
+		else
+		{
+			System.out.println("None of the conditions matched, notifyLeaving");
 		}
 	}
 
