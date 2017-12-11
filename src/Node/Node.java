@@ -29,7 +29,7 @@ public class Node implements NodeInteractionInterface
 	private FailureAgent failureAgent;
 	private FileManager fileManager;
 	private UpdateAgent updateAgent;
-	//private AgentHandler agentHandler;
+	private AgentHandler agentHandler;
 	private Controller controller;
 
 	private ResolverInterface resolverStub;
@@ -50,7 +50,7 @@ public class Node implements NodeInteractionInterface
 		this.resolverStub = null;
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
-		//this.agentHandler = new AgentHandler();
+		this.agentHandler = new AgentHandler();
 		this.controller = new Controller();
 	}
 
@@ -106,11 +106,7 @@ public class Node implements NodeInteractionInterface
 				ie.printStackTrace();
 			}
 
-
-
 			this.lifeCycleManager.start();
-
-
 
 			boolean exit = false;
 
@@ -126,39 +122,7 @@ public class Node implements NodeInteractionInterface
 				ie.printStackTrace();
 			}
 
-			/*
-			while(!exit)
-			{
-				//wait until discovery is finished...
-				synchronized (this.id)
-				{
-					if(this.id != Node.DEFAULT_ID)
-					{
-
-						synchronized (this.previousNeighbour)
-						{
-							if(this.previousNeighbour != Node.DEFAULT_ID)
-							{
-
-								synchronized (this.nextNeighbour)
-								{
-									if(this.nextNeighbour != Node.DEFAULT_ID)
-									{
-
-										exit = true;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			*/
-
-			//DownloadManager.getInstance().start();
-
-
-
+			DownloadManager.getInstance().start();
 
 			this.fileManager.start();
 			this.updateAgent.start();
@@ -172,9 +136,9 @@ public class Node implements NodeInteractionInterface
 
 	public void stop ()
 	{
-		this.lifeCycleManager.stop(); // stop lifecycle manager first to make sure the neighbours are already changed!!
 		this.fileManager.stop();
 		this.updateAgent.stop();
+		this.lifeCycleManager.stop(); // stop lifecycle manager first to make sure the neighbours are already changed!!
 
 		try
 		{
@@ -322,10 +286,8 @@ public class Node implements NodeInteractionInterface
 		this.neighbourSetSemaphore.release(1);
 	}
 
-	/*
 	public AgentHandler getAgentHandler ()
 	{
 		return this.agentHandler;
 	}
-	*/
 }
