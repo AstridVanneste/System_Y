@@ -17,6 +17,8 @@ public class DownloadManager implements Runnable
 	{
 		this.thread = new Thread(this);
 		this.thread.setName("DownloadManager Thread, Node: " + Node.getInstance().getName());
+		this.queuedFiles = new LinkedList<String>();
+		this.threads = new HashMap<String, DownloadThread>();
 	}
 
 	public static DownloadManager getInstance ()
