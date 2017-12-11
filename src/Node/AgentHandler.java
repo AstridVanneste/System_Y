@@ -39,6 +39,7 @@ public class AgentHandler implements AgentHandlerInterface
 		{
 			e.printStackTrace();
 		}
+
 		try
 		{
 			Thread agentThread = new Thread(agent);
