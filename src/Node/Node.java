@@ -83,7 +83,6 @@ public class Node implements NodeInteractionInterface
 			{
 				this.neighbourSetSemaphore.acquire(2);
 
-
 				NodeInteractionInterface nodeInteractionStub = (NodeInteractionInterface) UnicastRemoteObject.exportObject(this, 0);
 				FileManagerInterface fileInteractionStub = (FileManagerInterface) UnicastRemoteObject.exportObject(this.fileManager,0);
 				AgentHandlerInterface agentHandlerInterface = (AgentHandlerInterface) UnicastRemoteObject.exportObject(this.agentHandler, 0);
