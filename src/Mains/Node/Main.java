@@ -105,6 +105,7 @@ public class Main
 				    }
 				    case "F":
 				    case "f":
+				    	System.out.println("Listing all files in the system...");
 				    	for (String file : Node.getInstance().getAgentHandler().getAllFiles())
 					    {
 					    	System.out.println("File: " + file);
