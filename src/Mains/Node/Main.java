@@ -44,7 +44,7 @@ public class Main
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | Manually [D]ownload File"/* | Do[w]nload file through FileAgent"*/);
+			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | Manually [D]ownload File | Do[w]nload file through FileAgent");
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
@@ -94,16 +94,21 @@ public class Main
 					    Node.getInstance().getFileManager().requestFile(filename);
 					    break;
 				    }
-				    /*
 				    case "W":
 				    case "w":
 				    {
 					    System.out.println("Type the filename of the file you want to download...");
 					    String filename = scanner.nextLine();
-					    Node.getInstance().getAgentHandler().download(filename);
+					    Node.DownloadManager.getInstance().submit(filename);
 					    break;
 				    }
-					    */
+				    case "F":
+				    case "f":
+				    	for (String file : Node.getInstance().getAgentHandler().getAllFiles())
+					    {
+					    	System.out.println("File: " + file);
+					    }
+					    break;
 				    default:
 					    System.err.println("[ERROR]\tInvalid input: '" + next + "'");
 					    continue;
