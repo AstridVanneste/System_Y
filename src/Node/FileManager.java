@@ -177,19 +177,7 @@ public class FileManager implements FileManagerInterface
 
 	public void shutdown()
 	{
-		for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
-		{
-			if (pair.getValue().getOwnerID() == Node.getInstance().getId())
-			{
-				// I'm the owner
-				// Copy the file to my previous
-				// Tell him he's the new owner
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
-			}
-		}
-
 		String localFolder = this.getFolder(FileType.LOCAL_FILE);
-
 		for (File localFile : (new File(localFolder)).listFiles())
 		{
 			// The file is local to my system
@@ -211,6 +199,21 @@ public class FileManager implements FileManagerInterface
 				e.printStackTrace();
 			}
 		}
+
+		for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
+		{
+			if (pair.getValue().getOwnerID() == Node.getInstance().getId())
+			{
+				// I'm the owner
+				// Copy the file to my previous
+				// Tell him he's the new owner
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
+			}
+		}
+
+
+
+
 
 		String replicatedFolder = this.getFolder(FileType.REPLICATED_FILE);
 
@@ -624,7 +627,21 @@ public class FileManager implements FileManagerInterface
 			re.printStackTrace();
 		}
 
-		client.sendFile(this.getFullPath(filename, srcType));
+		if(srcType == FileType.OWNED_FILE)
+		{
+			if (this.fileLedgers.get(filename).getReplicatedId() == Node.DEFAULT_ID)
+			{
+				client.sendFile(this.getFullPath(filename,FileType.OWNED_FILE));
+			}
+			else
+			{
+				client.sendFile(this.getFullPath(filename, FileType.LOCAL_FILE));
+			}
+		}
+		else
+		{
+			client.sendFile(this.getFullPath(filename, srcType));
+		}
 		int localPort = client.getLocalPort();
 		String remoteHost = "";
 

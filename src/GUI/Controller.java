@@ -3,7 +3,6 @@ package GUI;
 import Node.Node;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -260,8 +259,10 @@ public class Controller
 
 	public void shutdown()
 	{
-		System.out.println("Shutting down...");
 		Node.getInstance().stop();
 	}
 
+	private void changeWindow () {
+
+	}
 }
