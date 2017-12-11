@@ -79,8 +79,6 @@ public class LifeCycleManager implements Runnable
 			{
 				if(this.subscriber.hasData())
 				{
-
-
 					// Subscriber got some data
 					// Start parsing bytes
 					DatagramPacket packet = this.subscriber.receivePacket();
@@ -118,7 +116,6 @@ public class LifeCycleManager implements Runnable
 									}
 								}
 
-								/*
 								try
 								{
 									// Get the remote node's AgentHandler
@@ -130,15 +127,12 @@ public class LifeCycleManager implements Runnable
 								{
 									re.printStackTrace();
 								}
-								*/
 							}
 						}
 					}
 					else if (request.getHeader().getTransactionID() == this.bootstrapTransactionID)
 					{
 						// We are a new node, let's start setting neighbours
-
-
 
 						//check if message contains error message duplicate id from NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_DUPLICATE_ID)

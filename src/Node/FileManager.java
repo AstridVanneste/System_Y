@@ -261,7 +261,7 @@ public class FileManager implements FileManagerInterface
 		 */
 		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() == 0))
 		{
-			System.out.println("File was local and downloaded at least once.");
+			System.out.println("File was local and never downloaded.");
 			File fileObj = new File(fullPath);
 			fileObj.delete();
 
@@ -287,7 +287,7 @@ public class FileManager implements FileManagerInterface
 			/*
 			 *  File was local and downloaded at least once
 			 */
-			System.out.println("notifyLeaving, file was local or replicated with no downloads");
+			System.out.println("notifyLeaving, file was local or replicated with >= 1 downloads");
 
 			if (type == FileType.LOCAL_FILE)
 			{
