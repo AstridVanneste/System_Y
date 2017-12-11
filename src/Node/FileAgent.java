@@ -16,8 +16,8 @@ public class FileAgent extends Agent
 	public void run()
 	{
 		//todo: Request list of all files on this node and merge fileMap with this
-		//LinkedList<String> newFiles = Node.getInstance().getAgentHandler().getAdvertiseQueue();
-		LinkedList<String> newFiles = new LinkedList<String>();
+		LinkedList<String> newFiles = Node.getInstance().getAgentHandler().getAdvertiseQueue();
+		//LinkedList<String> newFiles = new LinkedList<String>();
 
 		// A node advertised these files as 'network available', add them to the fileMap
 		for (String filename : newFiles)
@@ -33,11 +33,11 @@ public class FileAgent extends Agent
 			}
 		}
 
-		//Node.getInstance().getAgentHandler().clearAdvertiseQueue();
+		Node.getInstance().getAgentHandler().clearAdvertiseQueue();
 
 		//todo: Request list of all files that need to be removed from fileMap
-		// LinkedList<String> removeList = Node.getInstance().getAgentHandler().getRemoveQueue();
-		LinkedList<String> removeList = new LinkedList<String>();
+		LinkedList<String> removeList = Node.getInstance().getAgentHandler().getRemoveQueue();
+		//LinkedList<String> removeList = new LinkedList<String>();
 
 		// Remove all files (from the network) that this node requested to be removed
 		for (String filename : removeList)
@@ -52,14 +52,14 @@ public class FileAgent extends Agent
 			}
 		}
 
-		// Node.getInstance().getAgentHandler().clearRemoveQueue();
+		Node.getInstance().getAgentHandler().clearRemoveQueue();
 
 		// todo: Add list of network files to node
-		// Node.getInstance().getAgentHandler().setAllFiles(this.fileMap.keySet());
+		Node.getInstance().getAgentHandler().setAllFiles(this.fileMap.keySet());
 
 		//todo: Request file queue from Node.AgentHandler
-		// LinkedList<String> downloadQueue = Node.getInstance().getDownloadQueue();
-		LinkedList<String> downloadQueue = new LinkedList<String>();
+		LinkedList<String> downloadQueue = Node.getInstance().getAgentHandler().getDownloadQueue();
+		//LinkedList<String> downloadQueue = new LinkedList<String>();
 		LinkedList<String> reDownloadQueue = new LinkedList<String>();
 
 		// If a file is present in the network and isn't locked by someone else, start downloading
@@ -94,11 +94,11 @@ public class FileAgent extends Agent
 			}
 		}
 
-		//Node.getInstance.getAgentHandler().clearDownloadQueue();
-		//for (String filename : reDownloadQueue)
-		//{
-		//  Node.getInstance.getAgentHandler().downloadFile(filename);
-		//}
+		Node.getInstance().getAgentHandler().clearDownloadQueue();
+		for (String filename : reDownloadQueue)
+		{
+		  Node.getInstance().getAgentHandler().downloadFile(filename);
+		}
 
 		// Iterate over all downloads, if a file was requested by us and the download is done, remove it from the DownloadManager
 		for (String filename : DownloadManager.getInstance().getDownloadList())
