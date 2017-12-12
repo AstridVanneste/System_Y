@@ -1,8 +1,9 @@
 package Node;
 
+import java.io.Serializable;
 import java.util.concurrent.Semaphore;
 
-public class DownloadPair
+public class DownloadPair implements Serializable
 {
 	private Semaphore lock;
 	private short requestID;
