@@ -144,13 +144,9 @@ public class Node implements NodeInteractionInterface
 			Registry reg = LocateRegistry.getRegistry();
 			reg.unbind(NODE_INTERACTION_NAME);
 		}
-		catch(RemoteException re)
+		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
-		}
-		catch (NotBoundException e)
-		{
-			e.printStackTrace();
 		}
 
 		this.resolverStub = null;
@@ -233,7 +229,6 @@ public class Node implements NodeInteractionInterface
 
 	public ResolverInterface getResolverStub()
 	{
-
 		return this.resolverStub;
 	}
 

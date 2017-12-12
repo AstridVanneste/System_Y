@@ -33,10 +33,13 @@ public class AgentHandler implements AgentHandlerInterface
 	{
 		try
 		{
-			Thread agentThread = new Thread(agent);
-			agentThread.setName("FileAgentThread, Node: " + Node.getInstance().getName());
-			agentThread.start();
-			agentThread.join();
+			if (Node.getInstance().getFileManager().isRunning())
+			{
+				Thread agentThread = new Thread(agent);
+				agentThread.setName("FileAgentThread, Node: " + Node.getInstance().getName());
+				agentThread.start();
+				agentThread.join();
+			}
 
 			if (!agent.isFinished())
 			{

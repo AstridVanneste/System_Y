@@ -177,6 +177,8 @@ public class FileManager implements FileManagerInterface
 
 	public void shutdown()
 	{
+		this.running = false;
+
 		String localFolder = this.getFolder(FileType.LOCAL_FILE);
 		for (File localFile : (new File(localFolder)).listFiles())
 		{
@@ -237,8 +239,6 @@ public class FileManager implements FileManagerInterface
 				e.printStackTrace();
 			}
 		}
-
-		this.running = false;
 	}
 
 	public void notifyLeaving(String filename, FileType type)
@@ -900,7 +900,7 @@ public class FileManager implements FileManagerInterface
 		return builder.toString();
 	}
 
-	public boolean isRunning()
+	public synchronized boolean isRunning()
 	{
 		return this.running;
 	}
