@@ -31,28 +31,30 @@ public class AgentHandler implements AgentHandlerInterface
 	@Override
 	public void runAgent(Agent agent)
 	{
-		try
+		/*try
 		{
 			System.out.println("runAgent called by " + getClientHost());
 		}
 		catch (ServerNotActiveException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 
 		try
 		{
 			Thread agentThread = new Thread(agent);
 			agentThread.setName("FileAgentThread, Node: " + Node.getInstance().getName());
 			agentThread.start();
-			System.out.println("Started Agent");
+			//System.out.println("Started Agent");
 			agentThread.join();
-			System.out.println("FileAgent ran");
+			//System.out.println("FileAgent ran");
 
 			if (!agent.isFinished())
 			{
-				System.out.println("Agent wasn't finished, moving agent to next node");
-				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour()));
+				//System.out.println("Agent wasn't finished, moving agent to next node, ResolverStub: " + Node.getInstance().getResolverStub());
+				short nextId = Node.getInstance().getNextNeighbour();
+				//System.out.println("Next neighbour is  " + nextId);
+				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
 				AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
 				remoteAgentHandler.runAgent(agent);
 			}

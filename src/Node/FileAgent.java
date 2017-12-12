@@ -15,7 +15,7 @@ public class FileAgent extends Agent
 	@Override
 	public void run()
 	{
-		System.out.println("Running FileAgent, Thread:  " + Thread.currentThread().getName());
+		//System.out.println("Running FileAgent, Thread:  " + Thread.currentThread().getName());
 		//todo: Request list of all files on this node and merge fileMap with this
 		LinkedList<String> newFiles = Node.getInstance().getAgentHandler().getAdvertiseQueue();
 		//LinkedList<String> newFiles = new LinkedList<String>();
