@@ -200,20 +200,19 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
+		synchronized (this.fileLedgers)
 		{
-			if (pair.getValue().getOwnerID() == Node.getInstance().getId())
+			for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
 			{
-				// I'm the owner
-				// Copy the file to my previous
-				// Tell him he's the new owner
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
+				if (pair.getValue().getOwnerID() == Node.getInstance().getId())
+				{
+					// I'm the owner
+					// Copy the file to my previous
+					// Tell him he's the new owner
+					this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
+				}
 			}
 		}
-
-
-
-
 
 		String replicatedFolder = this.getFolder(FileType.REPLICATED_FILE);
 
