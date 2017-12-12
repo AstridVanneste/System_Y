@@ -41,9 +41,10 @@ public class DownloadManager implements Runnable
 	{
 		while (true)    // todo: insert stop condition
 		{
-			synchronized (this.queuedFiles)
+
+			if (this.queuedFiles.size() > 0)
 			{
-				if (this.queuedFiles.size() > 0)
+				synchronized (this.queuedFiles)
 				{
 					for (String filename : this.queuedFiles)
 					{
@@ -58,11 +59,14 @@ public class DownloadManager implements Runnable
 				this.queuedFiles.clear();
 			}
 
-			for (String filename : this.threads.keySet())
+			synchronized (this.threads)
 			{
-				if (this.threads.get(filename).isDone())
+				for (String filename : this.threads.keySet())
 				{
-					this.threads.get(filename).stop();
+					if (this.threads.get(filename).isDone())
+					{
+						this.threads.get(filename).stop();
+					}
 				}
 			}
 		}
@@ -70,6 +74,7 @@ public class DownloadManager implements Runnable
 
 	public synchronized void submit (String filename)
 	{
+		System.out.println("File " + filename + " submitted");
 		this.queuedFiles.add(filename);
 	}
 
@@ -100,7 +105,7 @@ public class DownloadManager implements Runnable
 		return list;
 	}
 
-	public void removeFileFromList (String filename)
+	public synchronized void removeFileFromList (String filename)
 	{
 		if (this.threads.containsKey(filename))
 		{

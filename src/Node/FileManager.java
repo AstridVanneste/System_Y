@@ -681,6 +681,7 @@ public class FileManager implements FileManagerInterface
 	public void requestFile(String filename) //todo: make sure you don't download files you already have
 	{
 		String ownerIP = "";
+		System.out.println("Requesting file " + filename);
 
 		try
 		{
