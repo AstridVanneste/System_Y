@@ -5,10 +5,13 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ServerNotActiveException;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
+
+import static java.rmi.server.RemoteServer.getClientHost;
 
 public class AgentHandler implements AgentHandlerInterface
 {
@@ -30,14 +33,25 @@ public class AgentHandler implements AgentHandlerInterface
 	{
 		try
 		{
+			System.out.println("runAgent called by " + getClientHost());
+		}
+		catch (ServerNotActiveException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
 			Thread agentThread = new Thread(agent);
 			agentThread.setName("FileAgentThread, Node: " + Node.getInstance().getName());
 			agentThread.start();
-
+			System.out.println("Started Agent");
 			agentThread.join();
+			System.out.println("FileAgent ran");
 
 			if (!agent.isFinished())
 			{
+				System.out.println("Agent wasn't finished, moving agent to next node");
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(Node.getInstance().getNextNeighbour()));
 				AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
 				remoteAgentHandler.runAgent(agent);

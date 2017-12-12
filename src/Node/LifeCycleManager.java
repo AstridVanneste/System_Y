@@ -118,8 +118,9 @@ public class LifeCycleManager implements Runnable
 
 								try
 								{
-									// Get the remote node's AgentHandler
+									//Get the remote node's AgentHandler
 									Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newNodeID));
+									Node.getInstance().getAgentHandler().runAgent(new FileAgent());
 									AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
 									remoteAgentHandler.runAgent(new FileAgent());
 								}
