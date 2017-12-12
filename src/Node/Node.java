@@ -113,9 +113,7 @@ public class Node implements NodeInteractionInterface
 
 			try
 			{
-
 				this.neighbourSetSemaphore.acquire(2);  // Blocks until (a) permit(s) become available
-
 			}
 			catch (InterruptedException ie)
 			{

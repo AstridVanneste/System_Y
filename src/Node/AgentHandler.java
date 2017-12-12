@@ -98,6 +98,7 @@ public class AgentHandler implements AgentHandlerInterface
 	{
 		if (!this.downloadQueue.contains(filename))
 		{
+			System.out.println("Add file to queue");
 			this.downloadQueue.addLast(filename);
 		}
 	}
