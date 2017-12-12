@@ -100,7 +100,7 @@ public class Main
 				    {
 					    System.out.println("Type the filename of the file you want to download...");
 					    String filename = scanner.nextLine();
-					    DownloadManager.getInstance().submit(filename);
+					    Node.getInstance().getAgentHandler().downloadFile(filename);
 					    break;
 				    }
 				    case "F":

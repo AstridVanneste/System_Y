@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 public class FileAgent extends Agent implements Serializable
 {
-	TreeMap<String, DownloadPair> fileMap;
+	private TreeMap<String, DownloadPair> fileMap;
 
 	public FileAgent ()
 	{
@@ -17,9 +17,9 @@ public class FileAgent extends Agent implements Serializable
 	public void run()
 	{
 		//System.out.println("Running FileAgent, Thread:  " + Thread.currentThread().getName());
-		//todo: Request list of all files on this node and merge fileMap with this
-		LinkedList<String> newFiles = Node.getInstance().getAgentHandler().getAdvertiseQueue();
-		//LinkedList<String> newFiles = new LinkedList<String>();
+
+		LinkedList<String> newFiles = new LinkedList<String>();
+		newFiles.addAll(Node.getInstance().getAgentHandler().getAdvertiseQueue());
 
 		// A node advertised these files as 'network available', add them to the fileMap
 		if (newFiles.size() > 0)
@@ -40,9 +40,8 @@ public class FileAgent extends Agent implements Serializable
 			Node.getInstance().getAgentHandler().clearAdvertiseQueue();
 		}
 
-		//todo: Request list of all files that need to be removed from fileMap
-		LinkedList<String> removeList = Node.getInstance().getAgentHandler().getRemoveQueue();
-		//LinkedList<String> removeList = new LinkedList<String>();
+		LinkedList<String> removeList = new LinkedList<String>();
+		removeList.addAll(Node.getInstance().getAgentHandler().getRemoveQueue());
 
 		// Remove all files (from the network) that this node requested to be removed
 		if (removeList.size() > 0)
