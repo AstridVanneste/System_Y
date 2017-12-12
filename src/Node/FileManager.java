@@ -503,10 +503,6 @@ public class FileManager implements FileManagerInterface
 				}
 				else if ((type != FileType.DOWNLOADED_FILE) && (type != FileType.REPLICATED_FILE) && (ownerId != Node.getInstance().getId()))     // We aren't the owner, The file isn't downloaded or replicated (So owned, local)
 				{
-
-
-
-
 					if (type == FileType.OWNED_FILE)                                // We own the file
 					{
 						FileLedger fileLedger = this.fileLedgers.get(file.getName());   // Fetch the Ledger
@@ -542,6 +538,11 @@ public class FileManager implements FileManagerInterface
 					else
 					{
 						this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
+					}
+
+					if(type == FileType.LOCAL_FILE)
+					{
+						Node.getInstance().getAgentHandler().advertiseFile(file.getName());
 					}
 				}
 			}

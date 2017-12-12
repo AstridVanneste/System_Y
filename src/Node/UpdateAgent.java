@@ -94,6 +94,8 @@ public class UpdateAgent implements Runnable
 						e.printStackTrace();
 						Node.getInstance().getFailureAgent().failure(ownerId);
 					}
+
+					Node.getInstance().getAgentHandler().advertiseFile(eventPath.toString());
 				}
 
 				watchkey.reset();
