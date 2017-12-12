@@ -539,11 +539,12 @@ public class FileManager implements FileManagerInterface
 					{
 						this.sendFile(ownerId, file.getName(), type, FileType.OWNED_FILE);
 					}
+				}
 
-					if(type == FileType.LOCAL_FILE)
-					{
-						Node.getInstance().getAgentHandler().advertiseFile(file.getName());
-					}
+				if(type == FileType.LOCAL_FILE)
+				{
+					System.out.println("Adding " + file.getName() + " to the list of files");
+					Node.getInstance().getAgentHandler().advertiseFile(file.getName());
 				}
 			}
 			catch (RemoteException re)
