@@ -43,12 +43,15 @@ public class DownloadManager implements Runnable
 		{
 			synchronized (this.queuedFiles)
 			{
-				for (String filename : this.queuedFiles)
+				if (this.queuedFiles.size() > 0)
 				{
-					if (!this.threads.containsKey(filename))
+					for (String filename : this.queuedFiles)
 					{
-						this.threads.put(filename, new DownloadThread(filename));
-						this.threads.get(filename).start();
+						if (!this.threads.containsKey(filename))
+						{
+							this.threads.put(filename, new DownloadThread(filename));
+							this.threads.get(filename).start();
+						}
 					}
 				}
 
