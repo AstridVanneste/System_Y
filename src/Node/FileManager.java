@@ -280,7 +280,8 @@ public class FileManager implements FileManagerInterface
 				}
 			}
 
-			this.fileLedgers.remove(filename);  // todo: Remove ledger first, then fetch ledger and use it to delete replicas!!!!!!!!!
+			Node.getInstance().getAgentHandler().deleteFile(filename);
+			this.fileLedgers.remove(filename);
 		}
 		else if ((type == FileType.LOCAL_FILE) || (type == FileType.REPLICATED_FILE))
 		{
