@@ -336,16 +336,6 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void lockSlot()
 	{
-		/*
-		try
-		{
-
-		}
-		catch(ServerNotActiveException	snae)
-		{
-			snae.printStackTrace();
-		}
-		*/
 		try
 		{
 			this.sendSemaphore.acquire(1);
@@ -359,17 +349,6 @@ public class FileManager implements FileManagerInterface
 	@Override
 	public void unlockSlot()
 	{
-		/*
-		try
-		{
-			System.out.println("unlock slot called by " + getClientHost() + " " + this.sendSemaphore.availablePermits() + " slots available");
-		}
-		catch(ServerNotActiveException	snae)
-		{
-			snae.printStackTrace();
-		}
-		*/
-
 		this.sendSemaphore.release(1);
 	}
 
@@ -410,7 +389,7 @@ public class FileManager implements FileManagerInterface
 			throw new IOException("No file with name " + filename + " in " + OWNED_FILE_PREFIX);
 		}
 
-		this.fileLedgers.get(filename).addDownloader(dstID); //add person who requests to downloaders
+		this.fileLedgers.get(filename).addDownloader(dstID); //add person who requests the file to downloaders
 	}
 
 	/**
@@ -724,17 +703,9 @@ public class FileManager implements FileManagerInterface
 			the owner will later call a push() method on this node to actually receive the file.
 			 */
 		}
-		catch (RemoteException re)
-		{
-			re.printStackTrace();
-		}
-		catch (NotBoundException nbe)
+		catch (NotBoundException | IOException nbe)
 		{
 			nbe.printStackTrace();
-		}
-		catch (IOException ioe)
-		{
-			ioe.printStackTrace();
 		}
 	}
 
