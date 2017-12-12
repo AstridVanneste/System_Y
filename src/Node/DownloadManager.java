@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
-//todo: remove files from DownloadManager when they are done
 public class DownloadManager implements Runnable
 {
+	private boolean isRunning;
 	private Thread thread;
 	private LinkedList<String> queuedFiles;
 	private HashMap <String, DownloadThread> threads;
@@ -15,6 +15,7 @@ public class DownloadManager implements Runnable
 
 	private DownloadManager ()
 	{
+		this.isRunning = false;
 		this.thread = new Thread(this);
 		this.thread.setName("DownloadManager Thread, Node: " + Node.getInstance().getName());
 		this.queuedFiles = new LinkedList<String>();
@@ -33,13 +34,14 @@ public class DownloadManager implements Runnable
 
 	public void start ()
 	{
+		this.isRunning = true;
 		this.thread.start();
 	}
 
 	@Override
 	public void run()
 	{
-		while (true)    // todo: insert stop condition
+		while (this.isRunning)    // todo: insert stop condition
 		{
 
 			if (this.queuedFiles.size() > 0)
@@ -127,5 +129,23 @@ public class DownloadManager implements Runnable
 	public Set<String> getDownloadList ()
 	{
 		return this.threads.keySet();
+	}
+
+	public synchronized void stop ()
+	{
+		for (String filename : this.threads.keySet())
+		{
+			this.threads.get(filename).stop();;
+		}
+
+		try
+		{
+			this.isRunning = false;
+			this.thread.join();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }
