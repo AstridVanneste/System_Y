@@ -106,7 +106,7 @@ public class FailureAgent
 				{
 					Node.getInstance().getResolverStub().getIP(Node.getInstance().getId());
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(Node.getInstance().getResolverStub().getNext(prevID));
-					//Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(prevID, Node.getInstance().getId()));
+					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(prevID, Node.getInstance().getId()));
 					Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 					Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
 				}
@@ -129,7 +129,7 @@ public class FailureAgent
 
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
-					//Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
+					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);

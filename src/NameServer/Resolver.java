@@ -22,9 +22,9 @@ public class Resolver implements ResolverInterface
 	{
 		if(NameServer.getInstance().map.containsKey(nodeId))
 		{
-			Util.General.printLineSep();
+			//Util.General.printLineSep();
 			String IP=  NameServer.getInstance().map.get(nodeId);
-			System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")" + " = " + IP);
+			//System.out.println("Resolver.getIP(" + Short.toString(nodeId) + ")" + " = " + IP);
 			try
 			{
 				System.out.println("Called by: " + getClientHost());
@@ -50,7 +50,7 @@ public class Resolver implements ResolverInterface
 
 		if(hash < NameServer.getInstance().map.firstKey())
 		{
-			Util.General.printLineSep();
+			//Util.General.printLineSep();
 			id = NameServer.getInstance().map.lastKey();
 		}
 		else if(NameServer.getInstance().map.containsKey(hash))
@@ -63,17 +63,17 @@ public class Resolver implements ResolverInterface
 			id =  NameServer.getInstance().map.lowerKey(hash);
 		}
 
-		Util.General.printLineSep();
-		System.out.println("Resolver.getOwnerID(" + filename + ") = " + id);
-		System.out.println("Hash of file = " + hash);
-		try
+		//Util.General.printLineSep();
+		//System.out.println("Resolver.getOwnerID(" + filename + ") = " + id);
+		//System.out.println("Hash of file = " + hash);
+		/*try
 		{
 			System.out.println("Called by: " + getClientHost());
 		}
 		catch (ServerNotActiveException snae)
 		{
 			snae.printStackTrace();
-		}
+		}*/
 
 		return id;
 	}
@@ -84,24 +84,24 @@ public class Resolver implements ResolverInterface
 
 		short id;
 
-		System.out.println("RESOLVER: ID: " + ID + " FIRST: " + NameServer.getInstance().map.firstKey());
-		System.out.println("EQUALS = " + NameServer.getInstance().map.firstKey().equals(ID));
+		//System.out.println("RESOLVER: ID: " + ID + " FIRST: " + NameServer.getInstance().map.firstKey());
+		//System.out.println("EQUALS = " + NameServer.getInstance().map.firstKey().equals(ID));
 
-		System.out.println(NameServer.getInstance().toString());
+		//System.out.println(NameServer.getInstance().toString());
 
 		if(NameServer.getInstance().map.firstKey().compareTo(ID)>0 || NameServer.getInstance().map.firstKey().equals(ID))
 		{
-			Util.General.printLineSep();
+			//Util.General.printLineSep();
 			id = NameServer.getInstance().map.lastKey();
 		}
 		else
 		{
-			Util.General.printLineSep();
+			//Util.General.printLineSep();
 			id =  NameServer.getInstance().map.lowerKey(ID);
 		}
 
-		Util.General.printLineSep();
-		System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ") = " + id);
+		//Util.General.printLineSep();
+		//System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ") = " + id);
 		try
 		{
 			System.out.println("Called by: " + getClientHost());
@@ -130,16 +130,16 @@ public class Resolver implements ResolverInterface
 			id =  NameServer.getInstance().map.higherKey(ID);
 		}
 
-		Util.General.printLineSep();
-		System.out.println("Resolver.getNext(" + Short.toString(ID) + ") = " + id);
-		try
+		//Util.General.printLineSep();
+		//System.out.println("Resolver.getNext(" + Short.toString(ID) + ") = " + id);
+		/*try
 		{
 			System.out.println("Called by: " + getClientHost());
 		}
 		catch (ServerNotActiveException snae)
 		{
 			snae.printStackTrace();
-		}
+		}*/
 
 		return id;
 	}

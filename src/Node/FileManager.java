@@ -686,6 +686,8 @@ public class FileManager implements FileManagerInterface
 		String ownerIP = "";
 		System.out.println("Requesting file " + filename);
 
+		System.out.println("Requesting file " + filename);
+
 		try
 		{
 			short ownerId = Node.getInstance().getResolverStub().getOwnerID(filename);
