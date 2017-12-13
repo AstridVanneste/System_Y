@@ -20,6 +20,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import static java.rmi.server.RemoteServer.getClientHost;
@@ -40,7 +41,7 @@ public class FileManager implements FileManagerInterface
 
 	private Server tcpServer;
 	private String rootDirectory;
-	private HashMap<String, FileLedger> fileLedgers;
+	private ConcurrentHashMap<String, FileLedger> fileLedgers;
 	private boolean running;
 	private Semaphore sendSemaphore;
 
@@ -48,7 +49,7 @@ public class FileManager implements FileManagerInterface
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
-		this.fileLedgers = new HashMap<String, FileLedger>();
+		this.fileLedgers = new ConcurrentHashMap<String, FileLedger>();
 		this.running = false;
 		this.sendSemaphore = new Semaphore(MAX_PERMITS, true);
 
@@ -915,7 +916,7 @@ public class FileManager implements FileManagerInterface
 		return file.exists();
 	}
 
-	public HashMap<String, FileLedger> getFileLedgers()
+	public ConcurrentHashMap<String, FileLedger> getFileLedgers()
 	{
 		return this.fileLedgers;
 	}
@@ -945,6 +946,4 @@ public class FileManager implements FileManagerInterface
 	{
 		return fileLedgers.get(name);
 	}
-
-
 }
