@@ -20,6 +20,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import static java.rmi.server.RemoteServer.getClientHost;
@@ -40,7 +41,7 @@ public class FileManager implements FileManagerInterface
 
 	private Server tcpServer;
 	private String rootDirectory;
-	private HashMap<String, FileLedger> fileLedgers;
+	private ConcurrentHashMap<String, FileLedger> fileLedgers;
 	private boolean running;
 	private Semaphore sendSemaphore;
 
@@ -48,7 +49,7 @@ public class FileManager implements FileManagerInterface
 	{
 		this.tcpServer = null;
 		this.rootDirectory = System.getProperty("user.home");
-		this.fileLedgers = new HashMap<String, FileLedger>();
+		this.fileLedgers = new ConcurrentHashMap<String, FileLedger>();
 		this.running = false;
 		this.sendSemaphore = new Semaphore(MAX_PERMITS, true);
 
@@ -202,17 +203,17 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		synchronized (this.fileLedgers)
+		Iterator<String> keyIt = this.fileLedgers.keySet().iterator();
+
+		while(keyIt.hasNext())
 		{
-			for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
+			String key = keyIt.next();
+			if (this.fileLedgers.get(key).getOwnerID() == Node.getInstance().getId())
 			{
-				if (pair.getValue().getOwnerID() == Node.getInstance().getId())
-				{
-					// I'm the owner
-					// Copy the file to my previous
-					// Tell him he's the new owner
-					this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
-				}
+				// I'm the owner
+				// Copy the file to my previous
+				// Tell him he's the new owner
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), key, FileType.OWNED_FILE, FileType.OWNED_FILE);
 			}
 		}
 
@@ -280,6 +281,7 @@ public class FileManager implements FileManagerInterface
 			}
 
 			Node.getInstance().getAgentHandler().deleteFile(filename);
+			System.out.println("removing ledger " + filename + " from the list thread: " + Thread.currentThread().getName());
 			this.fileLedgers.remove(filename);
 		}
 		else if ((type == FileType.LOCAL_FILE) || (type == FileType.REPLICATED_FILE))
@@ -292,12 +294,12 @@ public class FileManager implements FileManagerInterface
 			if (type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
-				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString());
+				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 			}
 
 			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
 
-			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString());
+			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 
 			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
@@ -406,6 +408,7 @@ public class FileManager implements FileManagerInterface
 		else
 		{
 			this.fileLedgers.put(fileLedger.getFileName(), fileLedger);
+			System.out.println("adding fileledger of " + fileLedger.getFileName() + "thread " + Thread.currentThread().getName());
 		}
 	}
 
@@ -476,6 +479,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					this.fileLedgers.put(file.getName(), new FileLedger(file.getName(), Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
+					System.out.println("adding fileledger " + file.getName() + " thread " + Thread.currentThread().getName());
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(), file.getName(), FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 				}
@@ -657,10 +661,9 @@ public class FileManager implements FileManagerInterface
 					ledger.setOwnerID(dstID);
 					remoteFileManager.addFileLedger(ledger);
 					this.fileLedgers.remove(filename);
+					System.out.println("removing ledger " + filename + "from list thread " + Thread.currentThread().getName());
 				}
 			}
-
-
 		}
 		catch (RemoteException re)
 		{
@@ -913,7 +916,7 @@ public class FileManager implements FileManagerInterface
 		return file.exists();
 	}
 
-	public HashMap<String, FileLedger> getFileLedgers()
+	public ConcurrentHashMap<String, FileLedger> getFileLedgers()
 	{
 		return this.fileLedgers;
 	}
@@ -927,6 +930,7 @@ public class FileManager implements FileManagerInterface
 	public void replaceFileLedger(FileLedger ledger)
 	{
 		this.fileLedgers.put(ledger.getFileName(), ledger);
+		System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
 	}
 
 	/**
@@ -942,6 +946,4 @@ public class FileManager implements FileManagerInterface
 	{
 		return fileLedgers.get(name);
 	}
-
-
 }

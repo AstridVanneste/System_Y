@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Astrid on 04/12/2017.
@@ -31,7 +32,7 @@ public class RecoveryAgent extends Agent
 	public void run()
 	{
 		//OWNED FILES
-		HashMap<String, FileLedger> ownedFilesMap = Node.getInstance().getFileManager().getFileLedgers();
+		ConcurrentHashMap<String, FileLedger> ownedFilesMap = Node.getInstance().getFileManager().getFileLedgers();
 		for(String filename:  ownedFilesMap.keySet())
 		{
 			FileLedger ledger = ownedFilesMap.get(filename);
