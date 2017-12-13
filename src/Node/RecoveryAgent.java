@@ -66,6 +66,7 @@ public class RecoveryAgent extends Agent
 		//For files of which te failed node was owner we will need to do the entire circle to recreate the original fileledger.
 		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
 
+
 		//LOCAL FILES
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 		for(File file: folder.listFiles())
