@@ -202,17 +202,17 @@ public class FileManager implements FileManagerInterface
 			}
 		}
 
-		synchronized (this.fileLedgers)
+		Iterator<String> keyIt = this.fileLedgers.keySet().iterator();
+
+		while(keyIt.hasNext())
 		{
-			for (Map.Entry<String, FileLedger> pair : this.fileLedgers.entrySet())
+			String key = keyIt.next();
+			if (this.fileLedgers.get(key).getOwnerID() == Node.getInstance().getId())
 			{
-				if (pair.getValue().getOwnerID() == Node.getInstance().getId())
-				{
-					// I'm the owner
-					// Copy the file to my previous
-					// Tell him he's the new owner
-					this.sendFile(Node.getInstance().getPreviousNeighbour(), pair.getKey(), FileType.OWNED_FILE, FileType.OWNED_FILE);
-				}
+				// I'm the owner
+				// Copy the file to my previous
+				// Tell him he's the new owner
+				this.sendFile(Node.getInstance().getPreviousNeighbour(), key, FileType.OWNED_FILE, FileType.OWNED_FILE);
 			}
 		}
 
