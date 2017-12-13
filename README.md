@@ -39,8 +39,10 @@
 
 ### Opdracht 6
 #### FileAgent & RecoveryAgent
-- [ ] Brainstorm about FileAgent
-- [ ] Brainstorm about RecoveryAgent
+- [x] Brainstorm about FileAgent
+- [x] Brainstorm about RecoveryAgent
+- [ ] Test FileAgent
+- [ ] Test RecoveryAgent
 
 ### Opdracht 7
 #### GUI
