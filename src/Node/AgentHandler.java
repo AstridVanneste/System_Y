@@ -33,7 +33,7 @@ public class AgentHandler implements AgentHandlerInterface
 	{
 		try
 		{
-			if (Node.getInstance().getFileManager().isRunning())
+			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
 			{
 				Thread agentThread = new Thread(agent);
 				agentThread.setName("FileAgentThread, Node: " + Node.getInstance().getName());
