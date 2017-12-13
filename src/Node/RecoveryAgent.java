@@ -66,11 +66,19 @@ public class RecoveryAgent extends Agent
 		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
 
 		//LOCAL FILES
-
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 		for(File file: folder.listFiles())
 		{
-			if(this.wasOwner(file.getName()))	//failed node was owner of the file
+			short ownerId = Node.DEFAULT_ID;
+			try
+			{
+				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
+			}
+			catch (RemoteException re)
+			{
+				re.printStackTrace();
+			}
+			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
 				if(ledgers.keySet().contains(file.getName()))
 				{
@@ -78,18 +86,25 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.getInstance().getId(),Node.DEFAULT_ID,Node.DEFAULT_ID)); //file was not yet detected => we need to create a ledger!
+					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.getInstance().getId(),ownerId,Node.DEFAULT_ID)); //file was not yet detected => we need to create a ledger!
 				}
 			}
 		}
 
 		//REPLICATED FILES
-
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.REPLICATED_FILE));
-
 		for(File file: folder.listFiles())
 		{
-			if(this.wasOwner(file.getName()))	//failed node was owner of the file
+			short ownerId = Node.DEFAULT_ID;
+			try
+			{
+				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
+			}
+			catch (RemoteException re)
+			{
+				re.printStackTrace();
+			}
+			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
 				if(ledgers.keySet().contains(file.getName()))
 				{
@@ -97,18 +112,25 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.DEFAULT_ID,Node.DEFAULT_ID,Node.getInstance().getId())); //file was not yet detected => we need to create a ledger!
+					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.getInstance().getId())); //file was not yet detected => we need to create a ledger!
 				}
 			}
 		}
 
 		//DOWNLOADED FILES
-
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE));
-
 		for(File file: folder.listFiles())
 		{
-			if(this.wasOwner(file.getName()))	//failed node was owner of the file
+			short ownerId = Node.DEFAULT_ID;
+			try
+			{
+				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
+			}
+			catch (RemoteException re)
+			{
+				re.printStackTrace();
+			}
+			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
 				if(ledgers.keySet().contains(file.getName()))
 				{
@@ -116,7 +138,7 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					FileLedger ledger = new FileLedger(file.getName(),Node.DEFAULT_ID,Node.DEFAULT_ID,Node.DEFAULT_ID);
+					FileLedger ledger = new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.DEFAULT_ID);
 					ledger.addDownloader(Node.getInstance().getId());
 					this.ledgers.put(file.getName(),ledger); //file was not yet detected => we need to create a ledger!
 				}
@@ -124,19 +146,17 @@ public class RecoveryAgent extends Agent
 		}
 
 
-		if(callerId == Node.getInstance().getNextNeighbour())	//agent has made it back to the start. the ledgers are complete and can be send to the owners.
+		if(callerId == Node.getInstance().getNextNeighbour())	//Agent has made it across the entire system. The ledgers are complete and can be send to the owners.
 		{
 			for(String filename: this.ledgers.keySet())
 			{
 				FileLedger ledger = this.ledgers.get(filename);
 
-				short owner = -1;
-				String ownerIP = "";
+				String ownerIP ="";
 
 				try
 				{
-					owner = Node.getInstance().getResolverStub().getOwnerID(filename);
-					ownerIP = Node.getInstance().getResolverStub().getIP(owner);
+					ownerIP = Node.getInstance().getResolverStub().getIP(ledger.getOwnerID());
 				}
 				catch(RemoteException re)
 				{
@@ -152,7 +172,7 @@ public class RecoveryAgent extends Agent
 				catch(RemoteException re)
 				{
 					re.printStackTrace();
-					Node.getInstance().getFailureAgent().failure(owner);
+					Node.getInstance().getFailureAgent().failure(ledger.getOwnerID());
 				}
 				catch (NotBoundException | IOException nbi)
 				{
@@ -185,13 +205,12 @@ public class RecoveryAgent extends Agent
 				}
 
 			}
-
-
 			this.finished = true;
 		}
 
 	}
 
+	@Deprecated
 	private boolean wasOwner(String filename)
 	{
 		try
