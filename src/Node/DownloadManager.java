@@ -135,7 +135,7 @@ public class DownloadManager implements Runnable
 	{
 		for (String filename : this.threads.keySet())
 		{
-			this.threads.get(filename).stop();;
+			this.threads.get(filename).stop();
 		}
 
 		try
