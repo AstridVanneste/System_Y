@@ -280,6 +280,7 @@ public class FileManager implements FileManagerInterface
 			}
 
 			Node.getInstance().getAgentHandler().deleteFile(filename);
+			System.out.println("removing ledger " + filename + " from the list thread: " + Thread.currentThread().getName());
 			this.fileLedgers.remove(filename);
 		}
 		else if ((type == FileType.LOCAL_FILE) || (type == FileType.REPLICATED_FILE))
@@ -292,12 +293,12 @@ public class FileManager implements FileManagerInterface
 			if (type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
-				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString());
+				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 			}
 
 			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
 
-			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString());
+			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 
 			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
@@ -406,6 +407,7 @@ public class FileManager implements FileManagerInterface
 		else
 		{
 			this.fileLedgers.put(fileLedger.getFileName(), fileLedger);
+			System.out.println("adding fileledger of " + fileLedger.getFileName() + "thread " + Thread.currentThread().getName());
 		}
 	}
 
@@ -476,6 +478,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					this.fileLedgers.put(file.getName(), new FileLedger(file.getName(), Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
+					System.out.println("adding fileledger " + file.getName() + " thread " + Thread.currentThread().getName());
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(), file.getName(), FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 				}
@@ -657,6 +660,7 @@ public class FileManager implements FileManagerInterface
 					ledger.setOwnerID(dstID);
 					remoteFileManager.addFileLedger(ledger);
 					this.fileLedgers.remove(filename);
+					System.out.println("removing ledger " + filename + "from list thread " + Thread.currentThread().getName());
 				}
 			}
 
@@ -925,6 +929,7 @@ public class FileManager implements FileManagerInterface
 	public void replaceFileLedger(FileLedger ledger)
 	{
 		this.fileLedgers.put(ledger.getFileName(), ledger);
+		System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
 	}
 
 	/**
