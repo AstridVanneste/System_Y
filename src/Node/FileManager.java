@@ -664,8 +664,6 @@ public class FileManager implements FileManagerInterface
 					System.out.println("removing ledger " + filename + "from list thread " + Thread.currentThread().getName());
 				}
 			}
-
-
 		}
 		catch (RemoteException re)
 		{
