@@ -44,9 +44,21 @@ public class AgentHandler implements AgentHandlerInterface
 
 			if (!agent.isFinished())
 			{
+				short nextId = Node.getInstance().getNextNeighbour();
 				try
 				{
-					short nextId = Node.getInstance().getNextNeighbour();
+					while (Node.getInstance().getFailureAgent().getActiveFailures().contains(nextId))
+					{
+
+						nextId = Node.getInstance().getResolverStub().getNext(nextId);
+					}
+				}
+				catch(RemoteException re)
+				{
+					re.printStackTrace();
+				}
+				try
+				{
 					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
 					AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
 					remoteAgentHandler.runAgent(agent);
