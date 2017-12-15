@@ -81,7 +81,6 @@ public class Resolver implements ResolverInterface
 	@Override
 	public short getPrevious(short ID) throws RemoteException
 	{
-
 		short id;
 
 		//System.out.println("RESOLVER: ID: " + ID + " FIRST: " + NameServer.getInstance().map.firstKey());
@@ -102,6 +101,7 @@ public class Resolver implements ResolverInterface
 
 		//Util.General.printLineSep();
 		//System.out.println("Resolver.getPrevious(" + Short.toString(ID) + ") = " + id);
+		/*
 		try
 		{
 			System.out.println("Called by: " + getClientHost());
@@ -110,6 +110,7 @@ public class Resolver implements ResolverInterface
 		{
 			snae.printStackTrace();
 		}
+		*/
 
 		return id;
 	}

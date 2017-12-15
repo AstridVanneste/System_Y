@@ -2,6 +2,7 @@ package Node;
 
 
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -43,13 +44,20 @@ public class AgentHandler implements AgentHandlerInterface
 
 			if (!agent.isFinished())
 			{
-				short nextId = Node.getInstance().getNextNeighbour();
-				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
-				AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
-				remoteAgentHandler.runAgent(agent);
+				try
+				{
+					short nextId = Node.getInstance().getNextNeighbour();
+					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
+					AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
+					remoteAgentHandler.runAgent(agent);
+				}
+				catch (RemoteException | NotBoundException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-		catch (InterruptedException | RemoteException | NotBoundException ie)
+		catch (InterruptedException ie)
 		{
 			ie.printStackTrace();
 		}
