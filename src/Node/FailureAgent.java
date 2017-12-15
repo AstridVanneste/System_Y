@@ -5,15 +5,18 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.LinkedList;
 
 /**
  * Created by Astrid on 07/11/2017.
  */
 public class FailureAgent
 {
+	LinkedList<Short> activeFailures;
+
 	public FailureAgent()
 	{
-
+		this.activeFailures = new LinkedList<Short>();
 	}
 
 	/**
@@ -21,6 +24,14 @@ public class FailureAgent
 	 */
 	private void failure(short firstID, short lastID)
 	{
+		if(!this.activeFailures.contains(firstID))
+		{
+			this.activeFailures.add(firstID);
+		}
+		if(!this.activeFailures.contains(lastID))
+		{
+			this.activeFailures.add(lastID);
+		}
 
 		String IPprev = "";
 		String IPnext = "";
@@ -130,6 +141,7 @@ public class FailureAgent
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
 					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
+					this.activeFailures.remove(tmpID);
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);
@@ -190,5 +202,10 @@ public class FailureAgent
 	public void failure(short ID)
 	{
 		this.failure(ID,ID);
+	}
+
+	public LinkedList<Short> getActiveFailures()
+	{
+		return this.activeFailures;
 	}
 }
