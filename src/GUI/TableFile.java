@@ -1,40 +1,51 @@
 package GUI;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class TableFile implements Comparable<TableFile>{
-	private final SimpleStringProperty fileName = new SimpleStringProperty("");
-	private final SimpleStringProperty size = new SimpleStringProperty("");
+	private final StringProperty fileName;
+	private final StringProperty size;
 
 	public TableFile()
 	{
-		this("", "");
+		this(null,null);
 	}
 
-	public TableFile(String fileName, String size)
+	public TableFile(String fN, String s)
 	{
-		setFileName(fileName);
-		setSize(size);
+		this.fileName = new SimpleStringProperty(fN);
+		this.size = new SimpleStringProperty(s);
 	}
 
 	public String getFileName()
 	{
-		return fileName.get();
+		return this.fileName.get();
+	}
+
+	public StringProperty fileNameProperty()
+	{
+		return this.fileName;
 	}
 
 	public void setFileName(String fName)
 	{
-		fileName.set(fName);
+		this.fileName.set(fName);
 	}
 
 	public String getSize()
 	{
-		return size.get();
+		return this.size.get();
+	}
+
+	public StringProperty sizeProperty()
+	{
+		return this.size;
 	}
 
 	public void setSize(String siz)
 	{
-		size.set(siz);
+		this.size.set(siz);
 	}
 
 	@Override

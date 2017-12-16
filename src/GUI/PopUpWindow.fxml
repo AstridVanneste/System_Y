@@ -5,13 +5,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="75.0" prefWidth="120.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="140.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.PopUpController">
    <center>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
-            <Button maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" prefWidth="120.0" text="Open" />
-            <Button maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" prefWidth="120.0" text="Delete Local" />
-            <Button maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" prefWidth="120.0" text="Delete on network" />
+            <Button fx:id="openButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#openFile" prefWidth="120.0" text="Open" />
+            <Button fx:id="deleteLocalButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#deleteLocal" prefWidth="120.0" text="Delete Local" />
+            <Button fx:id="deleteNetworkButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#deleteNetwork" prefWidth="120.0" text="Delete on network" />
          </children>
       </VBox>
    </center>
