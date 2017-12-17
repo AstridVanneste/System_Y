@@ -86,7 +86,7 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.getInstance().getId(),ownerId,Node.DEFAULT_ID)); //file was not yet detected => we need to create a ledger!
+					this.ledgers.put(file.getName(), new FileLedger(file.getName(),Node.getInstance().getId(),ownerId,Node.DEFAULT_ID)); //file was not yet detected => we need to create a ledger!
 				}
 			}
 		}
@@ -104,6 +104,7 @@ public class RecoveryAgent extends Agent
 			{
 				re.printStackTrace();
 			}
+
 			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
 				if(ledgers.keySet().contains(file.getName()))
@@ -112,7 +113,7 @@ public class RecoveryAgent extends Agent
 				}
 				else
 				{
-					this.ledgers.put(file.getName(),new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.getInstance().getId())); //file was not yet detected => we need to create a ledger!
+					this.ledgers.put(file.getName(), new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.getInstance().getId())); //file was not yet detected => we need to create a ledger!
 				}
 			}
 		}
@@ -130,23 +131,24 @@ public class RecoveryAgent extends Agent
 			{
 				re.printStackTrace();
 			}
+
 			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
 				if(ledgers.keySet().contains(file.getName()))
 				{
 					ledgers.get(file.getName()).addDownloader(Node.getInstance().getId());
 				}
-				else
+				else //todo: Only remove if the file shouldn't be present in the network
 				{
 					FileLedger ledger = new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.DEFAULT_ID);
 					ledger.addDownloader(Node.getInstance().getId());
-					this.ledgers.put(file.getName(),ledger); //file was not yet detected => we need to create a ledger!
+					this.ledgers.put(file.getName(), ledger); //file was not yet detected => we need to create a ledger!
 				}
 			}
 		}
 
 
-		if(callerId == Node.getInstance().getNextNeighbour())	//Agent has made it across the entire system. The ledgers are complete and can be send to the owners.
+		if(callerId == Node.getInstance().getNextNeighbour())	//Agent has made it across the entire system. The ledgers are complete and can be sent to the owners.
 		{
 			for(String filename: this.ledgers.keySet())
 			{
@@ -176,11 +178,11 @@ public class RecoveryAgent extends Agent
 				}
 				catch (NotBoundException | IOException nbi)
 				{
-					nbi.printStackTrace();
+					nbi.printStackTrace();  //todo: IOException will be thrown when ledger is already present, instead of just printing the stack trace, you might want to update the owner's ledger
 				}
 
 
-				short localID = this.ledgers.get(filename).getLocalID();
+				short localID = this.ledgers.get(filename).getLocalID(); //todo: why not just use ledger.getLocalID() ???
 				String localIP = "";
 				try
 				{
