@@ -120,7 +120,7 @@ public class Resolver implements ResolverInterface
 	{
 		short id;
 
-		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals( ID))
+		if(NameServer.getInstance().map.lastKey().compareTo(ID) < 0 ||  NameServer.getInstance().map.lastKey().equals(ID))
 		{
 			Util.General.printLineSep();
 			id =  NameServer.getInstance().map.firstKey();

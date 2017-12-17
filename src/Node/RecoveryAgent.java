@@ -33,7 +33,7 @@ public class RecoveryAgent extends Agent
 	{
 		//OWNED FILES
 		ConcurrentHashMap<String, FileLedger> ownedFilesMap = Node.getInstance().getFileManager().getFileLedgers();
-		for(String filename:  ownedFilesMap.keySet())
+		for(String filename : ownedFilesMap.keySet())
 		{
 			FileLedger ledger = ownedFilesMap.get(filename);
 
@@ -62,10 +62,8 @@ public class RecoveryAgent extends Agent
 			}
 		}
 
-
 		//For files of which te failed node was owner we will need to do the entire circle to recreate the original fileledger.
 		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
-
 
 		//LOCAL FILES
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
@@ -82,9 +80,9 @@ public class RecoveryAgent extends Agent
 			}
 			if(ownerId == this.failedId)	//failed node was owner of the file
 			{
-				if(ledgers.keySet().contains(file.getName()))
+				if(this.ledgers.keySet().contains(file.getName()))
 				{
-					ledgers.get(file.getName()).setLocalID(Node.getInstance().getId());
+					this.ledgers.get(file.getName()).setLocalID(Node.getInstance().getId());
 				}
 				else
 				{
