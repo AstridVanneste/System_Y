@@ -48,8 +48,6 @@ public class FailureAgent
 			nextID = Node.getInstance().getResolverStub().getNext(lastID);
 			IPprev = Node.getInstance().getResolverStub().getIP(prevID);
 			IPnext = Node.getInstance().getResolverStub().getIP(nextID);
-
-
 		}
 		catch(RemoteException re)
 		{
