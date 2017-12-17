@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -122,27 +123,28 @@ public class RecoveryAgent extends Agent
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE));
 		for(File file: folder.listFiles())
 		{
-			short ownerId = Node.DEFAULT_ID;
-			try
+			if(Node.getInstance().getAgentHandler().getAllFiles().contains(file.getName()))
 			{
-				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
-			}
-			catch (RemoteException re)
-			{
-				re.printStackTrace();
-			}
-
-			if(ownerId == this.failedId)	//failed node was owner of the file
-			{
-				if(ledgers.keySet().contains(file.getName()))
+				short ownerId = Node.DEFAULT_ID;
+				try
 				{
-					ledgers.get(file.getName()).addDownloader(Node.getInstance().getId());
+					ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
+				} catch (RemoteException re)
+				{
+					re.printStackTrace();
 				}
-				else //todo: Only remove if the file shouldn't be present in the network
+
+				if (ownerId == this.failedId)    //failed node was owner of the file
 				{
-					FileLedger ledger = new FileLedger(file.getName(),Node.DEFAULT_ID,ownerId,Node.DEFAULT_ID);
-					ledger.addDownloader(Node.getInstance().getId());
-					this.ledgers.put(file.getName(), ledger); //file was not yet detected => we need to create a ledger!
+					if (ledgers.keySet().contains(file.getName()))
+					{
+						ledgers.get(file.getName()).addDownloader(Node.getInstance().getId());
+					} else
+					{
+						FileLedger ledger = new FileLedger(file.getName(), Node.DEFAULT_ID, ownerId, Node.DEFAULT_ID);
+						ledger.addDownloader(Node.getInstance().getId());
+						this.ledgers.put(file.getName(), ledger); //file was not yet detected => we need to create a ledger!
+					}
 				}
 			}
 		}
@@ -178,11 +180,11 @@ public class RecoveryAgent extends Agent
 				}
 				catch (NotBoundException | IOException nbi)
 				{
-					nbi.printStackTrace();  //todo: IOException will be thrown when ledger is already present, instead of just printing the stack trace, you might want to update the owner's ledger
+					nbi.printStackTrace();
 				}
 
 
-				short localID = this.ledgers.get(filename).getLocalID(); //todo: why not just use ledger.getLocalID() ???
+				short localID = ledger.getLocalID();
 				String localIP = "";
 				try
 				{
