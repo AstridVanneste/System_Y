@@ -139,7 +139,7 @@ public class FailureAgent
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
 					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
-					this.activeFailures.remove(tmpID);
+					this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);
