@@ -11,13 +11,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class MainController
 {
-	private ObservableList<TableFile> data = FXCollections.observableArrayList();		// data as an observable list of TableFiles
+	private ObservableList<TableFile> data;		// data as an observable list of TableFiles
 	private String fileSelected;
 
 	private static MainController instance;
@@ -29,9 +30,9 @@ public class MainController
 	@FXML
 	private javafx.scene.control.TableView<TableFile> tableView;
 	@FXML
-	private TableColumn<TableFile, String> fileName;
+	private TableColumn<TableFile, String> fileNameColumn;
 	@FXML
-	private TableColumn<TableFile, String> size;
+	private TableColumn<TableFile, String> sizeColumn;
 	@FXML
 	private Label previousLabel;
 	@FXML
@@ -39,7 +40,7 @@ public class MainController
 
 	public MainController()
 	{
-
+		this.data = FXCollections.observableArrayList();
 	}
 
 	public static MainController getInstance()
@@ -57,23 +58,30 @@ public class MainController
 	@FXML
 	public void initialize()
 	{
-		this.fileName.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
-		this.size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
-		//setExampleFiles();
+		this.fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"));
+		this.sizeColumn.setCellValueFactory(new PropertyValueFactory("size"));
+
+		//this.tableView.getColumns().setAll(this.fileNameColumn,this.sizeColumn);
+		setExampleFiles();
 	}
 
 	public void notifyChanges()
 	{
 		this.data.clear();
-		this.tableView.getColumns().removeAll(tableView.getItems());
+		//this.tableView.getItems().removeAll();
 
-		for(String s : Node.getInstance().getAgentHandler().getAllFiles())
+		for(String s : Test.getAllFiles())//Node.getInstance().getAgentHandler().getAllFiles()
 		{
 			System.out.println("New file: " + s);
-			TableFile tableFile = new TableFile(s,"Not supported yet");
-			this.tableView.getItems().add(tableFile);
+			this.data.add(new TableFile(s,"Not supported yet"));
 		}
+		this.tableView.setItems(this.data);
+	}
 
+	private void addFile(String name)
+	{
+		this.data.add(new TableFile(name, "Not supported yet"));
+		this.tableView.setItems(this.data);
 	}
 
 	public void UpdateNeighbours (String prevID, String nextID)
@@ -119,12 +127,10 @@ public class MainController
 
 	private void setExampleFiles ()
 	{
-/*
-		addFile(new TableFile("File2", "Not supported yet"));
-		addFile(new TableFile("File3", "Not supported yet"));
-		addFile(new TableFile("File4", "Not supported yet"));
-		addFile(new TableFile("File5", "Not supported yet"));
-*/
+
+		addFile("File2");
+		addFile("File3");
+
 
 	}
 }
