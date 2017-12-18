@@ -32,6 +32,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 		this.removeQueue = new LinkedList<String>();
 		this.proceedSem =  new Semaphore(1, true);
 		this.thread = new Thread(this);
+		this.finishedAgents = new LinkedList<Agent>();
+		this.thread.setName("AgentHandler Thread - " + Node.getInstance().getName());
 	}
 
 	public void start()
