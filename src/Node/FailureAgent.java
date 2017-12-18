@@ -199,7 +199,10 @@ public class FailureAgent
 
 	public void failure(short ID)
 	{
-		this.failure(ID,ID);
+		if(!this.activeFailures.contains(ID))
+		{
+			this.failure(ID, ID);
+		}
 	}
 
 	public LinkedList<Short> getActiveFailures()
