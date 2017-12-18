@@ -1,5 +1,7 @@
 package Node;
 
+import GUI.MainController;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -133,6 +135,8 @@ public class FileAgent extends Agent implements Serializable
 				}
 			}
 		}
+
+		MainController.getInstance().notifyChanges();
 	}
 
 	@Override

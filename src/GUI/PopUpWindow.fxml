@@ -10,7 +10,7 @@
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="openButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#openFile" prefWidth="120.0" text="Open" />
-            <Button fx:id="deleteLocalButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#deleteLocal" prefWidth="120.0" text="Delete Local" />
+            <Button fx:id="deleteLocalButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#deleteLocal" prefWidth="120.0" text="Delete local" />
             <Button fx:id="deleteNetworkButton" maxWidth="120.0" minWidth="120.0" mnemonicParsing="false" onAction="#deleteNetwork" prefWidth="120.0" text="Delete on network" />
          </children>
       </VBox>

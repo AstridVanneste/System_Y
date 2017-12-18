@@ -897,6 +897,11 @@ public class FileManager implements FileManagerInterface
 		return this.fileLedgers;
 	}
 
+	public void deleteFileRemote (short ID, String fileName, FileType type)
+	{
+
+	}
+
 	/**
 	 * replaces the current ledger for a file with a new one
 	 *
