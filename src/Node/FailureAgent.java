@@ -65,7 +65,7 @@ public class FailureAgent
 		}
 		catch(RemoteException | NotBoundException re)
 		{
-			re.printStackTrace();
+			//re.printStackTrace();
 			//CALL FAILURE
 			prevFailed = true;
 		}
@@ -81,7 +81,7 @@ public class FailureAgent
 		}
 		catch(RemoteException | NotBoundException re)
 		{
-			re.printStackTrace();
+			//re.printStackTrace();
 			//CALL FAILURE
 			nextFailed = true;
 		}
@@ -89,7 +89,6 @@ public class FailureAgent
 		// Handling Recursion
 		if (prevFailed && nextFailed)
 		{
-
 			this.failure(prevID, nextID);
 		}
 		else if (prevFailed)
@@ -200,7 +199,7 @@ public class FailureAgent
 
 	public void failure(short ID)
 	{
-		if(!this.activeFailures.contains(ID))
+		if(!this.activeFailures.contains(ID) && Node.getInstance().getId() != ID)
 		{
 			this.failure(ID, ID);
 		}
