@@ -57,7 +57,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			{
 				proceedSem.acquire( 1);
 
-				Agent agent = this.finishedAgents.getFirst();
+				Agent agent = this.finishedAgents.removeFirst();
 
 				if (!agent.isFinished())
 				{
@@ -89,6 +89,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 						//e.printStackTrace();
 					}
 				}
+
 			}
 			catch (InterruptedException e)
 			{
