@@ -14,12 +14,15 @@ import java.util.concurrent.Semaphore;
 
 import static java.rmi.server.RemoteServer.getClientHost;
 
-public class AgentHandler implements AgentHandlerInterface
+public class AgentHandler implements AgentHandlerInterface, Runnable
 {
 	private LinkedList <String> allFiles;
 	private LinkedList <String> advertiseQueue;
 	private LinkedList <String> downloadQueue;
 	private LinkedList <String> removeQueue;
+	private Semaphore proceedSem;
+	private Thread thread;
+	private LinkedList<Agent> finishedAgents;
 
 	public AgentHandler ()
 	{
@@ -27,6 +30,71 @@ public class AgentHandler implements AgentHandlerInterface
 		this.advertiseQueue = new LinkedList<String>();
 		this.downloadQueue = new LinkedList<String>();
 		this.removeQueue = new LinkedList<String>();
+		this.proceedSem =  new Semaphore(1, true);
+		this.thread = new Thread(this);
+		this.thread.setName("AgentHandler Thread - " + Node.getInstance().getName());
+	}
+
+	public void start()
+	{
+		try
+		{
+			this.proceedSem.acquire(1);
+			this.thread.start();
+		}
+		catch (InterruptedException ie)
+		{
+			ie.printStackTrace();
+		}
+	}
+
+	@Override
+	public void run()
+	{
+		while (true)
+		{
+			try
+			{
+				proceedSem.acquire( 1);
+
+				Agent agent = this.finishedAgents.getFirst();
+
+				if (!agent.isFinished())
+				{
+					short nextId = Node.getInstance().getNextNeighbour();
+					try
+					{
+						while (Node.getInstance().getFailureAgent().getActiveFailures().contains(nextId))
+						{
+							System.out.println(nextId + " was in the failure-list.");
+							nextId = Node.getInstance().getResolverStub().getNext(nextId);
+						}
+
+						System.out.println("Sending agent to " + nextId);
+					}
+					catch(RemoteException re)
+					{
+						re.printStackTrace();
+					}
+					try
+					{
+						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
+						AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
+						remoteAgentHandler.runAgent(agent);
+					}
+					catch (RemoteException | NotBoundException e)
+					{
+						System.err.println("AgentHandler.runAgent()");
+						Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
+						//e.printStackTrace();
+					}
+				}
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -42,34 +110,8 @@ public class AgentHandler implements AgentHandlerInterface
 				agentThread.join();
 			}
 
-			if (!agent.isFinished())
-			{
-				short nextId = Node.getInstance().getNextNeighbour();
-				try
-				{
-					while (Node.getInstance().getFailureAgent().getActiveFailures().contains(nextId))
-					{
-
-						nextId = Node.getInstance().getResolverStub().getNext(nextId);
-					}
-				}
-				catch(RemoteException re)
-				{
-					re.printStackTrace();
-				}
-				try
-				{
-					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
-					AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
-					remoteAgentHandler.runAgent(agent);
-				}
-				catch (RemoteException | NotBoundException e)
-				{
-					System.err.println("AgentHandler.runAgent()");
-					Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
-					//e.printStackTrace();
-				}
-			}
+			this.finishedAgents.add(agent);
+			this.proceedSem.release(1);
 		}
 		catch (InterruptedException ie)
 		{
