@@ -194,7 +194,7 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(localFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				ownerInterface.notifyLeaving(localFile.getName(), FileType.LOCAL_FILE);
+				ownerInterface.notifyLeaving(localFile.getName(), FileType.LOCAL_FILE, Node.getInstance().getId());
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -232,7 +232,7 @@ public class FileManager implements FileManagerInterface
 				ownerID = Node.getInstance().getResolverStub().getOwnerID(replicatedFile.getName());
 				Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerID));
 				FileManagerInterface ownerInterface = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-				ownerInterface.notifyLeaving(replicatedFile.getName(), FileType.REPLICATED_FILE);
+				ownerInterface.notifyLeaving(replicatedFile.getName(), FileType.REPLICATED_FILE, Node.getInstance().getId());
 			}
 			catch (RemoteException | NotBoundException e)
 			{
@@ -242,7 +242,7 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
-	public void notifyLeaving(String filename, FileType type)
+	public void notifyLeaving(String filename, FileType type, short id)
 	{
 		try
 		{
@@ -297,19 +297,33 @@ public class FileManager implements FileManagerInterface
 				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 			}
 
-			this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
+			if(Node.getInstance().getPreviousNeighbour() != id)												//todo: this if statement was added and needs to be tested
+			{
+				this.fileLedgers.get(filename).setReplicatedId(Node.getInstance().getPreviousNeighbour());
+			}
+			else
+			{
+				try
+				{
+					short replicatedId = Node.getInstance().getResolverStub().getPrevious(Node.getInstance().getPreviousNeighbour());
+					this.fileLedgers.get(filename).setReplicatedId(replicatedId);
+				} catch (RemoteException e)
+				{
+					e.printStackTrace();
+				}
+			}
 
 			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 
 			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
 				System.out.println("Local and owner are equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
+				this.sendFile(this.fileLedgers.get(filename).getReplicatedId(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 			}
 			else
 			{
 				System.out.println("Local and owner aren't equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
-				this.sendFile(Node.getInstance().getPreviousNeighbour(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
+				this.sendFile(this.fileLedgers.get(filename).getReplicatedId(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
 			}
 		}
 		else
@@ -765,41 +779,12 @@ public class FileManager implements FileManagerInterface
 		this.rootDirectory = rootDirectory;
 	}
 
-	public void deleteFileRemote(short id, String filename, FileType filetype)
-	{
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			remoteFileManager.deleteFile(filename, filetype);
-		}
-		catch (NotBoundException | IOException re)
-		{
-			re.printStackTrace();
-		}
-	}
-
-	public FileLedger getFileLedgerRemote(short id, String fileName)
-	{
-		FileLedger fileLedger = null;
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			fileLedger = remoteFileManager.getFileLedger(fileName);
-		}
-		catch (NotBoundException | IOException re)
-		{
-			re.printStackTrace();
-		}
-		return fileLedger;
-	}
-
 	public void deleteFileLedger(String fileName)
 	{
 		fileLedgers.remove(fileName);
 	}
 
+	@Override
 	public void deleteFileLedgerRemote(String fileName) throws RemoteException
 	{
 		fileLedgers.remove(fileName);
