@@ -36,6 +36,7 @@ public class RecoveryAgent extends Agent
 	public void run()
 	{
 		//OWNED FILES
+		System.out.println("Starting owned files");
 		for(Map.Entry<String,FileLedger> pair: Node.getInstance().getFileManager().getFileLedgers().entrySet())
 		{
 			String filename = pair.getKey();
@@ -70,6 +71,7 @@ public class RecoveryAgent extends Agent
 		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
 
 		//LOCAL FILES
+		System.out.println("Starting local files");
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 		for(File file: folder.listFiles())
 		{
@@ -96,6 +98,7 @@ public class RecoveryAgent extends Agent
 		}
 
 		//REPLICATED FILES
+		System.out.println("Starting replicated files");
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.REPLICATED_FILE));
 		for(File file: folder.listFiles())
 		{
@@ -123,6 +126,7 @@ public class RecoveryAgent extends Agent
 		}
 
 		//DOWNLOADED FILES
+		System.out.println("started downloaded files");
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE));
 		for(File file: folder.listFiles())
 		{
