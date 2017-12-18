@@ -32,7 +32,6 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 		this.removeQueue = new LinkedList<String>();
 		this.proceedSem =  new Semaphore(1, true);
 		this.thread = new Thread(this);
-		this.thread.setName("AgentHandler Thread - " + Node.getInstance().getName());
 	}
 
 	public void start()
@@ -40,6 +39,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 		try
 		{
 			this.proceedSem.acquire(1);
+			this.thread.setName("AgentHandler Thread - " + Node.getInstance().getName());
 			this.thread.start();
 		}
 		catch (InterruptedException ie)
