@@ -1,5 +1,7 @@
 package Node;
 
+import javafx.util.Pair;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,6 +11,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,10 +36,10 @@ public class RecoveryAgent extends Agent
 	public void run()
 	{
 		//OWNED FILES
-		ConcurrentHashMap<String, FileLedger> ownedFilesMap = Node.getInstance().getFileManager().getFileLedgers();
-		for(String filename : ownedFilesMap.keySet())
+		for(Map.Entry<String,FileLedger> pair: Node.getInstance().getFileManager().getFileLedgers().entrySet())
 		{
-			FileLedger ledger = ownedFilesMap.get(filename);
+			String filename = pair.getKey();
+			FileLedger ledger = pair.getValue();
 
 			if(ledger.getLocalID() == failedId)		//the failed id was local of the file
 			{
