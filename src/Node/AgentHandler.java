@@ -65,6 +65,7 @@ public class AgentHandler implements AgentHandlerInterface
 				}
 				catch (RemoteException | NotBoundException e)
 				{
+					System.err.println("AgentHandler.runAgent()");
 					Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 					//e.printStackTrace();
 				}

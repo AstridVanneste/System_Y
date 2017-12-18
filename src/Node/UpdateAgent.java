@@ -92,6 +92,7 @@ public class UpdateAgent implements Runnable
 					catch (RemoteException e)
 					{
 						e.printStackTrace();
+						System.err.println("UpdateAgent.run");
 						Node.getInstance().getFailureAgent().failure(ownerId);
 					}
 
