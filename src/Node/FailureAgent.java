@@ -24,6 +24,7 @@ public class FailureAgent
 	 */
 	private void failure(short firstID, short lastID)
 	{
+		System.err.println("Failure called on range [" + firstID + ", " + lastID + "]");
 		if(!this.activeFailures.contains(firstID))
 		{
 			this.activeFailures.add(firstID);
@@ -64,7 +65,7 @@ public class FailureAgent
 		}
 		catch(RemoteException | NotBoundException re)
 		{
-			re.printStackTrace();
+			//re.printStackTrace();
 			//CALL FAILURE
 			prevFailed = true;
 		}
@@ -80,7 +81,7 @@ public class FailureAgent
 		}
 		catch(RemoteException | NotBoundException re)
 		{
-			re.printStackTrace();
+			//re.printStackTrace();
 			//CALL FAILURE
 			nextFailed = true;
 		}
@@ -88,7 +89,6 @@ public class FailureAgent
 		// Handling Recursion
 		if (prevFailed && nextFailed)
 		{
-
 			this.failure(prevID, nextID);
 		}
 		else if (prevFailed)
@@ -139,7 +139,7 @@ public class FailureAgent
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
 					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
-					this.activeFailures.remove(tmpID);
+					this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);
@@ -199,7 +199,10 @@ public class FailureAgent
 
 	public void failure(short ID)
 	{
-		this.failure(ID,ID);
+		if(!this.activeFailures.contains(ID) && Node.getInstance().getId() != ID)
+		{
+			this.failure(ID, ID);
+		}
 	}
 
 	public LinkedList<Short> getActiveFailures()

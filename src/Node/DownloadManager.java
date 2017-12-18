@@ -43,7 +43,6 @@ public class DownloadManager implements Runnable
 	{
 		while (this.isRunning)    // todo: insert stop condition
 		{
-
 			if (this.queuedFiles.size() > 0)
 			{
 				synchronized (this.queuedFiles)

@@ -22,6 +22,8 @@
          <children>
             <Label fx:id="nodeNameLabel" text="Node Name" />
             <Label fx:id="nodeIDLabel" text="Node ID" />
+            <Label fx:id="previousLabel" text="Previous Node" />
+            <Label fx:id="nextLabel" text="Next node" />
             <Region visible="false" HBox.hgrow="ALWAYS" />
             <ImageView fx:id="shutdownButton" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#shutdown" pickOnBounds="true" HBox.hgrow="ALWAYS">
                <image>
