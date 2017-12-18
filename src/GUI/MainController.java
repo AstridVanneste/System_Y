@@ -76,7 +76,7 @@ public class MainController
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		PopUpController controller = fxmlLoader.getController();
+		//PopUpController controller = fxmlLoader.getController();
 
 		Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UTILITY);
@@ -85,8 +85,8 @@ public class MainController
 		secondaryStage.setScene(new Scene(root, 160, 120));
 		secondaryStage.show();
 
-		controller.setSelectedFile(this.fileSelected);
-		controller.setFiles(this.data);
+		//controller.setSelectedFile(this.fileSelected);
+		//controller.setFiles(this.data);
 
 	}
 
