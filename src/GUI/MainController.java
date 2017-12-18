@@ -2,7 +2,6 @@ package GUI;
 
 import Node.Node;
 import java.io.IOException;
-import java.util.LinkedList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,9 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -54,17 +51,6 @@ public class MainController
 		return MainController.instance;
 	}
 
-	private void setExampleFiles ()
-	{
-/*
-		addFile(new TableFile("File2", "Not supported yet"));
-		addFile(new TableFile("File3", "Not supported yet"));
-		addFile(new TableFile("File4", "Not supported yet"));
-		addFile(new TableFile("File5", "Not supported yet"));
-*/
-
-	}
-
 	/**
 	 * When calling the correspondent fxml-file, this method will also be called
 	 */
@@ -78,28 +64,16 @@ public class MainController
 
 	public void notifyChanges()
 	{
-		this.data.removeAll();
+		this.data.clear();
+		this.tableView.getColumns().removeAll(tableView.getItems());
+
 		for(String s : Node.getInstance().getAgentHandler().getAllFiles())
 		{
+			System.out.println("New file: " + s);
 			TableFile tableFile = new TableFile(s,"Not supported yet");
-			data.add(tableFile);
+			this.tableView.getItems().add(tableFile);
 		}
-	}
 
-	/**
-	 *  This function is called to create a new fileEntry in the TableView
-	 */
-	public void addFile(String fileName)
-	{
-
-		this.data.add(new TableFile(fileName, "Not supported yet"));
-		this.tableView.setItems(this.data);
-	}
-
-	public void deleteFile(String fileName)
-	{
-		this.data.remove(new TableFile(fileName, "Not supported yet"));
-		this.tableView.setItems(this.data);
 	}
 
 	public void UpdateNeighbours (String prevID, String nextID)
@@ -109,33 +83,13 @@ public class MainController
 	}
 
 	/**
-	 *  Compares the list of the files in the network vs the files in the tableView
-	 *  Adds a file in the tableView if necessary.
-	 */
-	public void updateFiles(LinkedList<String> list)
-	{
-		LinkedList<String> files = list;
-
-		for(String file : files)
-		{
-			TableFile newFile = new TableFile(file, "Not supported yet");
-
-			if (!data.contains(newFile))
-			{
-				//addFile(newFile);
-			}
-		}
-	}
-
-
-	/**
 	 * When clicked on a fileEntry, a PopUpWindow will open to do something with the file
 	 * @throws IOException
 	 */
 	public void openPopUpWindow () throws IOException
 	{
 		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
-		setFileSelected(file);
+		this.fileSelected = file;
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
@@ -149,7 +103,7 @@ public class MainController
 		secondaryStage.show();
 
 		//controller.setSelectedFile(this.fileSelected);
-		//controller.setFiles(this.data);
+		//controller.setFiles(this.tableView.getItems());
 
 	}
 	public void shutdown()
@@ -158,19 +112,19 @@ public class MainController
 		Node.getInstance().stop();
 	}
 
-	public void setFileSelected (String fileName)
-	{
-		this.fileSelected = fileName;
-	}
-
-	public String getFileSelected()
-	{
-		return this.fileSelected;
-	}
-
 	public ObservableList<TableFile> getData()
 	{
 		return this.data;
 	}
 
+	private void setExampleFiles ()
+	{
+/*
+		addFile(new TableFile("File2", "Not supported yet"));
+		addFile(new TableFile("File3", "Not supported yet"));
+		addFile(new TableFile("File4", "Not supported yet"));
+		addFile(new TableFile("File5", "Not supported yet"));
+*/
+
+	}
 }
