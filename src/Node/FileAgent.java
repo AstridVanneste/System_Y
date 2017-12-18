@@ -32,7 +32,6 @@ public class FileAgent extends Agent implements Serializable
 				{
 					//We add these files to the filemap, but only if they don't exist already
 					this.fileMap.put(filename, new DownloadPair(1, Node.DEFAULT_ID));
-					MainController.getInstance().addFile(filename);
 				}
 				else
 				{
@@ -54,7 +53,6 @@ public class FileAgent extends Agent implements Serializable
 				if (this.fileMap.containsKey(filename))
 				{
 					this.fileMap.remove(filename);
-					MainController.getInstance().deleteFile(filename);
 				}
 				else
 				{
@@ -137,6 +135,8 @@ public class FileAgent extends Agent implements Serializable
 				}
 			}
 		}
+
+		MainController.getInstance().notifyChanges();
 	}
 
 	@Override

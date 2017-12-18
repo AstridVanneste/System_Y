@@ -76,6 +76,16 @@ public class MainController
 		//setExampleFiles();
 	}
 
+	public void notifyChanges()
+	{
+		this.data.removeAll();
+		for(String s : Node.getInstance().getAgentHandler().getAllFiles())
+		{
+			TableFile tableFile = new TableFile(s,"Not supported yet");
+			data.add(tableFile);
+		}
+	}
+
 	/**
 	 *  This function is called to create a new fileEntry in the TableView
 	 */
@@ -99,31 +109,6 @@ public class MainController
 	}
 
 	/**
-	 * When clicked on a fileEntry, a PopUpWindow will open to do something with the file
-	 * @throws IOException
-	 */
-	public void openPopUpWindow () throws IOException
-	{
-		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
-		setFileSelected(file);
-
-		FXMLLoader fxmlLoader = new FXMLLoader();
-		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		PopUpController controller = fxmlLoader.getController();
-
-		Stage secondaryStage = new Stage();
-		secondaryStage.initStyle(StageStyle.UTILITY);
-		secondaryStage.setMinWidth(160);
-		secondaryStage.setMinHeight(120);
-		secondaryStage.setScene(new Scene(root, 160, 120));
-		secondaryStage.show();
-
-		controller.setSelectedFile(this.fileSelected);
-		controller.setFiles(this.data);
-
-	}
-
-	/**
 	 *  Compares the list of the files in the network vs the files in the tableView
 	 *  Adds a file in the tableView if necessary.
 	 */
@@ -142,6 +127,31 @@ public class MainController
 		}
 	}
 
+
+	/**
+	 * When clicked on a fileEntry, a PopUpWindow will open to do something with the file
+	 * @throws IOException
+	 */
+	public void openPopUpWindow () throws IOException
+	{
+		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
+		setFileSelected(file);
+
+		FXMLLoader fxmlLoader = new FXMLLoader();
+		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
+		//PopUpController controller = fxmlLoader.getController();
+
+		Stage secondaryStage = new Stage();
+		secondaryStage.initStyle(StageStyle.UTILITY);
+		secondaryStage.setMinWidth(160);
+		secondaryStage.setMinHeight(120);
+		secondaryStage.setScene(new Scene(root, 160, 120));
+		secondaryStage.show();
+
+		//controller.setSelectedFile(this.fileSelected);
+		//controller.setFiles(this.data);
+
+	}
 	public void shutdown()
 	{
 		shutdownButton.setImage(new Image("@exit_image.jpg"));
