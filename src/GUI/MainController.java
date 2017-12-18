@@ -10,7 +10,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -29,13 +31,17 @@ public class MainController
 	private TableColumn<TableFile, String> fileName;
 	@FXML
 	private TableColumn<TableFile, String> size;
+	@FXML
+	private Label previousLabel;
+	@FXML
+	private Label nextLabel;
 
 	public MainController()
 	{
 
 	}
 
-	public void setExampleFiles ()
+	private void setExampleFiles ()
 	{
 		addFile(new TableFile("File2", "Not supported yet"));
 		addFile(new TableFile("File3", "Not supported yet"));
@@ -52,7 +58,7 @@ public class MainController
 	{
 		this.fileName.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
 		this.size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
-		setExampleFiles();
+		//setExampleFiles();
 	}
 
 	/**
@@ -64,11 +70,16 @@ public class MainController
 		this.tableView.setItems(this.data);
 	}
 
+	public void UpdateNeighbours (String prevID, String nextID)
+	{
+		this.previousLabel.setText(prevID);
+		this.nextLabel.setId(nextID);
+	}
+
 	/**
 	 * When clicked on a fileEntry, a PopUpWindow will open to do something with the file
 	 * @throws IOException
 	 */
-
 	public void openPopUpWindow () throws IOException
 	{
 		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
@@ -111,6 +122,7 @@ public class MainController
 
 	public void shutdown()
 	{
+		shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
 	}
 

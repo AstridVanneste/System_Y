@@ -1,6 +1,7 @@
 package Node;
 
 //import GUI.Controller;
+import GUI.MainController;
 import NameServer.*;
 
 import java.rmi.*;
@@ -28,7 +29,7 @@ public class Node implements NodeInteractionInterface
 	private FileManager fileManager;
 	private UpdateAgent updateAgent;
 	private AgentHandler agentHandler;
-	//private Controller controller;
+	private MainController mainController;
 
 	private ResolverInterface resolverStub;
 
@@ -49,7 +50,7 @@ public class Node implements NodeInteractionInterface
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
 		this.agentHandler = new AgentHandler();
-		//this.controller = new Controller();
+		//this.mainController = new Controller();
 	}
 
 	/**
@@ -191,11 +192,11 @@ public class Node implements NodeInteractionInterface
 	public UpdateAgent getUpdateAgent(){
 		return this.updateAgent;
 	}
-	/*
-	public Controller getController()
+
+	public MainController getMainController()
 	{
-		return this.controller;
-	}*/
+		return this.mainController;
+	}
 
 	public short getId()
 	{

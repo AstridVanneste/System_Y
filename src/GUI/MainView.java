@@ -8,10 +8,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/**
- * Created by Axel on 12/12/2017.
- */
-
 public class MainView extends Application
 {
 
