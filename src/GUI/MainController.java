@@ -11,7 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -20,6 +22,8 @@ public class MainController
 {
 	private ObservableList<TableFile> data = FXCollections.observableArrayList();		// data as an observable list of TableFiles
 	private String fileSelected;
+
+	private static MainController instance;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -41,12 +45,23 @@ public class MainController
 
 	}
 
+	public static MainController getInstance()
+	{
+		if(MainController.instance == null)
+		{
+			MainController.instance = new MainController();
+		}
+		return MainController.instance;
+	}
+
 	private void setExampleFiles ()
 	{
+/*
 		addFile(new TableFile("File2", "Not supported yet"));
 		addFile(new TableFile("File3", "Not supported yet"));
 		addFile(new TableFile("File4", "Not supported yet"));
 		addFile(new TableFile("File5", "Not supported yet"));
+*/
 
 	}
 
@@ -64,9 +79,16 @@ public class MainController
 	/**
 	 *  This function is called to create a new fileEntry in the TableView
 	 */
-	public void addFile(TableFile tableFile)
+	public void addFile(String fileName)
 	{
-		this.data.add(tableFile);
+
+		this.data.add(new TableFile(fileName, "Not supported yet"));
+		this.tableView.setItems(this.data);
+	}
+
+	public void deleteFile(String fileName)
+	{
+		this.data.remove(new TableFile(fileName, "Not supported yet"));
 		this.tableView.setItems(this.data);
 	}
 
@@ -87,7 +109,7 @@ public class MainController
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		//PopUpController controller = fxmlLoader.getController();
+		PopUpController controller = fxmlLoader.getController();
 
 		Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UTILITY);
@@ -96,8 +118,8 @@ public class MainController
 		secondaryStage.setScene(new Scene(root, 160, 120));
 		secondaryStage.show();
 
-		//controller.setSelectedFile(this.fileSelected);
-		//controller.setFiles(this.data);
+		controller.setSelectedFile(this.fileSelected);
+		controller.setFiles(this.data);
 
 	}
 
@@ -115,7 +137,7 @@ public class MainController
 
 			if (!data.contains(newFile))
 			{
-				addFile(newFile);
+				//addFile(newFile);
 			}
 		}
 	}
