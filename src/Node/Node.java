@@ -123,7 +123,7 @@ public class Node implements NodeInteractionInterface
 
 			this.fileManager.start();
 			this.updateAgent.start();
-			//this.agentHandler.start();
+			this.agentHandler.start();
 		}
 		else
 		{
