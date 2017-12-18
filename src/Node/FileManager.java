@@ -198,6 +198,7 @@ public class FileManager implements FileManagerInterface
 			}
 			catch (RemoteException | NotBoundException e)
 			{
+				System.err.println("FileManager.shutdown()");
 				Node.getInstance().getFailureAgent().failure(ownerID);
 				e.printStackTrace();
 			}
@@ -236,6 +237,7 @@ public class FileManager implements FileManagerInterface
 			}
 			catch (RemoteException | NotBoundException e)
 			{
+				System.err.println("FileManager.shutdown()");
 				Node.getInstance().getFailureAgent().failure(ownerID);
 				e.printStackTrace();
 			}
@@ -531,6 +533,7 @@ public class FileManager implements FileManagerInterface
 			}
 			catch (RemoteException re)
 			{
+				System.err.println("FileManager.checkFiles()");
 				re.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(ownerId);
 			}
@@ -541,6 +544,7 @@ public class FileManager implements FileManagerInterface
 			catch (NotBoundException e)
 			{
 				e.printStackTrace();
+				System.err.println("FileManager.checkFiles()");
 				Node.getInstance().getFailureAgent().failure(ownerId);
 			}
 		}
@@ -668,6 +672,7 @@ public class FileManager implements FileManagerInterface
 		catch (RemoteException re)
 		{
 			re.printStackTrace();
+			System.err.println("FileManager.sendFile()");
 			Node.getInstance().getFailureAgent().failure(dstID);
 		}
 		catch (IOException ioe)

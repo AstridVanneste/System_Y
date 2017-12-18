@@ -24,6 +24,7 @@ public class FailureAgent
 	 */
 	private void failure(short firstID, short lastID)
 	{
+		System.err.println("Failure called on range [" + firstID + ", " + lastID + "]");
 		if(!this.activeFailures.contains(firstID))
 		{
 			this.activeFailures.add(firstID);
