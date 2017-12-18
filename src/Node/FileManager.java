@@ -765,41 +765,12 @@ public class FileManager implements FileManagerInterface
 		this.rootDirectory = rootDirectory;
 	}
 
-	public void deleteFileRemote(short id, String filename, FileType filetype)
-	{
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			remoteFileManager.deleteFile(filename, filetype);
-		}
-		catch (NotBoundException | IOException re)
-		{
-			re.printStackTrace();
-		}
-	}
-
-	public FileLedger getFileLedgerRemote(short id, String fileName)
-	{
-		FileLedger fileLedger = null;
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			fileLedger = remoteFileManager.getFileLedger(fileName);
-		}
-		catch (NotBoundException | IOException re)
-		{
-			re.printStackTrace();
-		}
-		return fileLedger;
-	}
-
 	public void deleteFileLedger(String fileName)
 	{
 		fileLedgers.remove(fileName);
 	}
 
+	@Override
 	public void deleteFileLedgerRemote(String fileName) throws RemoteException
 	{
 		fileLedgers.remove(fileName);
