@@ -1,6 +1,6 @@
 package Node;
 
-import GUI.MainController;
+//import GUI.Controller;
 import NameServer.*;
 
 import java.rmi.*;
@@ -8,9 +8,8 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
-
-
 
 public class Node implements NodeInteractionInterface
 {
@@ -29,7 +28,7 @@ public class Node implements NodeInteractionInterface
 	private FileManager fileManager;
 	private UpdateAgent updateAgent;
 	private AgentHandler agentHandler;
-	private MainController mainController;
+	//private Controller controller;
 
 	private ResolverInterface resolverStub;
 
@@ -50,7 +49,7 @@ public class Node implements NodeInteractionInterface
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
 		this.agentHandler = new AgentHandler();
-		this.mainController = new MainController();
+		//this.controller = new Controller();
 	}
 
 	/**
@@ -192,11 +191,12 @@ public class Node implements NodeInteractionInterface
 	public UpdateAgent getUpdateAgent(){
 		return this.updateAgent;
 	}
-
-	public MainController getMainController()
+	/*
+	public Controller getController()
 	{
-		return this.mainController;
-	}
+		return this.controller;
+	}*/
+
 	public short getId()
 	{
 		return this.id;
