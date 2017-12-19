@@ -29,7 +29,6 @@ public class Node implements NodeInteractionInterface
 	private FileManager fileManager;
 	private UpdateAgent updateAgent;
 	private AgentHandler agentHandler;
-	private MainController mainController;
 
 	private ResolverInterface resolverStub;
 
@@ -50,7 +49,6 @@ public class Node implements NodeInteractionInterface
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
 		this.agentHandler = new AgentHandler();
-		//this.mainController = new Controller();
 	}
 
 	/**
@@ -191,11 +189,6 @@ public class Node implements NodeInteractionInterface
 
 	public UpdateAgent getUpdateAgent(){
 		return this.updateAgent;
-	}
-
-	public MainController getMainController()
-	{
-		return this.mainController;
 	}
 
 	public short getId()

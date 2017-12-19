@@ -1,42 +1,31 @@
-//package GUI;
-//
-//import Node.*;
-//import javafx.collections.ObservableList;
-//import javafx.fxml.FXML;
-//
-//import java.awt.*;
-//import java.io.File;
-//import java.io.IOException;
-//import java.rmi.RemoteException;
-//import java.util.Set;
-//
-//import static Node.FileType.*;
-//
-//public class PopUpController
-//{
-//
-//	private ObservableList<TableFile> files;
-//	private String selectedFile;
-//
-//	private static final String PREFIX = "/";
-//
-//	@FXML
-//	private javafx.scene.control.Button deleteLocalButton;
-//	@FXML
-//	private javafx.scene.control.Button deleteNetworkButton;
-//	@FXML
-//	private javafx.scene.control.Button openButton;
-//
-//	public PopUpController()
-//	{
-//	}
-//
-//	/**
-//	 *
-//	 */
-//	public void openFile()
-//	{
-//
+package GUI;
+
+import javafx.fxml.FXML;
+
+public class PopUpController
+{
+	private String selectedFile;
+
+	private static final String PREFIX = "/";
+
+	@FXML
+	private javafx.scene.control.Button deleteLocalButton;
+	@FXML
+	private javafx.scene.control.Button deleteNetworkButton;
+	@FXML
+	private javafx.scene.control.Button openButton;
+
+	public PopUpController()
+	{
+	}
+
+	/**
+	 *
+	 */
+	public void openFile()
+	{
+
+		System.out.println("Open file " + this.selectedFile + " ...");
 //		if(Node.getInstance().getFileManager().hasFile(this.selectedFile, LOCAL_FILE))
 //		{
 //			if (Desktop.isDesktopSupported()) {
@@ -98,11 +87,11 @@
 //			}
 //			//return true;
 //		}
-//	}
-//
-//	public void deleteLocal()
-//	{
-//
+	}
+
+	public void deleteLocal()
+	{
+		System.out.println("Delete file local...");
 //		if(Node.getInstance().getFileManager().hasFile(this.selectedFile, LOCAL_FILE))
 //		{
 //			try
@@ -131,11 +120,11 @@
 //				Node.getInstance().getFileManager().deleteFileRemote(localId,this.selectedFile,LOCAL_FILE);
 //			}
 //		}
-//	}
-//
-//	public void deleteNetwork()
-//	{
-//
+	}
+
+	public void deleteNetwork()
+	{
+		System.out.println("Delete file on network...");
 //		if(Node.getInstance().getFileManager().hasFile(this.selectedFile, OWNED_FILE))
 //		{
 //			FileLedger fileLedger = Node.getInstance().getFileManager().getFileLedgers().get(this.selectedFile);
@@ -217,19 +206,13 @@
 //				e.printStackTrace();
 //			}
 //		}
-//	}
-//
-//	public void setFiles(ObservableList<TableFile> files)
-//	{
-//		this.files = files;
-//	}
-//
-//
-//	public void setSelectedFile(String selectedFile)
-//	{
-//		this.selectedFile = selectedFile;
-//	}
-//
-//
-//
-//}
+	}
+
+	public void setSelectedFile(String selectedFile)
+	{
+		this.selectedFile = selectedFile;
+	}
+
+
+
+}

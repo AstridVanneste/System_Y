@@ -2,25 +2,26 @@ package GUI;
 
 import Node.Node;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Random;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 public class MainController
 {
-	private ObservableList<TableFile> data = FXCollections.observableArrayList();		// data as an observable list of TableFiles
 	private String fileSelected;
-
-	private static MainController instance;
+	private Scene view;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -29,26 +30,20 @@ public class MainController
 	@FXML
 	private javafx.scene.control.TableView<TableFile> tableView;
 	@FXML
-	private TableColumn<TableFile, String> fileName;
-	@FXML
-	private TableColumn<TableFile, String> size;
+	private TableColumn<TableFile, String> fileNameColumn;
+	//@FXML
+	//private TableColumn<TableFile, String> sizeColumn;
 	@FXML
 	private Label previousLabel;
 	@FXML
 	private Label nextLabel;
+	@FXML
+	private Label nodeNameLabel;
+	@FXML
+	private Label nodeIDLabel;
 
 	public MainController()
 	{
-
-	}
-
-	public static MainController getInstance()
-	{
-		if(MainController.instance == null)
-		{
-			MainController.instance = new MainController();
-		}
-		return MainController.instance;
 	}
 
 	/**
@@ -57,29 +52,53 @@ public class MainController
 	@FXML
 	public void initialize()
 	{
-		this.fileName.setCellValueFactory(cellData -> cellData.getValue().fileNameProperty());
-		this.size.setCellValueFactory(cellData -> cellData.getValue().sizeProperty());
-		//setExampleFiles();
+		this.fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"));
 	}
 
-	public void notifyChanges()
+	public void init ()
 	{
-		this.data.clear();
-		this.tableView.getColumns().removeAll(tableView.getItems());
+		//updateFiles();
+	}
 
-		for(String s : Node.getInstance().getAgentHandler().getAllFiles())
-		{
-			System.out.println("New file: " + s);
-			TableFile tableFile = new TableFile(s,"Not supported yet");
-			this.tableView.getItems().add(tableFile);
+	public void view(Parent root){
+		if(view == null)
+			view = new Scene(root,600,400);
+		Stage stage = new Stage();
+		stage.setResizable(false);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(final WindowEvent arg0) {
+				System.exit(-1);
+			}
+		});
+		stage.setScene(view);
+		stage.show();
+
+		this.nodeNameLabel.setText(Node.getInstance().getName());
+		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
+		updateNeighbours();
+	}
+
+	public void updateFiles()
+	{
+		LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
+		tableView.getItems().clear();
+		for (String entry : files) {
+			tableView.getItems().add(new TableFile(entry));
+			System.out.println(entry);
 		}
-
 	}
 
-	public void UpdateNeighbours (String prevID, String nextID)
+	public void addRandomFile()
 	{
-		this.previousLabel.setText(prevID);
-		this.nextLabel.setId(nextID);
+		String file = new String("File" + new Random().nextInt());
+		tableView.getItems().add(new TableFile(file));
+	}
+
+	public void updateNeighbours ()
+	{
+		this.nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
+		this.previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
 	}
 
 	/**
@@ -93,7 +112,7 @@ public class MainController
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		//PopUpController controller = fxmlLoader.getController();
+		PopUpController controller = fxmlLoader.getController();
 
 		Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UTILITY);
@@ -102,29 +121,13 @@ public class MainController
 		secondaryStage.setScene(new Scene(root, 160, 120));
 		secondaryStage.show();
 
-		//controller.setSelectedFile(this.fileSelected);
-		//controller.setFiles(this.tableView.getItems());
-
+		controller.setSelectedFile(this.fileSelected);
 	}
+
 	public void shutdown()
 	{
 		shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
 	}
 
-	public ObservableList<TableFile> getData()
-	{
-		return this.data;
-	}
-
-	private void setExampleFiles ()
-	{
-/*
-		addFile(new TableFile("File2", "Not supported yet"));
-		addFile(new TableFile("File3", "Not supported yet"));
-		addFile(new TableFile("File4", "Not supported yet"));
-		addFile(new TableFile("File5", "Not supported yet"));
-*/
-
-	}
 }

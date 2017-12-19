@@ -135,8 +135,6 @@ public class FileAgent extends Agent implements Serializable
 				}
 			}
 		}
-
-		MainController.getInstance().notifyChanges();
 	}
 
 	@Override
