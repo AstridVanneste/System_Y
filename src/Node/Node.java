@@ -50,7 +50,6 @@ public class Node implements NodeInteractionInterface
 		this.updateAgent = new UpdateAgent();
 		this.neighbourSetSemaphore = new Semaphore(2, true);
 		this.agentHandler = new AgentHandler();
-		//this.mainController = new Controller();
 	}
 
 	/**

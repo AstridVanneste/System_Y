@@ -15,7 +15,8 @@ public class MainView extends Application
 	public void start(Stage primaryStage) throws Exception{
 		try
 		{
-			Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
+			FXMLLoader fxmlLoader = new FXMLLoader();
+			Parent root = fxmlLoader.load(getClass().getResource("MainWindow.fxml"));
 
 			primaryStage.setMinWidth(600);
 			primaryStage.setMinHeight(400);

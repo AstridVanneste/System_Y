@@ -60,29 +60,34 @@ public class MainController
 	{
 		this.fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"));
 		this.sizeColumn.setCellValueFactory(new PropertyValueFactory("size"));
-
+		this.tableView.setItems(this.data);
 		//this.tableView.getColumns().setAll(this.fileNameColumn,this.sizeColumn);
 		setExampleFiles();
 	}
 
 	public void notifyChanges()
 	{
-		this.data.clear();
+		//this.data.clear();
 		//this.tableView.getItems().removeAll();
 
 		for(String s : Test.getAllFiles())//Node.getInstance().getAgentHandler().getAllFiles()
 		{
 			System.out.println("New file: " + s);
-			this.data.add(new TableFile(s,"Not supported yet"));
+			addFile(s);
 		}
-		this.tableView.setItems(this.data);
 	}
 
 	private void addFile(String name)
 	{
-		this.data.add(new TableFile(name, "Not supported yet"));
-		this.tableView.setItems(this.data);
+		//this.data = tableView.getItems();
+		//this.data.add(new TableFile(name, "Not supported yet"));
+		tableView.getItems().add(new TableFile(name, "Not supported yet"));
+		// test if tabelview gives null
+		System.out.println(this.tableView);
+
+		//this.tableView.getItems().addAll(this.data);
 	}
+
 
 	public void UpdateNeighbours (String prevID, String nextID)
 	{
@@ -114,6 +119,7 @@ public class MainController
 		//controller.setFiles(this.tableView.getItems());
 
 	}
+
 	public void shutdown()
 	{
 		shutdownButton.setImage(new Image("@exit_image.jpg"));
