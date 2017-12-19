@@ -6,12 +6,12 @@ import javafx.scene.control.Tab;
 
 public class TableFile implements Comparable<TableFile>{
 	private StringProperty fileName;
-	private StringProperty size;
+	//private StringProperty size;
 
-	public TableFile(String name, String size)
+	public TableFile(String name)
 	{
 		this.fileName = new SimpleStringProperty(name);
-		this.size = new SimpleStringProperty(size);
+		//this.size = new SimpleStringProperty(size);
 	}
 
 	public void setFileName(String value)
@@ -32,22 +32,22 @@ public class TableFile implements Comparable<TableFile>{
 	}
 
 
-	public void setSize(String value)
-	{
-		sizeProperty().set(value);
-	}
-
-	public String getSize()
-	{
-		return sizeProperty().get();
-	}
-
-	public StringProperty sizeProperty()
-	{
-		if (size == null)
-			size = new SimpleStringProperty(this, "size");
-		return size;
-	}
+//	public void setSize(String value)
+//	{
+//		sizeProperty().set(value);
+//	}
+//
+//	public String getSize()
+//	{
+//		return sizeProperty().get();
+//	}
+//
+//	public StringProperty sizeProperty()
+//	{
+//		if (size == null)
+//			size = new SimpleStringProperty(this, "size");
+//		return size;
+//	}
 
 	@Override
 	public int compareTo(TableFile file)

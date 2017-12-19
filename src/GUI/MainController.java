@@ -2,9 +2,10 @@ package GUI;
 
 import Node.Node;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Random;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,13 +16,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 public class MainController
 {
-	private ObservableList<TableFile> data;		// data as an observable list of TableFiles
 	private String fileSelected;
-
-	private static MainController instance;
+	private Scene view;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -31,25 +31,19 @@ public class MainController
 	private javafx.scene.control.TableView<TableFile> tableView;
 	@FXML
 	private TableColumn<TableFile, String> fileNameColumn;
-	@FXML
-	private TableColumn<TableFile, String> sizeColumn;
+	//@FXML
+	//private TableColumn<TableFile, String> sizeColumn;
 	@FXML
 	private Label previousLabel;
 	@FXML
 	private Label nextLabel;
+	@FXML
+	private Label nodeNameLabel;
+	@FXML
+	private Label nodeIDLabel;
 
 	public MainController()
 	{
-		this.data = FXCollections.observableArrayList();
-	}
-
-	public static MainController getInstance()
-	{
-		if(MainController.instance == null)
-		{
-			MainController.instance = new MainController();
-		}
-		return MainController.instance;
 	}
 
 	/**
@@ -59,40 +53,52 @@ public class MainController
 	public void initialize()
 	{
 		this.fileNameColumn.setCellValueFactory(new PropertyValueFactory("fileName"));
-		this.sizeColumn.setCellValueFactory(new PropertyValueFactory("size"));
-		this.tableView.setItems(this.data);
-		//this.tableView.getColumns().setAll(this.fileNameColumn,this.sizeColumn);
-		setExampleFiles();
 	}
 
-	public void notifyChanges()
+	public void init ()
 	{
-		//this.data.clear();
-		//this.tableView.getItems().removeAll();
+		//updateFiles();
+	}
 
-		for(String s : Test.getAllFiles())//Node.getInstance().getAgentHandler().getAllFiles()
-		{
-			System.out.println("New file: " + s);
-			addFile(s);
+	public void view(Parent root){
+		if(view == null)
+			view = new Scene(root,600,400);
+		Stage stage = new Stage();
+		stage.setResizable(false);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(final WindowEvent arg0) {
+				System.exit(-1);
+			}
+		});
+		stage.setScene(view);
+		stage.show();
+
+		this.nodeNameLabel.setText(Node.getInstance().getName());
+		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
+		updateNeighbours();
+	}
+
+	public void updateFiles()
+	{
+		LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
+		tableView.getItems().clear();
+		for (String entry : files) {
+			tableView.getItems().add(new TableFile(entry));
+			System.out.println(entry);
 		}
 	}
 
-	private void addFile(String name)
+	public void addRandomFile()
 	{
-		//this.data = tableView.getItems();
-		//this.data.add(new TableFile(name, "Not supported yet"));
-		tableView.getItems().add(new TableFile(name, "Not supported yet"));
-		// test if tabelview gives null
-		System.out.println(this.tableView);
-
-		//this.tableView.getItems().addAll(this.data);
+		String file = new String("File" + new Random().nextInt());
+		tableView.getItems().add(new TableFile(file));
 	}
 
-
-	public void UpdateNeighbours (String prevID, String nextID)
+	public void updateNeighbours ()
 	{
-		this.previousLabel.setText(prevID);
-		this.nextLabel.setId(nextID);
+		this.nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
+		this.previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
 	}
 
 	/**
@@ -106,7 +112,7 @@ public class MainController
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		//PopUpController controller = fxmlLoader.getController();
+		PopUpController controller = fxmlLoader.getController();
 
 		Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UTILITY);
@@ -115,9 +121,7 @@ public class MainController
 		secondaryStage.setScene(new Scene(root, 160, 120));
 		secondaryStage.show();
 
-		//controller.setSelectedFile(this.fileSelected);
-		//controller.setFiles(this.tableView.getItems());
-
+		controller.setSelectedFile(this.fileSelected);
 	}
 
 	public void shutdown()
@@ -126,17 +130,4 @@ public class MainController
 		Node.getInstance().stop();
 	}
 
-	public ObservableList<TableFile> getData()
-	{
-		return this.data;
-	}
-
-	private void setExampleFiles ()
-	{
-
-		addFile("File2");
-		addFile("File3");
-
-
-	}
 }
