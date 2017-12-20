@@ -595,8 +595,6 @@ public class FileManager implements FileManagerInterface
 	 */
 	public void sendFile(short dstID, String filename, FileType srcType, FileType dstType)
 	{
-
-
 		String dstIP = "";
 
 		try
