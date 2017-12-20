@@ -1,5 +1,7 @@
 package Node;
 
+import GUI.ManageController;
+import GUI.PopUpController;
 import IO.Network.Constants;
 import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
@@ -292,6 +294,8 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
+			ManageController.getInstance().getMainController().updateNeighbours();
+
 		}
 
 		// The node will change the previous and next id of the new node in following cases:
@@ -334,6 +338,7 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
+			ManageController.getInstance().getMainController().updateNeighbours();
 		}
 
 		if(previous)
@@ -348,6 +353,8 @@ public class LifeCycleManager implements Runnable
 			}
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
+
+
 	}
 
 	public boolean isRunning ()

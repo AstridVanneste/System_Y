@@ -39,13 +39,14 @@ public class LoginController
 		if(validEntered) {
 			Stage currentWindow = (Stage) nodeName.getScene().getWindow();
 			currentWindow.close();
-			manageController.toMainWindow();
 
 			System.out.println("logged in");
+			System.out.println("name " + name);
+			Node.getInstance().setName(name);
+			Node.getInstance().getFileManager().setRootDirectory(directory);
+			Node.getInstance().start();
 
-			//Node.getInstance().setName(name);
-			//Node.getInstance().getFileManager().setRootDirectory(directory);
-			//Node.getInstance().start();
+			manageController.toMainWindow();
 		}
 	}
 

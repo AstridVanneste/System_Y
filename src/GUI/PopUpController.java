@@ -97,6 +97,7 @@ public class PopUpController
 			}
 			//return true;
 		}
+		System.exit(-1);
 	}
 
 	public void deleteLocal()
@@ -138,6 +139,7 @@ public class PopUpController
 			}
 
 		}
+		System.exit(-1);
 	}
 
 	public void deleteNetwork()
@@ -242,6 +244,7 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
+		System.exit(-1);
 	}
 
 	public void setSelectedFile(String selectedFile)

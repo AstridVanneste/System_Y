@@ -28,7 +28,6 @@ public class GUIMain extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		ManageController controller = new ManageController();
-		controller.login(arg);
+		ManageController.getInstance().login(arg);
 	}
 }
