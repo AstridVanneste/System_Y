@@ -21,10 +21,30 @@
             <Insets />
          </BorderPane.margin>
          <children>
-            <Label fx:id="nodeNameLabel" text="Node Name" />
-            <Label fx:id="nodeIDLabel" text="Node ID" />
-            <Label fx:id="previousLabel" text="Previous Node" />
-            <Label fx:id="nextLabel" text="Next node" />
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Node Name" />
+                  <Label fx:id="nodeNameLabel" text="Name" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Node ID" />
+                  <Label fx:id="nodeIDLabel" text="ID" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Previous Node" />
+                  <Label fx:id="previousLabel" text="Prev ID" />
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label text="Next node" />
+                  <Label fx:id="nextLabel" text="Label" />
+               </children>
+            </VBox>
             <Region visible="false" HBox.hgrow="ALWAYS" />
             <ImageView fx:id="shutdownButton" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#shutdown" pickOnBounds="true" HBox.hgrow="ALWAYS">
                <image>
@@ -69,7 +89,7 @@
       </ScrollPane>
    </center>
    <right>
-      <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#addRandomFile" text="Refresh" BorderPane.alignment="CENTER_LEFT">
+      <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#updateFiles" text="Refresh" BorderPane.alignment="CENTER_LEFT">
          <BorderPane.margin>
             <Insets right="10.0" />
          </BorderPane.margin>

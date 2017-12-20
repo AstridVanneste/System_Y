@@ -57,7 +57,7 @@ public class MainController
 
 	public void init ()
 	{
-		//updateFiles();
+		updateFiles();
 	}
 
 	public void view(Parent root){
@@ -74,9 +74,10 @@ public class MainController
 		stage.setScene(view);
 		stage.show();
 
+		System.out.println(Node.getInstance().getName());
 		this.nodeNameLabel.setText(Node.getInstance().getName());
+		System.out.println(String.valueOf(Node.getInstance().getId()));
 		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
-		updateNeighbours();
 	}
 
 	public void updateFiles()
@@ -87,6 +88,7 @@ public class MainController
 			tableView.getItems().add(new TableFile(entry));
 			System.out.println(entry);
 		}
+		updateNeighbours();
 	}
 
 	public void addRandomFile()
@@ -126,8 +128,9 @@ public class MainController
 
 	public void shutdown()
 	{
-		shutdownButton.setImage(new Image("@exit_image.jpg"));
+		//shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
+		System.exit(-1);
 	}
 
 }

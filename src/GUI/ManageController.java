@@ -16,6 +16,8 @@ public class ManageController
 	private Parent rootMain;
 	private Parent rootLogin;
 
+	public static ManageController instance;
+
 	public ManageController() throws IOException
 	{
 		loginView.setLocation(getClass().getResource("LoginWindow.fxml"));
@@ -30,6 +32,21 @@ public class ManageController
 		loginController.init(this);
 	}
 
+	public static ManageController getInstance()
+	{
+		if(ManageController.instance == null)
+		{
+			try
+			{
+				ManageController.instance = new ManageController();
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return ManageController.instance;
+	}
+
 	public void login(String[] args)
 	{
 		loginController.view(rootLogin, args);
@@ -41,4 +58,8 @@ public class ManageController
 		mainController.view(rootMain);
 	}
 
+	public MainController getMainController()
+	{
+		return mainController;
+	}
 }
