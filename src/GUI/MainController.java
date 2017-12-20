@@ -115,6 +115,7 @@ public class MainController
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
 		PopUpController controller = fxmlLoader.getController();
+		controller.init();
 
 		Stage secondaryStage = new Stage();
 		secondaryStage.initStyle(StageStyle.UTILITY);
@@ -130,7 +131,7 @@ public class MainController
 	{
 		//shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
-		System.exit(-1);
+		System.exit(0);
 	}
 
 }

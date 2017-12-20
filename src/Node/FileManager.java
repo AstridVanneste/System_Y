@@ -798,7 +798,7 @@ public class FileManager implements FileManagerInterface
 	{
 		String dstIP = "";
 		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
-
+		client.start();
 		int localPort = client.getLocalPort();
 		String remoteHost = "";
 
