@@ -34,7 +34,7 @@ public class PopUpController
 
 	public void init()
 	{
-		currentWindow = (Stage) openButton.getScene().getWindow();
+		//currentWindow = (Stage) openButton.getScene().getWindow();
 		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
 		{
 			deleteLocalButton.setVisible(false);
@@ -109,7 +109,7 @@ public class PopUpController
 			}
 			//return true;
 		}
-		currentWindow.close();
+		//currentWindow.close();
 	}
 
 	public void deleteLocal()
@@ -125,7 +125,7 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
-		currentWindow.close();
+		//currentWindow.close();
 	}
 
 	public void deleteNetwork()
@@ -230,7 +230,7 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
-		currentWindow.close();
+		//currentWindow.close();
 	}
 
 	public void setSelectedFile(String selectedFile)

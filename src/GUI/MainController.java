@@ -89,6 +89,7 @@ public class MainController
 			System.out.println(entry);
 		}
 		updateNeighbours();
+		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
 
 	public void updateNeighbours ()
