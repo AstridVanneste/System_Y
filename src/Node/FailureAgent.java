@@ -115,9 +115,9 @@ public class FailureAgent
 				{
 					Node.getInstance().getResolverStub().getIP(Node.getInstance().getId());
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(Node.getInstance().getResolverStub().getNext(prevID));
-					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(prevID, Node.getInstance().getId()));
 					Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 					Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
+					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(prevID, Node.getInstance().getId()));
 				}
 				catch (RemoteException re)
 				{
@@ -138,8 +138,6 @@ public class FailureAgent
 
 					Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
-					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
-					this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);
@@ -163,6 +161,8 @@ public class FailureAgent
 					Node.getInstance().setPreviousNeighbour(prevID);
 				}
 
+				Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
+				this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
 			}
 		}
 		catch (RemoteException re)

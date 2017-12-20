@@ -294,7 +294,7 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
-			ManageController.getInstance().getMainController().updateNeighbours();
+			//ManageController.getInstance().getMainController().updateNeighbours();
 
 		}
 
@@ -338,7 +338,7 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
-			ManageController.getInstance().getMainController().updateNeighbours();
+			//ManageController.getInstance().getMainController().updateNeighbours();
 		}
 
 		if(previous)
