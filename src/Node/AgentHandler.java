@@ -79,9 +79,22 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					}
 					try
 					{
+						if (agent instanceof FileAgent)
+						{
+							System.out.println("FileAgent");
+						}
+						else
+						{
+							System.out.println("RecoveryAgent");
+						}
+
+						System.out.println("1");
 						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
+						System.out.println("2");
 						AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
+						System.out.println("3");
 						remoteAgentHandler.runAgent(agent);
+						System.out.println("4");
 					}
 					catch (RemoteException | NotBoundException e)
 					{
