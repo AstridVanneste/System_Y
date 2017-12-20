@@ -74,19 +74,19 @@ public class FileAgent extends Agent implements Serializable
 		{
 			for (String filename : downloadQueue)
 			{
-				System.out.println("Downloading file " + filename);
+				//System.out.println("Downloading file " + filename);
 				if (this.fileMap.containsKey(filename))
 				{
 					if (this.fileMap.get(filename).availablePermits() >= 1)
 					{
 						try
 						{
-							System.out.println("Requesting lock on file");
+							//System.out.println("Requesting lock on file");
 							this.fileMap.get(filename).acquire(1);
-							System.out.println("Got lock on file");
+							//System.out.println("Got lock on file");
 							this.fileMap.get(filename).setID(Node.getInstance().getId()); // Set the request ID to our ID, so we know we asked for this one when it comes back around
 							DownloadManager.getInstance().submit(filename);
-							System.out.println("Finished submitting");
+							//System.out.println("Finished submitting");
 						}
 						catch (InterruptedException ie)
 						{
@@ -114,7 +114,7 @@ public class FileAgent extends Agent implements Serializable
 		{
 			for (String filename : reDownloadQueue)
 			{
-				System.out.println("Adding " + filename + "to re-download queue");
+				//System.out.println("Adding " + filename + "to re-download queue");
 				Node.getInstance().getAgentHandler().downloadFile(filename);
 			}
 		}
@@ -124,11 +124,11 @@ public class FileAgent extends Agent implements Serializable
 		{
 			for (String filename : DownloadManager.getInstance().getDownloadList())
 			{
-				System.out.println("Checking if file " + filename + " is done.");
+				//System.out.println("Checking if file " + filename + " is done.");
 				// The download is done and we're the one that requested it
 				if (DownloadManager.getInstance().isDone(filename) && (this.fileMap.get(filename).getID() == Node.getInstance().getId()))
 				{
-					System.out.println("We requested " + filename + " and the download is marked done");
+					//System.out.println("We requested " + filename + " and the download is marked done");
 					DownloadManager.getInstance().removeFileFromList(filename);
 					this.fileMap.get(filename).setID(Node.DEFAULT_ID); // Set the ID of the node that requested the file back to default.
 					this.fileMap.get(filename).release(1);

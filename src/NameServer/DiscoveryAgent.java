@@ -44,11 +44,11 @@ public class DiscoveryAgent implements Runnable
 				{
 					DatagramPacket packet = this.multicastSub.receivePacket();
 					Datagram request = new Datagram(packet.getData());
-					System.out.println(request.getHeader().getTransactionID());
+					//System.out.println(request.getHeader().getTransactionID());
 					if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 					{
 						Util.General.printLineSep();
-						System.out.println("DiscoveryAgent.run()");
+						//System.out.println("DiscoveryAgent.run()");
 
 
 						byte[] data = request.getData();
@@ -112,7 +112,7 @@ public class DiscoveryAgent implements Runnable
 						short nodeId = NameServer.getHash(nodeName);
 
 
-						System.out.println("Name: " + nodeName + ", IP: " + unicastIp + ", ID: " + Short.toString(nodeId));
+						//System.out.println("Name: " + nodeName + ", IP: " + unicastIp + ", ID: " + Short.toString(nodeId));
 
 						NameServer.getInstance().map.put(nodeId, unicastIp);
 						short numNodes = (short) NameServer.getInstance().map.size();
@@ -129,7 +129,7 @@ public class DiscoveryAgent implements Runnable
 						replyHeader.setReplyCode(ProtocolHeader.REPLY_SUCCESSFULLY_ADDED);
 						Datagram replyDatagram = new Datagram(replyHeader);
 						replyDatagram.setData(replyData);
-						System.out.println("TransactionID: " + replyHeader.getTransactionID());
+						//System.out.println("TransactionID: " + replyHeader.getTransactionID());
 
 						Client replyClient = new Client();
 						replyClient.start();

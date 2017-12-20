@@ -246,6 +246,7 @@ public class FileManager implements FileManagerInterface
 
 	public void notifyLeaving(String filename, FileType type, short id)
 	{
+		/*
 		try
 		{
 			System.out.println("Node is leaving with file " + filename + ", type: " + type + " called by " + getClientHost());
@@ -254,6 +255,7 @@ public class FileManager implements FileManagerInterface
 		{
 			snae.printStackTrace();
 		}
+		*/
 
 		String fullPath = this.getFullPath(filename, FileType.OWNED_FILE);
 
@@ -263,7 +265,7 @@ public class FileManager implements FileManagerInterface
 		 */
 		if ((type == FileType.LOCAL_FILE) && (this.fileLedgers.get(filename).getNumDownloads() == 0))
 		{
-			System.out.println("File was local and never downloaded.");
+			//System.out.println("File was local and never downloaded.");
 			File fileObj = new File(fullPath);
 			fileObj.delete();
 
@@ -283,7 +285,7 @@ public class FileManager implements FileManagerInterface
 			}
 
 			Node.getInstance().getAgentHandler().deleteFile(filename);
-			System.out.println("removing ledger " + filename + " from the list thread: " + Thread.currentThread().getName());
+			//System.out.println("removing ledger " + filename + " from the list thread: " + Thread.currentThread().getName());
 			this.fileLedgers.remove(filename);
 		}
 		else if ((type == FileType.LOCAL_FILE) || (type == FileType.REPLICATED_FILE))
@@ -291,12 +293,12 @@ public class FileManager implements FileManagerInterface
 			/*
 			 *  File was local and downloaded at least once
 			 */
-			System.out.println("notifyLeaving, file was local or replicated with >= 1 downloads");
+			//System.out.println("notifyLeaving, file was local or replicated with >= 1 downloads");
 
 			if (type == FileType.LOCAL_FILE)
 			{
 				this.fileLedgers.get(filename).setLocalID(Node.DEFAULT_ID);
-				System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
+				//System.out.println("Fetched fileledger, set local ID to default:" + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 			}
 
 			if(Node.getInstance().getPreviousNeighbour() != id)												//todo: this if statement was added and needs to be tested
@@ -309,28 +311,29 @@ public class FileManager implements FileManagerInterface
 				{
 					short replicatedId = Node.getInstance().getResolverStub().getPrevious(Node.getInstance().getPreviousNeighbour());
 					this.fileLedgers.get(filename).setReplicatedId(replicatedId);
-				} catch (RemoteException e)
+				}
+				catch (RemoteException e)
 				{
 					e.printStackTrace();
 				}
 			}
 
-			System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
+			//System.out.println("Fetched fileledger, set replicated ID to previous: " + this.fileLedgers.get(filename).toString() + " thread " + Thread.currentThread().getName());
 
 			if (fileLedgers.get(filename).getLocalID() == fileLedgers.get(filename).getOwnerID())
 			{
-				System.out.println("Local and owner are equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
+				//System.out.println("Local and owner are equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
 				this.sendFile(this.fileLedgers.get(filename).getReplicatedId(), filename, FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 			}
 			else
 			{
-				System.out.println("Local and owner aren't equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
+				//System.out.println("Local and owner aren't equal (" + Integer.toString(fileLedgers.get(filename).getLocalID()) + ")");
 				this.sendFile(this.fileLedgers.get(filename).getReplicatedId(), filename, FileType.OWNED_FILE, FileType.REPLICATED_FILE);
 			}
 		}
 		else
 		{
-			System.out.println("None of the conditions matched, notifyLeaving");
+			//System.out.println("None of the conditions matched, notifyLeaving");
 		}
 	}
 
@@ -424,7 +427,7 @@ public class FileManager implements FileManagerInterface
 		else
 		{
 			this.fileLedgers.put(fileLedger.getFileName(), fileLedger);
-			System.out.println("adding fileledger of " + fileLedger.getFileName() + "thread " + Thread.currentThread().getName());
+			//System.out.println("adding fileledger of " + fileLedger.getFileName() + "thread " + Thread.currentThread().getName());
 		}
 	}
 
@@ -472,7 +475,7 @@ public class FileManager implements FileManagerInterface
 
 			//Node.getInstance().getController().addFile(new TableFile(file.getName(), "Not supported yet"));
 			String filename = file.getName();
-			System.out.println("checking file: " + filename + " File.exists() " + file.exists());
+			//System.out.println("checking file: " + filename + " File.exists() " + file.exists());
 
 			try
 			{
@@ -495,7 +498,7 @@ public class FileManager implements FileManagerInterface
 					Registry registry = LocateRegistry.getRegistry(replicatedIP);
 					FileManagerInterface fileManager = (FileManagerInterface) registry.lookup(Node.FILE_MANAGER_NAME);
 					this.fileLedgers.put(file.getName(), new FileLedger(file.getName(), Node.getInstance().getId(), Node.getInstance().getId(), Node.getInstance().getPreviousNeighbour()));
-					System.out.println("adding fileledger " + file.getName() + " thread " + Thread.currentThread().getName());
+					//System.out.println("adding fileledger " + file.getName() + " thread " + Thread.currentThread().getName());
 
 					this.sendFile(Node.getInstance().getPreviousNeighbour(), file.getName(), FileType.LOCAL_FILE, FileType.REPLICATED_FILE);
 				}
@@ -541,7 +544,7 @@ public class FileManager implements FileManagerInterface
 
 				if(type == FileType.LOCAL_FILE)
 				{
-					System.out.println("Adding " + file.getName() + " to the list of files");
+					//System.out.println("Adding " + file.getName() + " to the list of files");
 					Node.getInstance().getAgentHandler().advertiseFile(file.getName());
 				}
 			}
@@ -677,7 +680,7 @@ public class FileManager implements FileManagerInterface
 					ledger.setOwnerID(dstID);
 					remoteFileManager.addFileLedger(ledger);
 					this.fileLedgers.remove(filename);
-					System.out.println("removing ledger " + filename + "from list thread " + Thread.currentThread().getName());
+					//System.out.println("removing ledger " + filename + "from list thread " + Thread.currentThread().getName());
 				}
 			}
 		}
@@ -701,9 +704,9 @@ public class FileManager implements FileManagerInterface
 	public void requestFile(String filename) //todo: make sure you don't download files you already have
 	{
 		String ownerIP = "";
-		System.out.println("Requesting file " + filename);
+		//System.out.println("Requesting file " + filename);
 
-		System.out.println("Requesting file " + filename);
+		//System.out.println("Requesting file " + filename);
 
 		try
 		{
@@ -949,7 +952,7 @@ public class FileManager implements FileManagerInterface
 	public void replaceFileLedger(FileLedger ledger)
 	{
 		this.fileLedgers.put(ledger.getFileName(), ledger);
-		System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
+		//System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
 	}
 
 
