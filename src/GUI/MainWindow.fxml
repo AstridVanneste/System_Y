@@ -88,11 +88,11 @@
          </content>
       </ScrollPane>
    </center>
-   <right>
-      <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#updateFiles" text="Refresh" visible="false" BorderPane.alignment="CENTER_LEFT">
-         <BorderPane.margin>
-            <Insets right="10.0" />
-         </BorderPane.margin>
-      </Button>
-   </right>
+   <!--<right>-->
+      <!--<Button fx:id="refreshButton" mnemonicParsing="false" onAction="#updateFiles" text="Refresh" visible="false" BorderPane.alignment="CENTER_LEFT">-->
+         <!--<BorderPane.margin>-->
+            <!--<Insets right="10.0" />-->
+         <!--</BorderPane.margin>-->
+      <!--</Button>-->
+   <!--</right>-->
 </BorderPane>

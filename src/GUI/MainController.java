@@ -120,6 +120,7 @@ public class MainController
 		}
 		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
+
 	public void updateNeighbours ()
 	{
 		this.nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
