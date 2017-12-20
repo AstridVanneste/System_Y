@@ -1,6 +1,8 @@
 package Node;
 
 
+import sun.awt.image.ImageWatched;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -129,16 +131,19 @@ public class FailureAgent
 			else
 			{
 				short tmpID = Node.getInstance().getResolverStub().getNext(prevID);
+				LinkedList<Short>  failedIDs = new LinkedList<Short>();
 
 				while (tmpID != nextID)
 				{
-					Util.General.printLineSep();
+					//Util.General.printLineSep();
 
 
 
-					Util.General.printLineSep();
+					//Util.General.printLineSep();
 					Node.getInstance().getLifeCycleManager().getShutdownStub().requestShutdown(tmpID);
+					failedIDs.add(tmpID);
 					tmpID = Node.getInstance().getResolverStub().getNext(tmpID);
+					System.out.println("tmp id = " + tmpID);
 
 					//Node.getInstance().getFailureAgent().failure(tmp);
 				}
@@ -161,8 +166,12 @@ public class FailureAgent
 					Node.getInstance().setPreviousNeighbour(prevID);
 				}
 
-				Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(tmpID, Node.getInstance().getId()));
-				this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
+				for(short id: failedIDs)
+				{
+					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(id, Node.getInstance().getId()));
+					this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
+				}
+
 			}
 		}
 		catch (RemoteException re)
