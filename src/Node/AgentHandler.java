@@ -103,6 +103,10 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 						e.printStackTrace();
 					}
 				}
+				else
+				{
+					Node.getInstance().getAgentHandler().runAgent(new FileAgent());
+				}
 
 			}
 			catch (InterruptedException e)
