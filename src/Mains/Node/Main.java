@@ -3,6 +3,7 @@ package Mains.Node;
 import Node.Node;
 import Node.DownloadManager;
 
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import static Util.General.printLineSep;
@@ -106,7 +107,8 @@ public class Main
 				    case "F":
 				    case "f":
 				    	System.out.println("Listing all files in the system...");
-				    	for (String file : Node.getInstance().getAgentHandler().getAllFiles())
+				    	final LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();    // ConcurrentModificationException on a list that doesn't need to be modified => Mark final
+				    	for (String file : files)
 					    {
 					    	System.out.println("File: " + file);
 					    }
