@@ -57,7 +57,7 @@ public class MainController
 
 	public void init ()
 	{
-		updateFiles();
+		//updateFiles();
 	}
 
 	public void view(Parent root){
@@ -89,12 +89,6 @@ public class MainController
 			System.out.println(entry);
 		}
 		updateNeighbours();
-	}
-
-	public void addRandomFile()
-	{
-		String file = new String("File" + new Random().nextInt());
-		tableView.getItems().add(new TableFile(file));
 	}
 
 	public void updateNeighbours ()
