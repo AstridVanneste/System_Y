@@ -169,7 +169,7 @@ public class FailureAgent
 				for(short id: failedIDs)
 				{
 					Node.getInstance().getAgentHandler().runAgent(new RecoveryAgent(id, Node.getInstance().getId()));
-					this.activeFailures.remove(this.activeFailures.indexOf(tmpID));
+					this.activeFailures.remove(this.activeFailures.indexOf(id));
 				}
 
 			}
