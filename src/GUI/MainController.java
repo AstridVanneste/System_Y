@@ -119,7 +119,6 @@ public class MainController
 			}
 			tableView.setItems(obsList);
 		}
-		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
 
 	public void updateNeighbours ()
