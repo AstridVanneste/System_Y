@@ -35,9 +35,9 @@ public class RecoveryAgent extends Agent implements Serializable
 	@Override
 	public void run()
 	{
-		System.out.println("Starting run on Node: " + Node.getInstance().getId());
+		//System.out.println("Starting run on Node: " + Node.getInstance().getId());
 		//OWNED FILES
-		System.out.println("Starting owned files on "+ Node.getInstance().getId());
+		//System.out.println("Starting owned files on "+ Node.getInstance().getId());
 		for(Map.Entry<String,FileLedger> pair: Node.getInstance().getFileManager().getFileLedgers().entrySet())
 		{
 			String filename = pair.getKey();
@@ -72,7 +72,7 @@ public class RecoveryAgent extends Agent implements Serializable
 		//When we have finished the circle we will send the file (ask the local to send the file) and send the fileledgers.
 
 		//LOCAL FILES
-		System.out.println("Starting local files on " + Node.getInstance().getId());
+		//System.out.println("Starting local files on " + Node.getInstance().getId());
 		File folder = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE));
 		for(File file: folder.listFiles())
 		{
@@ -100,7 +100,7 @@ public class RecoveryAgent extends Agent implements Serializable
 		}
 
 		//REPLICATED FILES
-		System.out.println("Starting replicated files on" + Node.getInstance().getId());
+		//System.out.println("Starting replicated files on" + Node.getInstance().getId());
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.REPLICATED_FILE));
 		for(File file: folder.listFiles())
 		{
@@ -128,7 +128,7 @@ public class RecoveryAgent extends Agent implements Serializable
 		}
 
 		//DOWNLOADED FILES
-		System.out.println("started downloaded files on " + Node.getInstance().getId());
+		//System.out.println("started downloaded files on " + Node.getInstance().getId());
 		folder = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE));
 		for(File file: folder.listFiles())
 		{
@@ -161,7 +161,7 @@ public class RecoveryAgent extends Agent implements Serializable
 
 		if(callerId == Node.getInstance().getNextNeighbour())	//Agent has made it across the entire system. The ledgers are complete and can be sent to the owners.
 		{
-			System.out.println("Recovery agent starting to send files and ledgers on " + Node.getInstance().getId());
+			//System.out.println("Recovery agent starting to send files and ledgers on " + Node.getInstance().getId());
 			for(String filename: this.ledgers.keySet())
 			{
 				FileLedger ledger = this.ledgers.get(filename);
@@ -220,7 +220,7 @@ public class RecoveryAgent extends Agent implements Serializable
 			}
 			this.finished = true;
 		}
-		System.out.println("Completed recovery agent run on " + Node.getInstance().getId());
+		//System.out.println("Completed recovery agent run on " + Node.getInstance().getId());
 	}
 
 	@Deprecated

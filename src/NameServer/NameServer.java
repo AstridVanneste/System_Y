@@ -65,7 +65,7 @@ public class NameServer
         }
         catch (RemoteException re)
 	    {
-	    	System.out.println("Exception in start()");
+	    	System.err.println("Exception in start()");
 	    	re.printStackTrace();
         }
 	}
@@ -83,12 +83,12 @@ public class NameServer
 	    }
 	    catch (AlreadyBoundException abe)
 	    {
-	    	System.out.println("AlreadyBoundException in bind()");
+	    	System.err.println("AlreadyBoundException in bind()");
 	    	abe.printStackTrace();
 	    }
 	    catch (RemoteException re)
 	    {
-	    	System.out.println("RemoteException in  bind()");
+	    	System.err.println("RemoteException in  bind()");
             re.printStackTrace();
        }
 	}
@@ -152,13 +152,9 @@ public class NameServer
 			reg.unbind(SHUTDOWN_AGENT_NAME);
 
 		}
-		catch(RemoteException re)
+		catch(RemoteException | NotBoundException re)
 		{
 			re.printStackTrace();
-		}
-		catch (NotBoundException nbe)
-		{
-			nbe.printStackTrace();
 		}
 	}
 }
