@@ -99,6 +99,7 @@ public class MainController
 				}
 				i++;
 			}
+			
 			if(!identical)
 			{
 				obsList.clear();
