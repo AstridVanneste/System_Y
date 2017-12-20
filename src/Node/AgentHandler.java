@@ -100,7 +100,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					{
 						System.err.println("AgentHandler.runAgent()");
 						Node.getInstance().getFailureAgent().failure(nextId);
-						//e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 
