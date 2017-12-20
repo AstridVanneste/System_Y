@@ -77,6 +77,7 @@ public class RecoveryAgent extends Agent implements Serializable
 		for(File file: folder.listFiles())
 		{
 			short ownerId = Node.DEFAULT_ID;
+			Node.getInstance().getAgentHandler().advertiseFile(file.getName());
 			try
 			{
 				ownerId = Node.getInstance().getResolverStub().getOwnerID(file.getName());
