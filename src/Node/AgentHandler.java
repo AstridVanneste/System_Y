@@ -71,7 +71,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 							nextId = Node.getInstance().getResolverStub().getNext(nextId);
 						}
 
-						//System.out.println("Sending agent to " + nextId);
+						System.out.println("Sending agent to " + nextId);
 					}
 					catch(RemoteException re)
 					{
