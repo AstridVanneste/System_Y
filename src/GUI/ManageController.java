@@ -5,10 +5,7 @@ import javafx.scene.Parent;
 
 import java.io.IOException;
 
-/**
- * Created by Axel on 19/12/2017.
- */
-public class HeadController
+public class ManageController
 {
 	private FXMLLoader mainView = new FXMLLoader();
 	private FXMLLoader loginView = new FXMLLoader();
@@ -19,7 +16,7 @@ public class HeadController
 	private Parent rootMain;
 	private Parent rootLogin;
 
-	public HeadController() throws IOException
+	public ManageController() throws IOException
 	{
 		loginView.setLocation(getClass().getResource("LoginWindow.fxml"));
 		mainView.setLocation(getClass().getResource("MainWindow.fxml"));
