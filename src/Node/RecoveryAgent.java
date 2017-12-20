@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Astrid on 04/12/2017.
  */
-public class RecoveryAgent extends Agent
+public class RecoveryAgent extends Agent implements Serializable
 {
 	private short failedId;
 	private short callerId;
