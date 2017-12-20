@@ -1,6 +1,9 @@
 package Node;
 
 
+import GUI.MainController;
+import GUI.ManageController;
+
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -132,6 +135,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			}
 
 			this.finishedAgents.add(agent);
+			ManageController.getInstance().getMainController().updateFiles(allFiles);
 			this.proceedSem.release(1);
 		}
 		catch (InterruptedException ie)
