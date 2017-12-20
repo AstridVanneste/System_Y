@@ -82,7 +82,7 @@ public class MainController
 
 	public void updateFiles()
 	{
-		LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
+		final LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
 		tableView.getItems().clear();
 		for (String entry : files) {
 			tableView.getItems().add(new TableFile(entry));
