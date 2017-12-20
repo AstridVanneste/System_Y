@@ -3,8 +3,11 @@ package GUI;
 import Node.Node;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +25,7 @@ public class MainController
 {
 	private String fileSelected;
 	private Scene view;
+	private List<String> allFiles;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -80,18 +84,42 @@ public class MainController
 		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
 
-	public void updateFiles()
+	public void updateFiles(LinkedList<String> filesList)
 	{
-		final LinkedList<String> files = Node.getInstance().getAgentHandler().getAllFiles();
-		tableView.getItems().clear();
-		for (String entry : files) {
-			tableView.getItems().add(new TableFile(entry));
-			System.out.println(entry);
+		ObservableList<TableFile> obsList = tableView.getItems();
+		int i = 0;
+		boolean identical = true;
+		if(filesList.size() == obsList.size())
+		{
+			for(String s : filesList)
+			{
+				if(!s.equals(obsList.get(i).getFileName()))
+				{
+					identical = false;
+				}
+				i++;
+			}
+			if(!identical)
+			{
+				obsList.clear();
+				for(String s: filesList)
+				{
+					obsList.add(new TableFile(s));
+				}
+				tableView.setItems(obsList);
+			}
 		}
-		updateNeighbours();
+		else
+		{
+			obsList.clear();
+			for(String s: filesList)
+			{
+				obsList.add(new TableFile(s));
+			}
+			tableView.setItems(obsList);
+		}
 		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
-
 	public void updateNeighbours ()
 	{
 		this.nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));

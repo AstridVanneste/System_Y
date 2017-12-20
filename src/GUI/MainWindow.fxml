@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainController">
+<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainController">
    <bottom>
       <HBox alignment="CENTER_LEFT" fillHeight="false" minHeight="50.0" minWidth="600.0" spacing="20.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
@@ -89,7 +89,7 @@
       </ScrollPane>
    </center>
    <right>
-      <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#updateFiles" text="Refresh" BorderPane.alignment="CENTER_LEFT">
+      <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#updateFiles" text="Refresh" visible="false" BorderPane.alignment="CENTER_LEFT">
          <BorderPane.margin>
             <Insets right="10.0" />
          </BorderPane.margin>
