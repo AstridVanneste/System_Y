@@ -60,7 +60,6 @@ public class RecoveryAgent extends Agent implements Serializable
 					File file = new File(Node.getInstance().getFileManager().getFullPath(filename, FileType.OWNED_FILE));
 					file.delete();
 					Node.getInstance().getFileManager().deleteFileLedger(filename);
-					Node.getInstance().getAgentHandler().deleteFile(filename);
 				}
 			}
 			else if(ledger.getReplicatedId() == failedId) //the failed id was replicated of the file. We need to replicate it again.
