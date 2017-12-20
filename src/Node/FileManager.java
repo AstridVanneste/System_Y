@@ -911,9 +911,34 @@ public class FileManager implements FileManagerInterface
 		return this.fileLedgers;
 	}
 
-	public void deleteFileRemote (short ID, String fileName, FileType type)
+	public void deleteFileRemote(short id, String filename, FileType filetype)  throws RemoteException
 	{
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.deleteFile(filename, filetype);
+		}
+		catch (NotBoundException | IOException re)
+		{
+			re.printStackTrace();
+		}
+	}
 
+	public FileLedger getFileLedgerRemote(short id, String fileName)  throws RemoteException
+	{
+		FileLedger fileLedger = null;
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			fileLedger = remoteFileManager.getFileLedger(fileName);
+		}
+		catch (NotBoundException | IOException re)
+		{
+			re.printStackTrace();
+		}
+		return fileLedger;
 	}
 
 	/**
@@ -927,6 +952,8 @@ public class FileManager implements FileManagerInterface
 		this.fileLedgers.put(ledger.getFileName(), ledger);
 		System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
 	}
+
+
 
 	/**
 	 *
