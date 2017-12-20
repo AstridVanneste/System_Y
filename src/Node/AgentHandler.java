@@ -99,7 +99,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					catch (RemoteException | NotBoundException e)
 					{
 						System.err.println("AgentHandler.runAgent()");
-						Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
+						Node.getInstance().getFailureAgent().failure(nextId);
 						//e.printStackTrace();
 					}
 				}
