@@ -142,16 +142,18 @@ public class PopUpController
 				try
 				{
 					Node.getInstance().getFileManager().deleteFileRemote(localId,this.selectedFile,FileType.LOCAL_FILE);
+					Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
 				}
 			}
-			if(localId != 0)
+			if(replicatedId != Node.DEFAULT_ID)
 			{
 				try
 				{
 					Node.getInstance().getFileManager().deleteFileRemote(replicatedId,this.selectedFile,FileType.REPLICATED_FILE);
+					Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
@@ -161,6 +163,7 @@ public class PopUpController
 				try
 				{
 					Node.getInstance().getFileManager().deleteFileRemote(downId,this.selectedFile,FileType.DOWNLOADED_FILE);
+					Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 				} catch (RemoteException e)
 				{
 					e.printStackTrace();
@@ -169,6 +172,7 @@ public class PopUpController
 			try
 			{
 				Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.OWNED_FILE);
+				Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 			} catch (IOException e)
 			{
 				e.printStackTrace();
@@ -190,10 +194,12 @@ public class PopUpController
 					if(localId != Node.getInstance().getId())
 					{
 						Node.getInstance().getFileManager().deleteFileRemote(localId,this.selectedFile,FileType.LOCAL_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 					else
 					{
 						Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.LOCAL_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 				}
 				if(replicatedId != Node.DEFAULT_ID)
@@ -201,25 +207,30 @@ public class PopUpController
 					if(replicatedId != Node.getInstance().getId())
 					{
 						Node.getInstance().getFileManager().deleteFileRemote(replicatedId,this.selectedFile,FileType.REPLICATED_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 					else
 					{
 						Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.REPLICATED_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 				}
 				for(short downId : downloaders){
 					if(downId != Node.getInstance().getId())
 					{
 						Node.getInstance().getFileManager().deleteFileRemote(downId,this.selectedFile,FileType.DOWNLOADED_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 					else
 					{
 						Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.DOWNLOADED_FILE);
+						Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					}
 				}
 				if(ownerId != 0)
 				{
 					Node.getInstance().getFileManager().deleteFileRemote(replicatedId,this.selectedFile,FileType.OWNED_FILE);
+					Node.getInstance().getAgentHandler().deleteFile(selectedFile);
 					Node.getInstance().getFileManager().deleteFileLedgerRemote(fileLedger.getFileName());
 				}
 			} catch (RemoteException e)
