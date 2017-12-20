@@ -2,6 +2,7 @@ package GUI;
 
 import Node.*;
 import javafx.fxml.FXML;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -14,6 +15,8 @@ import static Node.FileType.REPLICATED_FILE;
 
 public class PopUpController
 {
+	private Stage currentWindow;
+
 	private String selectedFile;
 
 	private static final String PREFIX = "/";
@@ -27,6 +30,15 @@ public class PopUpController
 
 	public PopUpController()
 	{
+	}
+
+	public void init()
+	{
+		currentWindow = (Stage) openButton.getScene().getWindow();
+		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
+		{
+			deleteLocalButton.setVisible(false);
+		}
 	}
 
 	/**
@@ -97,7 +109,7 @@ public class PopUpController
 			}
 			//return true;
 		}
-		System.exit(-1);
+		currentWindow.close();
 	}
 
 	public void deleteLocal()
@@ -113,33 +125,7 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
-		else
-		{
-			FileLedger fileLedger;
-			short ownerId = 0;
-			try
-			{
-				ownerId = Node.getInstance().getResolverStub().getOwnerID(this.selectedFile);
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-			try
-			{
-				fileLedger = Node.getInstance().getFileManager().getFileLedgerRemote(ownerId,this.selectedFile);
-				short localId = fileLedger.getLocalID();
-				if(localId != 0)
-				{
-
-					Node.getInstance().getFileManager().deleteFileRemote(localId,this.selectedFile,LOCAL_FILE);
-				}
-			} catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-
-		}
-		System.exit(-1);
+		currentWindow.close();
 	}
 
 	public void deleteNetwork()
@@ -244,7 +230,7 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
-		System.exit(-1);
+		currentWindow.close();
 	}
 
 	public void setSelectedFile(String selectedFile)
