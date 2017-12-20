@@ -35,10 +35,16 @@ public class PopUpController
 	public void init()
 	{
 		//currentWindow = (Stage) openButton.getScene().getWindow();
-		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
-		{
-			deleteLocalButton.setVisible(false);
-		}
+		//File file = new File(Node.getInstance()..getFullPath(filename, type));
+		//return file.exists();
+		//System.out.println(Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE));
+		//if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
+		//{
+			//deleteLocalButton.setVisible(false);
+		//}
+		//else{
+			//deleteLocalButton.setVisible(true);
+		//}
 	}
 
 	/**
