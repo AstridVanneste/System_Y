@@ -67,7 +67,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					{
 						while (Node.getInstance().getFailureAgent().getActiveFailures().contains(nextId))
 						{
-							System.out.println(nextId + " was in the failure-list.");
+							//System.out.println(nextId + " was in the failure-list.");
 							nextId = Node.getInstance().getResolverStub().getNext(nextId);
 						}
 
@@ -79,6 +79,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					}
 					try
 					{
+						/*
 						if (agent instanceof FileAgent)
 						{
 							System.out.println("FileAgent");
@@ -87,18 +88,19 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 						{
 							System.out.println("RecoveryAgent");
 						}
+						*/
 
-						System.out.println("1");
+						//System.out.println("1");
 						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
-						System.out.println("2");
+						//System.out.println("2");
 						AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
-						System.out.println("3");
+						//System.out.println("3");
 						remoteAgentHandler.runAgent(agent);
-						System.out.println("4");
+						//System.out.println("4");
 					}
 					catch (RemoteException | NotBoundException e)
 					{
-						System.err.println("AgentHandler.runAgent()");
+						System.err.println("AgentHandler.runAgent() - " + nextId);
 						Node.getInstance().getFailureAgent().failure(nextId);
 						e.printStackTrace();
 					}
