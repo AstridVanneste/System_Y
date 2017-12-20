@@ -19,11 +19,11 @@ public class LoginController
 	@FXML
 	private TextField rootDir;
 
-	private HeadController headController;
+	private ManageController manageController;
 
-	public void init(HeadController controller)
+	public void init(ManageController controller)
 	{
-		this.headController = controller;
+		this.manageController = controller;
 	}
 
 	public void login()
@@ -39,7 +39,7 @@ public class LoginController
 		if(validEntered) {
 			Stage currentWindow = (Stage) nodeName.getScene().getWindow();
 			currentWindow.close();
-			headController.toMainWindow();
+			manageController.toMainWindow();
 
 			System.out.println("logged in");
 
@@ -61,10 +61,14 @@ public class LoginController
 				System.exit(0);
 			}
 		});
+
 		stage.setScene(view);
 		stage.show();
 
-		this.nodeName.setText(args[0]);
-		this.rootDir.setText(args[1]);
+		if (args.length != 0)
+		{
+			this.nodeName.setText(args[0]);
+			this.rootDir.setText(args[1]);
+		}
 	}
 }

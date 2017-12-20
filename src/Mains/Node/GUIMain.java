@@ -1,6 +1,6 @@
 package Mains.Node;
 
-import GUI.HeadController;
+import GUI.ManageController;
 import GUI.LoginController;
 import GUI.MainController;
 import Node.Node;
@@ -15,9 +15,6 @@ import java.util.Scanner;
 
 import static Util.General.printLineSep;
 
-/**
- * Created by Axel on 19/12/2017.
- */
 public class GUIMain extends Application
 {
 	private static String[] arg;
@@ -31,7 +28,7 @@ public class GUIMain extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
-		HeadController controller = new HeadController();
+		ManageController controller = new ManageController();
 		controller.login(arg);
 	}
 }
