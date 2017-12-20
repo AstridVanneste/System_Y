@@ -137,7 +137,7 @@ public class PopUpController
 			short localId = fileLedger.getLocalID();
 			short replicatedId = fileLedger.getReplicatedId();
 			Set<Short> downloaders = fileLedger.getCopies();
-			if(localId != 0)
+			if(localId != Node.DEFAULT_ID)
 			{
 				try
 				{
@@ -185,7 +185,7 @@ public class PopUpController
 				short localId = fileLedger.getLocalID();
 				short replicatedId = fileLedger.getReplicatedId();
 				Set<Short> downloaders = fileLedger.getCopies();
-				if(localId != 0)
+				if(localId != Node.DEFAULT_ID)
 				{
 					if(localId != Node.getInstance().getId())
 					{
@@ -196,7 +196,7 @@ public class PopUpController
 						Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.LOCAL_FILE);
 					}
 				}
-				if(replicatedId != 0)
+				if(replicatedId != Node.DEFAULT_ID)
 				{
 					if(replicatedId != Node.getInstance().getId())
 					{
