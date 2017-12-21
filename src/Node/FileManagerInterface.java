@@ -7,13 +7,6 @@ import java.rmi.RemoteException;
 public interface FileManagerInterface extends Remote
 {
 	/**
-	 *
-	 * @param type
-	 * @throws RemoteException
-	 */
-	public void checkFiles (FileType type) throws RemoteException;
-
-	/**
 	 * Remote method.
 	 * Caller = Node that's about to send a file.
 	 * Callee = Node that's about to receive a file.

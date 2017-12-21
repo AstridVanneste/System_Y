@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class TCPServerMain
 {
-	private static final int localPort = 2002;
+	private static final int localPort = 2200;
 
 	public static void main(String args[])
 	{
@@ -27,7 +27,7 @@ public class TCPServerMain
 
 			for(String remoteHost: server.getActiveConnections())
 			{
-				server.receiveFile(remoteHost, "Vaultboy.bmp");
+				server.receiveFile(remoteHost, "result.gif");
 			}
 
 			System.out.println("Press enter to stop server");

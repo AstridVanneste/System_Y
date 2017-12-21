@@ -99,7 +99,7 @@ public class MainController
 				}
 				i++;
 			}
-
+			
 			if(!identical)
 			{
 				obsList.clear();
@@ -119,7 +119,6 @@ public class MainController
 			}
 			tableView.setItems(obsList);
 		}
-
 	}
 
 	public void updateNeighbours ()

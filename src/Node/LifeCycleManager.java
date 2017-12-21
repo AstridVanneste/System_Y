@@ -343,14 +343,7 @@ public class LifeCycleManager implements Runnable
 
 		if(previous)
 		{
-			try
-			{
-				Node.getInstance().getFileManager().checkFiles(FileType.OWNED_FILE);
-			}
-			catch(RemoteException re)
-			{
-				re.printStackTrace();
-			}
+			Node.getInstance().getFileManager().checkFiles(FileType.OWNED_FILE);
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
 
