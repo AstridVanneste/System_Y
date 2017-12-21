@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class TCPClientMain
 {
-	private static final String remoteIP = "192.168.0.247";
-	private static final int remotePort = 2002;
+	private static final String remoteIP = "10.0.0.2";
+	private static final int remotePort = 2200;
 
 	public static void main(String args[])
 	{
@@ -22,7 +22,7 @@ public class TCPClientMain
 		System.out.println("Press enter to send file");
 		scanner.nextLine();
 
-	  client.sendFile("src/Mains/IO/64x64.png");
+	  client.sendFile("");
 
 		System.out.println("Sent file");
 
