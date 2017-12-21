@@ -118,16 +118,8 @@ public class FileManager implements FileManagerInterface
 		this.sendSemaphore.release(MAX_PERMITS);
 
 		//start replicating files.
+		this.checkFiles(FileType.LOCAL_FILE);
 
-
-		try
-		{
-			this.checkFiles(FileType.LOCAL_FILE);
-		}
-		catch (RemoteException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -244,6 +236,7 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
+	@Override
 	public void notifyLeaving(String filename, FileType type, short id)
 	{
 		/*
@@ -435,10 +428,8 @@ public class FileManager implements FileManagerInterface
 	 * Checks the owner of the files of a given type. When necessary it will push a file to the owner.
 	 *
 	 * @param type
-	 * @throws RemoteException
 	 */
-	@Override
-	public void checkFiles(FileType type) throws RemoteException
+	public void checkFiles(FileType type)
 	{
 		//System.out.println(Thread.currentThread().getName() + " FileManager.checkFiles(" + type + ") " + Node.getInstance().getResolverStub());
 		File folder = new File(this.getFullPath("", type));
@@ -913,6 +904,7 @@ public class FileManager implements FileManagerInterface
 		return this.fileLedgers;
 	}
 
+	@Override
 	public void deleteFileRemote(short id, String filename, FileType filetype)  throws RemoteException
 	{
 		try
@@ -927,6 +919,7 @@ public class FileManager implements FileManagerInterface
 		}
 	}
 
+	@Override
 	public FileLedger getFileLedgerRemote(short id, String fileName)  throws RemoteException
 	{
 		FileLedger fileLedger = null;
