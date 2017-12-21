@@ -66,6 +66,10 @@ public class RecoveryAgent extends Agent implements Serializable
 			{
 				Node.getInstance().getFileManager().sendFile(Node.getInstance().getPreviousNeighbour(),filename,FileType.OWNED_FILE,FileType.REPLICATED_FILE); //send the file to your previous neighbour as replicated file
 			}
+			else if(ledger.getDownloads().contains(this.failedId))
+			{
+				ledger.removeDownloader(this.failedId);
+			}
 		}
 
 		//For files of which te failed node was owner we will need to do the entire circle to recreate the original fileledger.

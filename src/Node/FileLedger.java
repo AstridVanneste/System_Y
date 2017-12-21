@@ -4,6 +4,7 @@ import Util.General;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 public class FileLedger implements Serializable
@@ -113,5 +114,10 @@ public class FileLedger implements Serializable
 	public Set<Short> getCopies()
 	{
 		return copies;
+	}
+
+	public Set<Short> getDownloads()
+	{
+		return this.copies;
 	}
 }

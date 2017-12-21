@@ -47,7 +47,6 @@ public class DiscoveryAgent implements Runnable
 					//System.out.println(request.getHeader().getTransactionID());
 					if (request.getHeader().getRequestCode() == ProtocolHeader.REQUEST_DISCOVERY_CODE)
 					{
-						Util.General.printLineSep();
 						//System.out.println("DiscoveryAgent.run()");
 
 
@@ -138,12 +137,16 @@ public class DiscoveryAgent implements Runnable
 						replyClient.send(Constants.DISCOVERY_MULTICAST_IP, Constants.DISCOVERY_CLIENT_PORT, replyDatagram.serialize());
 						//}
 						replyClient.stop();
+
+						Util.General.printLineSep();
+						System.out.println("Discovery: " + nodeName + " ID: " + nodeId);
+						Util.General.printLineSep();
 					}
 					else
 					{
 						System.err.println("[" + Thread.currentThread().getName() + "] Received multicast packet did not have correct request code, needs to be " + Integer.toHexString(ProtocolHeader.REQUEST_DISCOVERY_CODE) + ", got " + request.getHeader().getRequestCode());
 					}
-					Util.General.printLineSep();
+
 				}
 			}
 		}
