@@ -193,11 +193,11 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 	public synchronized void setAllFiles (Set<String> files)
 	{
-		/*
+
 		this.allFiles.clear();
 		this.allFiles.addAll(files);
-		*/
 
+/*
 		for (String file : files)
 		{
 			if (!this.allFiles.contains(file))
@@ -217,6 +217,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 				this.allFiles.remove(file);
 			}
 		}
+*/
 	}
 
 	// Method is synchronized because FileAgent uses it to re-add unfinished tasks
