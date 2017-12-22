@@ -6,6 +6,8 @@ import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -160,7 +162,15 @@ public class Server implements Runnable
 
 	public void receiveFile(String remoteHost, String filename)
 	{
-		File file = new File(filename);
+		FileOutputStream file = null;
+		try
+		{
+			file = new FileOutputStream(filename);
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
 		boolean firstSegment = true;
 		boolean quit = false;
 		int transactionID = -1;
@@ -196,7 +206,8 @@ public class Server implements Runnable
 							}
 							else
 							{
-								file.append(datagram.getData());
+								//file.append(datagram.getData());
+								file.write(datagram.getData());
 								packets++;
 
 							}
