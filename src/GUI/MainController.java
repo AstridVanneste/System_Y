@@ -19,8 +19,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import javax.swing.text.TableView;
-
 public class MainController
 {
 	private String fileSelected;
@@ -107,35 +105,44 @@ public class MainController
 
 	public void updateFiles(LinkedList<String> filesList)
 	{
-		boolean obsListChanged = false;
 		ObservableList<TableFile> obsList = tableView.getItems();
-		for (String file : filesList)
+
+		int i = 0;
+		boolean identical = true;
+		if(filesList.size() == obsList.size())
 		{
-			if (!obsList.contains(file))
+			for(String s : filesList)
 			{
-				obsList.add(new TableFile(file));
-				obsListChanged = true;
+				if(!s.equals(obsList.get(i).getFileName()))
+				{
+					System.out.println("not identical");
+					identical = false;
+				}
+				i++;
+			}
+
+			if(!identical)
+			{
+				obsList.clear();
+				System.out.println("cleared");
+				for(String s: filesList)
+				{
+					obsList.add(new TableFile(s));
+				}
+				tableView.setItems(obsList);
+				identical = true;
 			}
 		}
-
-		Iterator<TableFile> allIt = obsList.iterator();
-
-		while (allIt.hasNext())
+		if(filesList.size() != 0 && filesList.size() != obsList.size())
 		{
-			final String file  = allIt.next().getFileName();
-
-			if (!filesList.contains(file))
+			obsList.clear();
+			for(String s: filesList)
 			{
-				obsList.remove(file);
-				obsListChanged = true;
+				obsList.add(new TableFile(s));
+				System.out.println(s);
 			}
-		}
-
-		if(obsListChanged)
-		{
 			tableView.setItems(obsList);
 		}
-
 	}
 
 	public void updateNeighbours ()
