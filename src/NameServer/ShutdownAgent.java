@@ -1,13 +1,19 @@
 package NameServer;
 
 import IO.Network.UDP.Unicast.*;
+import Node.Node;
+import Node.NodeInteractionInterface;
 import Util.Serializer;
+import Util.General;
 
+import javax.rmi.CORBA.Util;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
-import java.util.*;
 
 import static java.rmi.server.RemoteServer.getClientHost;
 
@@ -51,7 +57,7 @@ public class ShutdownAgent implements ShutdownAgentInterface
 	 */
 	public void requestShutdown(short id)
     {
-		Util.General.printLineSep();
+		General.printLineSep();
 		System.out.println("ShutdownAgent.requestShutdown(" + id + ")");
 		try
 		{
@@ -70,5 +76,30 @@ public class ShutdownAgent implements ShutdownAgentInterface
 		}
 		System.out.println("AFTER SHUTDOWN");
 		System.out.println(NameServer.getInstance().toString());
+
+		if(id == NameServer.getInstance().getRingMonitorId())
+		{
+			if(NameServer.getInstance().map.size() >= 1)
+			{
+				try
+				{
+					short ringMonitorId = NameServer.getInstance().getResolver().getPrevious(id);
+					NameServer.getInstance().setRingMonitorId(ringMonitorId);
+
+					Registry reg = LocateRegistry.getRegistry(NameServer.getInstance().getResolver().getIP(ringMonitorId));
+					NodeInteractionInterface node = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+					node.runRingMonitor();
+					General.printLineSep();
+					System.out.println("Ring Monitor changes to: " + ringMonitorId);
+					General.printLineSep();
+				} catch (RemoteException re)
+				{
+					re.printStackTrace();
+				} catch (NotBoundException nbe)
+				{
+					nbe.printStackTrace();
+				}
+			}
+		}
     }
 }

@@ -1,6 +1,7 @@
 package NameServer;
 
 import IO.File;
+import Node.Node;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
@@ -29,12 +30,15 @@ public class NameServer
 	private ShutdownAgentInterface shutdownAgentStub;
 	private ResolverInterface resolverStub;
 
+	private short ringMonitorId;
+
 	private NameServer()
 	{
 		this.map = new TreeMap<>();
 		this.shutdownAgent = new ShutdownAgent();
 		this.resolver = new Resolver();
 		this.discoveryAgent = new DiscoveryAgent();
+		this.ringMonitorId = Node.DEFAULT_ID;
     }
 
 	public static NameServer getInstance()
@@ -156,5 +160,20 @@ public class NameServer
 		{
 			re.printStackTrace();
 		}
+	}
+
+	public void setRingMonitorId(short id)
+	{
+		this.ringMonitorId = id;
+	}
+
+	public short getRingMonitorId()
+	{
+		return this.ringMonitorId;
+	}
+
+	public Resolver getResolver()
+	{
+		return this.resolver;
 	}
 }
