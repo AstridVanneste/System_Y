@@ -209,7 +209,6 @@ public class Server implements Runnable
 								//file.append(datagram.getData());
 								file.write(datagram.getData());
 								packets++;
-
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)

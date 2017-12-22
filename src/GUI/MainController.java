@@ -81,7 +81,6 @@ public class MainController
 		System.out.println(Node.getInstance().getName());
 		this.nodeNameLabel.setText(Node.getInstance().getName());
 		System.out.println(String.valueOf(Node.getInstance().getId()));
-		this.nodeIDLabel.setText(String.valueOf(Node.getInstance().getId()));
 	}
 
 	public void updateFiles(LinkedList<String> filesList)

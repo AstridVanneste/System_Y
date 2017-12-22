@@ -278,7 +278,9 @@ public class Node implements NodeInteractionInterface
 	@Override
 	public void runRingMonitor() throws RemoteException
 	{
+		RingMonitor.getInstance();
 		RingMonitor.getInstance().start();
+		System.out.println("RingMonitor started");
 	}
 
 	public AgentHandler getAgentHandler ()
