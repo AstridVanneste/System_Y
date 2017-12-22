@@ -135,7 +135,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			}
 
 			this.finishedAgents.add(agent);
-			ManageController.getInstance().getMainController().updateFiles(allFiles);
+			//ManageController.getInstance().getMainController().updateFiles(allFiles);
 			this.proceedSem.release(1);
 		}
 		catch (InterruptedException ie)
