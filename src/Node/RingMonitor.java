@@ -8,7 +8,7 @@ package Node;
 public class RingMonitor implements Runnable
 {
 	private static final long TIMEOUT = 10000; //time in ms
-	private long startTime;
+	private Long startTime;
 	private Thread thread;
 	private boolean running;
 
@@ -38,6 +38,7 @@ public class RingMonitor implements Runnable
 	{
 		this.thread.start();
 		this.running = true;
+		this.startTime = System.nanoTime();
 	}
 
 	/**
@@ -64,11 +65,14 @@ public class RingMonitor implements Runnable
 	{
 		while(this.running)
 		{
-			if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
+			synchronized (this.startTime)
 			{
-				Node.getInstance().getAgentHandler().runAgent(new FileAgent());
-				this.startTime = System.nanoTime();
-				System.out.printf("Started new file agent because of timeout");
+				if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
+				{
+					Node.getInstance().getAgentHandler().runAgent(new FileAgent());
+					this.startTime = System.nanoTime();
+					System.out.printf("Started new file agent because of timeout");
+				}
 			}
 		}
 	}
@@ -87,7 +91,10 @@ public class RingMonitor implements Runnable
 	 */
 	public void fileAgentPassed()
 	{
-		this.startTime = System.nanoTime();
+		synchronized (this.startTime)
+		{
+			this.startTime = System.nanoTime();
+		}
 		System.out.println("Reset start time");
 	}
 }
