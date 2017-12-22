@@ -123,12 +123,6 @@ public class Server implements Runnable
 			return;
 		}
 
-		long totalReceived = 0;
-		long packetCounter = 0;
-
-		long startTime = System.nanoTime();
-		long stopTime = 0;
-
 		while (!done)
 		{
 			if (this.hasData(remoteHost))
@@ -143,9 +137,6 @@ public class Server implements Runnable
 				{
 					e.printStackTrace();
 				}
-
-				totalReceived += fileBuffer.length;
-				packetCounter++;
 			}
 
 			if (!this.hasData(remoteHost) && !this.connectionHandlers.get(remoteHost).isRunning())
@@ -155,8 +146,6 @@ public class Server implements Runnable
 				this.connectionHandlers.remove(remoteHost);
 			}
 		}
-
-		System.out.println("Received a total of " + totalReceived + "B accross " + packetCounter + " packets");
 
 		try
 		{
@@ -177,7 +166,7 @@ public class Server implements Runnable
 			{
 				Socket clientSocket = this.socket.accept();
 				String remoteHost = clientSocket.getRemoteSocketAddress().toString();
-				System.out.println("Got incoming connection on " + remoteHost);
+				//System.out.println("Got incoming connection on " + remoteHost);
 				this.connectionHandlers.put(remoteHost, new ConnectionHandler(clientSocket));
 				this.connectionHandlers.get(remoteHost).start();
 			}
@@ -211,12 +200,12 @@ public class Server implements Runnable
 			this.connectionHandlers.remove(remoteHost);
 		}
 
-		System.out.println("Finished ConnectionHandlers");
+		//System.out.println("Finished ConnectionHandlers");
 
 		this.running = false;
 		this.socket.close();
 
-		System.out.println("Closed socket");
+		//System.out.println("Closed socket");
 
 		try
 		{
@@ -227,6 +216,6 @@ public class Server implements Runnable
 			e.printStackTrace();
 		}
 
-		System.out.println("Joined Thread");
+		//System.out.println("Joined Thread");
 	}
 }

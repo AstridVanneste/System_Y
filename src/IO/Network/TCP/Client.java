@@ -21,7 +21,6 @@ public class Client
 		this.portNum = portNum;
 		this.socket = null;
 		this.outStream = null;
-		System.out.println("Constructed TCP Client");
 	}
 
 	public void start ()
@@ -30,7 +29,6 @@ public class Client
 		{
 			this.socket = new Socket(this.ip, this.portNum);
 			this.outStream = new DataOutputStream(this.socket.getOutputStream());
-			System.out.println("Started TCP Client");
 		}
 		catch (IOException ioe)
 		{
@@ -52,8 +50,6 @@ public class Client
 
 	public void sendFile (String filename)
 	{
-		long totalRead = 0;
-
 		try
 		{
 			FileInputStream stream = new FileInputStream(filename);
@@ -67,9 +63,6 @@ public class Client
 				System.arraycopy(fileBuffer, 0, trimmedBuffer, 0, bytesRead);
 
 				this.outStream.write(trimmedBuffer, 0, trimmedBuffer.length);
-
-				totalRead += bytesRead;
-				System.out.println("Read " + bytesRead + "B, sent " + fileBuffer.length + "B");
 			}
 
 			stream.close();
@@ -79,8 +72,6 @@ public class Client
 		{
 			e.printStackTrace();
 		}
-
-		System.out.println("Read a total of " + Long.toString(totalRead) + "B");
 	}
 
 	public void send(byte[] data)
