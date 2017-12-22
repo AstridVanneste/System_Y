@@ -97,6 +97,7 @@ public class LifeCycleManager implements Runnable
 						// We're not a new node, check and if needed update neighbours
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
+
 							this.updateNeighbours(newNodeID);
 
 							// You were alone, now there's 2 of you
@@ -104,6 +105,8 @@ public class LifeCycleManager implements Runnable
 							// You can also start circulating the FileAgent
 							if(numberOfNodes == 2)
 							{
+								ManageController.getInstance().closeLoadWindow();
+
 								//You were alone and have not yet started your filemanager.
 								if (!Node.getInstance().getFileManager().isRunning())
 								{
@@ -172,6 +175,8 @@ public class LifeCycleManager implements Runnable
 							{
 								Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 								Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
+
+								ManageController.getInstance().toLoadWindow();
 							}
 
 							this.bootstrapTransactionID = -1;
@@ -294,7 +299,6 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(newID); // New node has already failed us, what a fucking loser
 			}
-			//ManageController.getInstance().getMainController().updateNeighbours();
 
 		}
 
@@ -338,7 +342,7 @@ public class LifeCycleManager implements Runnable
 				e.printStackTrace();
 				Node.getInstance().getFailureAgent().failure(Node.getInstance().getNextNeighbour());
 			}
-			//ManageController.getInstance().getMainController().updateNeighbours();
+
 		}
 
 		if(previous)
@@ -346,6 +350,8 @@ public class LifeCycleManager implements Runnable
 			Node.getInstance().getFileManager().checkFiles(FileType.OWNED_FILE);
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
+
+		ManageController.getInstance().getMainController().updateNeighbours();
 
 
 	}

@@ -69,11 +69,13 @@ public class ManageController
 		mainController.view(rootMain);
 	}
 
+	// Show loadingwindow. Called after logged in
 	public void toLoadWindow ()
 	{
 		loadController.view(rootLoad);
 	}
 
+	// Close loadingwindow. Called by the model when a second node has joined the network
 	public void closeLoadWindow()
 	{
 		loadController.close();

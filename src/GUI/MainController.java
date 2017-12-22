@@ -26,6 +26,7 @@ public class MainController
 	private String fileSelected;
 	private Scene view;
 	private List<String> allFiles;
+	private Boolean popUpOpen;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -61,7 +62,7 @@ public class MainController
 
 	public void init ()
 	{
-		//updateFiles();
+		popUpOpen = false;
 	}
 
 	public void view(Parent root){
@@ -133,22 +134,26 @@ public class MainController
 	 */
 	public void openPopUpWindow () throws IOException
 	{
-		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
-		this.fileSelected = file;
+		if (!popUpOpen)
+		{
+			popUpOpen = true;
+			String file = tableView.getSelectionModel().getSelectedItem().getFileName();
+			this.fileSelected = file;
 
-		FXMLLoader fxmlLoader = new FXMLLoader();
-		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		PopUpController controller = fxmlLoader.getController();
-		controller.init();
+			FXMLLoader fxmlLoader = new FXMLLoader();
+			Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
+			PopUpController controller = fxmlLoader.getController();
+			controller.init(this);
 
-		Stage secondaryStage = new Stage();
-		secondaryStage.initStyle(StageStyle.UTILITY);
-		secondaryStage.setMinWidth(160);
-		secondaryStage.setMinHeight(120);
-		secondaryStage.setScene(new Scene(root, 160, 120));
-		secondaryStage.show();
+			Stage secondaryStage = new Stage();
+			secondaryStage.initStyle(StageStyle.UTILITY);
+			secondaryStage.setMinWidth(160);
+			secondaryStage.setMinHeight(120);
+			secondaryStage.setScene(new Scene(root, 160, 120));
+			secondaryStage.show();
 
-		controller.setSelectedFile(this.fileSelected);
+			controller.setSelectedFile(this.fileSelected);
+		}
 	}
 
 	public void shutdown()
@@ -156,6 +161,11 @@ public class MainController
 		//shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
 		System.exit(0);
+	}
+
+	public void setPopUpOpen (Boolean value)
+	{
+		this.popUpOpen = value;
 	}
 
 }
