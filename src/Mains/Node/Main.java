@@ -23,6 +23,7 @@ public class Main
 	    }
 	    else
 	    {
+	    	System.setProperty("java.security.policy","src\\Policies\\Client.policy");
 		    Scanner scanner = new Scanner(System.in);
 		    printLineSep();
 
