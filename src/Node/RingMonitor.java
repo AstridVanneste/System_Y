@@ -17,7 +17,7 @@ public class RingMonitor implements Runnable
 	private RingMonitor()
 	{
 		this.startTime = System.nanoTime();
-		this.thread = new Thread();
+		this.thread = new Thread(this);
 		this.thread.setName("Ring Monitor Thread, Node: " + Node.getInstance().getId());
 		this.running = false;
 	}
@@ -36,8 +36,8 @@ public class RingMonitor implements Runnable
 	 */
 	public void start()
 	{
-		this.thread.start();
 		this.running = true;
+		this.thread.start();
 		this.startTime = System.nanoTime();
 	}
 
@@ -57,24 +57,26 @@ public class RingMonitor implements Runnable
 		}
 	}
 
-	@Override
 	/**
 	 * The thread will check if the timeout has passed. If this is the case a new file agent will be introduced in the system.
 	 */
+	@Override
 	public void run()
 	{
+		//System.out.println("Started RingMonitor");
 		while(this.running)
 		{
-			synchronized (this.startTime)
+			//synchronized (this.startTime)
+			//{
+			if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
 			{
-				if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
-				{
-					Node.getInstance().getAgentHandler().runAgent(new FileAgent());
-					this.startTime = System.nanoTime();
-					System.out.printf("Started new file agent because of timeout");
-				}
+				Node.getInstance().getAgentHandler().runAgent(new FileAgent());
+				this.startTime = System.nanoTime();
+				///System.out.printf("Started new file agent because of timeout");
 			}
+			//}
 		}
+		//System.out.println("Fell through");
 	}
 
 	/**
@@ -95,6 +97,6 @@ public class RingMonitor implements Runnable
 		{
 			this.startTime = System.nanoTime();
 		}
-		System.out.println("Reset start time");
+		//System.out.println("Reset start time");
 	}
 }

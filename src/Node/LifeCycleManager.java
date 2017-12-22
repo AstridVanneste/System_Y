@@ -362,7 +362,6 @@ public class LifeCycleManager implements Runnable
 			this.shutdown();
 		}
 
-
 		this.subscriber.stop();
 
 		try

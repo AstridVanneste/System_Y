@@ -3,6 +3,7 @@ package Node;
 
 import GUI.MainController;
 import GUI.ManageController;
+import IO.File;
 
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -130,6 +131,11 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 		}
 		try
 		{
+			if (agent instanceof FileAgent)
+			{
+				RingMonitor.getInstance().fileAgentPassed();
+			}
+
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
 			{
 				Thread agentThread = new Thread(agent);

@@ -21,7 +21,7 @@ public class Datagram
 		this.data = new byte [data.length];
 		System.arraycopy(data, 0, this.data, 0, data.length);
 		this.header.setDataLength(this.data.length);
-		System.out.println("Set length " + data.length);
+		//System.out.println("Set length " + data.length);
 	}
 
 	/**

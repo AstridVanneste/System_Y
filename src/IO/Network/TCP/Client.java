@@ -61,7 +61,6 @@ public class Client //implements Runnable
 	{
 		try
 		{
-
 			this.out.write(data);
 		}
 		catch(IOException e)
