@@ -106,7 +106,7 @@ public class PopUpController
 		}
 		else
 		{
-			Node.getInstance().getFileManager().requestFile(this.selectedFile);
+			Node.getInstance().getAgentHandler().downloadFile(this.selectedFile);
 			if (Desktop.isDesktopSupported()) {
 				try {
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE) + PREFIX + this.selectedFile);
