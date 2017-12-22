@@ -149,7 +149,7 @@ public class DiscoveryAgent implements Runnable
 						System.out.println("Discovery: " + nodeName + " ID: " + nodeId);
 						Util.General.printLineSep();
 
-						if(numNodes == 1)
+						if(numNodes == 2)
 						{
 							NameServer.getInstance().setRingMonitorId(nodeId);
 							try

@@ -156,7 +156,9 @@ public class ProtocolHeader
 	 */
 	public ProtocolHeader setDataLength(int dataLength)
 	{
+		System.out.println("Got length " + Integer.toHexString(dataLength));
 		this.dataLength = dataLength & DATA_LENGTH_MASK;
+		System.out.println("After masking " + Integer.toHexString(this.dataLength));
 		return this;
 	}
 

@@ -132,39 +132,53 @@ public class Client //implements Runnable
 	{
 		Random random = new Random();
 		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION,0,random.nextInt(),ProtocolHeader.REQUEST_FILE,ProtocolHeader.REPLY_FILE);
-		File file = new File(filename);
+		FileInputStream file = null;
+		try
+		{
+			file = new FileInputStream(filename);
+		} catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
 		try
 		{
 			int length = 0;
-			while(file.available() > 0)
-			{
-				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
-				{
-					Datagram data = new Datagram(header, file.read(Constants.MAX_TCP_FILE_SEGMENT_SIZE));
-					this.send(data.serialize());
-					length++;
+			long bytes = 0;
 
-				}
-				else
-				{
-
-					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
-					Datagram data = new Datagram(header,file.read((int) file.available()));
-
-					this.send(data.serialize());
-					length++;
-
-				}
-
-
-			}
-
-			if(file.size() == 0)
+			if(file.available() == 0)
 			{
 				header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
 				Datagram data = new Datagram(header,new byte[0]);
 				this.send(data.serialize());
 			}
+
+			while(file.available() > 0)
+			{
+				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
+				{
+					byte[] buffer = new byte[Constants.MAX_TCP_FILE_SEGMENT_SIZE];
+					file.read(buffer);
+					Datagram data = new Datagram(header, buffer);
+					this.send(data.serialize());
+					length++;
+					//bytes += data.getData().length;
+				}
+				else
+				{
+					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
+					byte[] buffer = new byte[file.available()];
+					file.read(buffer);
+					Datagram data = new Datagram(header,buffer);
+
+					this.send(data.serialize());
+					length++;
+					//bytes += data.getData().length;
+
+					//System.out.println("last packet sent Packets: " + length +  "Total: " + bytes);
+				}
+			}
+
+			file.close();
 		}
 		catch(IOException ioe)
 		{

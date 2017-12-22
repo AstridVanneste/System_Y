@@ -165,6 +165,7 @@ public class Server implements Runnable
 		boolean quit = false;
 		int transactionID = -1;
 		long timer = 0;
+		int packets = 0;
 
 		try
 		{
@@ -186,7 +187,7 @@ public class Server implements Runnable
 								transactionID = datagram.getHeader().getTransactionID();
 								firstSegment = false;
 								file.write(datagram.getData()); //write first bytes to empty previous values at the same time
-								//packets++;
+								packets++;
 
 							}
 							else if (transactionID != datagram.getHeader().getTransactionID())
@@ -196,14 +197,14 @@ public class Server implements Runnable
 							else
 							{
 								file.append(datagram.getData());
-								//packets++;
+								packets++;
 
 							}
 
 							if(datagram.getHeader().getReplyCode() == ProtocolHeader.REPLY_FILE_END)
 							{
-
 								quit = true;
+								System.out.println("last packet detected after " + packets + " packets");
 							}
 							timer = 0;
 						}
@@ -214,7 +215,7 @@ public class Server implements Runnable
 					}
 					else
 					{
-						throw new IOException("Invalid request code (= " + datagram.getHeader().getRequestCode() + "should be " + ProtocolHeader.REQUEST_FILE+ ")");
+						throw new IOException("Invalid request code (= " + datagram.getHeader().getRequestCode() + " should be " + ProtocolHeader.REQUEST_FILE+ ")");
 					}
 				}
 				else

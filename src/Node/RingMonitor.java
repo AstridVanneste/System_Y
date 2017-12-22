@@ -88,5 +88,6 @@ public class RingMonitor implements Runnable
 	public void fileAgentPassed()
 	{
 		this.startTime = System.nanoTime();
+		System.out.println("Reset start time");
 	}
 }
