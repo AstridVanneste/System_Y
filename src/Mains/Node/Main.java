@@ -3,6 +3,8 @@ package Mains.Node;
 import Node.Node;
 import Node.DownloadManager;
 
+import java.net.URL;
+import java.security.Policy;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -23,7 +25,17 @@ public class Main
 	    }
 	    else
 	    {
-	    	System.setProperty("java.security.policy","src\\Policies\\Client.policy");
+		    String serverPolicyPath = "/Policies/Server.policy";
+		    URL serverPolicyURL = Mains.NameServer.Main.class.getResource(serverPolicyPath);
+
+		    if (serverPolicyURL == null)
+		    {
+			    System.err.println("getResource returned NULL");
+		    }
+
+		    System.setProperty("java.security.policy",serverPolicyURL.toString());
+		    Policy.getPolicy().refresh();
+
 		    Scanner scanner = new Scanner(System.in);
 		    printLineSep();
 

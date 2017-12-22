@@ -214,7 +214,7 @@ public class LifeCycleManager implements Runnable
 		byte[] nameLengthInByte = Serializer.intToBytes(Node.getInstance().getName().length());
 		byte[] nameInByte = Node.getInstance().getName().getBytes();
 
-		short[] ipInByte = new short[4];
+		int[] ipInByte = new int[4];
 
 		try
 		{
@@ -230,7 +230,7 @@ public class LifeCycleManager implements Runnable
 
 		for (int i = nameInByte.length + 4; i < nameInByte.length + 8; i++)
 		{
-			data[i] = (byte) (ipInByte[i - (nameInByte.length + 4)] & 0x00FF);
+			data[i] = (byte) (ipInByte[i - (nameInByte.length + 4)] & 0x000000FF);
 		}
 
 		Datagram datagram = new Datagram(header, data);
@@ -348,9 +348,7 @@ public class LifeCycleManager implements Runnable
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
 
-		//ManageController.getInstance().getMainController().updateNeighbours();
-
-
+		ManageController.getInstance().getMainController().updateNeighbours();
 	}
 
 	public boolean isRunning ()

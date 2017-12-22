@@ -4,6 +4,8 @@ package Mains.NameServer;
 import IO.File;
 import NameServer.NameServer;
 
+import java.net.URL;
+import java.security.Policy;
 import java.util.Scanner;
 
 public class Main
@@ -11,6 +13,17 @@ public class Main
     public static void main(String[] args)
     {
     	boolean quit = false;
+
+    	String serverPolicyPath = "/Policies/Server.policy";
+	    URL serverPolicyURL = Main.class.getResource(serverPolicyPath);
+
+	    if (serverPolicyURL == null)
+	    {
+		    System.err.println("getResource returned NULL");
+	    }
+
+	    System.setProperty("java.security.policy",serverPolicyURL.toString());
+	    Policy.getPolicy().refresh();
 
     	Util.General.printLineSep();
 		System.out.println("Starting NameServer...");
@@ -34,7 +47,7 @@ public class Main
 				NameServer.getInstance().stop();
 
 			}
-			else if(input.equals("M") || input.equals("m"));
+			else if(input.equals("M") || input.equals("m"))
 			{
 				System.out.println(NameServer.getInstance().toString());
 			}

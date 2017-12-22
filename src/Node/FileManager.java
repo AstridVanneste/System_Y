@@ -637,6 +637,7 @@ public class FileManager implements FileManagerInterface
 		{
 			client.sendFile(this.getFullPath(filename, srcType));
 		}
+
 		int localPort = client.getLocalPort();
 		String remoteHost = "";
 

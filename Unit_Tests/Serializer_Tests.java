@@ -8,7 +8,7 @@ public class Serializer_Tests
 	public void IPTest () throws Exception
 	{
 		String ipString = "192.168.0.1";
-		short[] ipBytes = Serializer.ipStringToBytes(ipString);
+		int[] ipBytes = Serializer.ipStringToBytes(ipString);
 		assertEquals("String -> Bytes", 192, ipBytes[0]);
 		assertEquals("String -> Bytes", 168, ipBytes[1]);
 		assertEquals("String -> Bytes", 0, ipBytes[2]);
