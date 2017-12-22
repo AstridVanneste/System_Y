@@ -124,6 +124,10 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 	@Override
 	public void runAgent(Agent agent)
 	{
+		if(agent instanceof FileAgent)
+		{
+			RingMonitor.getInstance().fileAgentPassed();
+		}
 		try
 		{
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
