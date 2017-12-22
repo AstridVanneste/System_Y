@@ -21,7 +21,6 @@ public class TCPServerMain
 			scanner.nextLine();
 			server.start();
 
-
 			System.out.println("Press enter to loop through active connections looking for files");
 			scanner.nextLine();
 

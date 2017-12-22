@@ -17,8 +17,11 @@ public class Datagram
 	public Datagram (ProtocolHeader header, byte[] data)
 	{
 		this.header = header;
-		this.data = data;
+		//this.data = data;
+		this.data = new byte [data.length];
+		System.arraycopy(data, 0, this.data, 0, data.length);
 		this.header.setDataLength(this.data.length);
+		System.out.println("Set length " + data.length);
 	}
 
 	/**
@@ -103,8 +106,7 @@ public class Datagram
 	 */
 	public byte[] serialize()
 	{
-
-		byte[] serial = new byte[data.length + ProtocolHeader.HEADER_LENGTH];
+		byte[] serial = new byte[this.data.length + ProtocolHeader.HEADER_LENGTH];
 
 		byte[] header = this.header.serialize();
 
@@ -115,12 +117,13 @@ public class Datagram
 			serial[i] = b;
 			i++;
 		}
+
 		for(byte b: this.data)
 		{
 			serial[i] = b;
 			i++;
 		}
-		int test = (int)(serial[4]) | (serial[5] << 8) | (serial[6] << 16) | (serial[7] << 24);
+
 		return serial;
 	}
 }
