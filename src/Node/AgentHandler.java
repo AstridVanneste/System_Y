@@ -11,6 +11,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ServerNotActiveException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeMap;
@@ -134,6 +135,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			if (agent instanceof FileAgent)
 			{
 				RingMonitor.getInstance().fileAgentPassed();
+				ManageController.getInstance().getMainController().updateFiles(allFiles);
 			}
 
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
@@ -145,7 +147,6 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			}
 
 			this.finishedAgents.add(agent);
-			ManageController.getInstance().getMainController().updateFiles(allFiles);
 			this.proceedSem.release(1);
 		}
 		catch (InterruptedException ie)
@@ -191,8 +192,30 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 	public synchronized void setAllFiles (Set<String> files)
 	{
+		/*
 		this.allFiles.clear();
 		this.allFiles.addAll(files);
+		*/
+
+		for (String file : files)
+		{
+			if (!this.allFiles.contains(file))
+			{
+				this.allFiles.add(file);
+			}
+		}
+
+		Iterator<String> allIt = this.allFiles.iterator();
+
+		while (allIt.hasNext())
+		{
+			String file  = allIt.next();
+
+			if (!files.contains(file))
+			{
+				this.allFiles.remove(file);
+			}
+		}
 	}
 
 	// Method is synchronized because FileAgent uses it to re-add unfinished tasks
