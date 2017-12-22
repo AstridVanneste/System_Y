@@ -36,13 +36,13 @@
             <VBox alignment="CENTER">
                <children>
                   <Label text="Previous Node" />
-                  <Label fx:id="previousLabel" text="Prev ID" />
+                  <Label fx:id="previousLabel"/>
                </children>
             </VBox>
             <VBox alignment="CENTER">
                <children>
                   <Label text="Next node" />
-                  <Label fx:id="nextLabel" text="Label" />
+                  <Label fx:id="nextLabel" />
                </children>
             </VBox>
             <Region visible="false" HBox.hgrow="ALWAYS" />

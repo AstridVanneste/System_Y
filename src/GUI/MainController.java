@@ -4,9 +4,7 @@ import Node.Node;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -26,6 +23,7 @@ public class MainController
 	private String fileSelected;
 	private Scene view;
 	private List<String> allFiles;
+	private Boolean popUpOpen;
 
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
@@ -61,8 +59,29 @@ public class MainController
 
 	public void init ()
 	{
-		//updateFiles();
+		popUpOpen = false;
 	}
+
+	/*public void start()
+	{
+		Thread t = new Thread(this);
+		t.start();
+	}
+
+	public void run()
+	{
+		while(isRunnig)
+		{
+			if(String.valueOf(Node.getInstance().getNextNeighbour()) != nextLabel.getText())
+			{
+				nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
+			}
+			if(String.valueOf(Node.getInstance().getPreviousNeighbour()) != previousLabel.getText())
+			{
+				previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
+			}
+		}
+	}*/
 
 	public void view(Parent root){
 		if(view == null)
@@ -132,22 +151,26 @@ public class MainController
 	 */
 	public void openPopUpWindow () throws IOException
 	{
-		String file = tableView.getSelectionModel().getSelectedItem().getFileName();
-		this.fileSelected = file;
+		if (!popUpOpen)
+		{
+			popUpOpen = true;
+			String file = tableView.getSelectionModel().getSelectedItem().getFileName();
+			this.fileSelected = file;
 
-		FXMLLoader fxmlLoader = new FXMLLoader();
-		Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-		PopUpController controller = fxmlLoader.getController();
-		controller.init();
+			FXMLLoader fxmlLoader = new FXMLLoader();
+			Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
+			PopUpController controller = fxmlLoader.getController();
+			controller.init(this);
 
-		Stage secondaryStage = new Stage();
-		secondaryStage.initStyle(StageStyle.UTILITY);
-		secondaryStage.setMinWidth(160);
-		secondaryStage.setMinHeight(120);
-		secondaryStage.setScene(new Scene(root, 160, 120));
-		secondaryStage.show();
+			Stage secondaryStage = new Stage();
+			secondaryStage.initStyle(StageStyle.UTILITY);
+			secondaryStage.setMinWidth(160);
+			secondaryStage.setMinHeight(120);
+			secondaryStage.setScene(new Scene(root, 160, 120));
+			secondaryStage.show();
 
-		controller.setSelectedFile(this.fileSelected);
+			controller.setSelectedFile(this.fileSelected);
+		}
 	}
 
 	public void shutdown()
@@ -155,6 +178,11 @@ public class MainController
 		//shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
 		System.exit(0);
+	}
+
+	public void setPopUpOpen (Boolean value)
+	{
+		this.popUpOpen = value;
 	}
 
 }

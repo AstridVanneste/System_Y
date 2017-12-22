@@ -2,6 +2,7 @@ package Node;
 
 //import GUI.Controller;
 import GUI.MainController;
+import GUI.ManageController;
 import NameServer.*;
 
 import java.rmi.*;
@@ -123,6 +124,7 @@ public class Node implements NodeInteractionInterface
 			this.fileManager.start();
 			this.updateAgent.start();
 			this.agentHandler.start();
+			ManageController.getInstance().setCloseLoad(true);
 		}
 		else
 		{

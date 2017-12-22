@@ -16,6 +16,7 @@ import static Node.FileType.REPLICATED_FILE;
 public class PopUpController
 {
 	private Stage currentWindow;
+	private MainController mainController;
 
 	private String selectedFile;
 
@@ -32,19 +33,9 @@ public class PopUpController
 	{
 	}
 
-	public void init()
+	public void init(MainController mainController)
 	{
-		//currentWindow = (Stage) openButton.getScene().getWindow();
-		//File file = new File(Node.getInstance()..getFullPath(filename, type));
-		//return file.exists();
-		//System.out.println(Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE));
-		//if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
-		//{
-			//deleteLocalButton.setVisible(false);
-		//}
-		//else{
-			//deleteLocalButton.setVisible(true);
-		//}
+		this.mainController = mainController;
 	}
 
 	/**
@@ -116,6 +107,7 @@ public class PopUpController
 			//return true;
 		}
 		//currentWindow.close();
+		mainController.setPopUpOpen(false);
 	}
 
 	public void deleteLocal()
@@ -132,6 +124,7 @@ public class PopUpController
 			}
 		}
 		//currentWindow.close();
+		mainController.setPopUpOpen(false);
 	}
 
 	public void deleteNetwork()
@@ -248,11 +241,16 @@ public class PopUpController
 			}
 		}
 		//currentWindow.close();
+		mainController.setPopUpOpen(false);
 	}
 
 	public void setSelectedFile(String selectedFile)
 	{
 		this.selectedFile = selectedFile;
+		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
+		{
+			deleteLocalButton.setVisible(false);
+		}
 	}
 
 
