@@ -129,6 +129,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 		if(agent instanceof FileAgent)
 		{
 			RingMonitor.getInstance().fileAgentPassed();
+			ManageController.getInstance().getMainController().updateFiles(allFiles);
 		}
 		try
 		{
@@ -209,7 +210,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 		while (allIt.hasNext())
 		{
-			String file  = allIt.next();
+			final String file  = allIt.next();
 
 			if (!files.contains(file))
 			{
