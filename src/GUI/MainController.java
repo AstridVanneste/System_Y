@@ -4,9 +4,7 @@ import Node.Node;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -64,6 +61,27 @@ public class MainController
 	{
 		popUpOpen = false;
 	}
+
+	/*public void start()
+	{
+		Thread t = new Thread(this);
+		t.start();
+	}
+
+	public void run()
+	{
+		while(isRunnig)
+		{
+			if(String.valueOf(Node.getInstance().getNextNeighbour()) != nextLabel.getText())
+			{
+				nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
+			}
+			if(String.valueOf(Node.getInstance().getPreviousNeighbour()) != previousLabel.getText())
+			{
+				previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
+			}
+		}
+	}*/
 
 	public void view(Parent root){
 		if(view == null)

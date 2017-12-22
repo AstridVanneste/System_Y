@@ -105,14 +105,13 @@ public class LifeCycleManager implements Runnable
 							// You can also start circulating the FileAgent
 							if(numberOfNodes == 2)
 							{
-								ManageController.getInstance().closeLoadWindow();
-
 								//You were alone and have not yet started your filemanager.
 								if (!Node.getInstance().getFileManager().isRunning())
 								{
 									try
 									{
 										Node.getInstance().releaseStartupSlot();
+
 									}
 									catch (RemoteException re)
 									{
@@ -175,8 +174,6 @@ public class LifeCycleManager implements Runnable
 							{
 								Node.getInstance().setNextNeighbour(Node.getInstance().getId());
 								Node.getInstance().setPreviousNeighbour(Node.getInstance().getId());
-
-								ManageController.getInstance().toLoadWindow();
 							}
 
 							this.bootstrapTransactionID = -1;

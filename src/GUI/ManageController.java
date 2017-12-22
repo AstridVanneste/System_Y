@@ -19,6 +19,8 @@ public class ManageController
 	private Parent rootLogin;
 	private Parent rootLoad;
 
+	private Boolean closeLoad;
+
 	public static ManageController instance;
 
 	public ManageController() throws IOException
@@ -40,6 +42,9 @@ public class ManageController
 
 		loginController.init(this);
 		loadController.init(this);
+		mainController.init();
+
+		closeLoad = false;
 	}
 
 	public static ManageController getInstance()
@@ -79,11 +84,21 @@ public class ManageController
 	public void closeLoadWindow()
 	{
 		loadController.close();
+		toMainWindow();
 	}
-
 
 	public MainController getMainController()
 	{
 		return mainController;
+	}
+
+	public synchronized Boolean getCloseLoad()
+	{
+		return closeLoad;
+	}
+
+	public synchronized void setCloseLoad(Boolean closeLoad)
+	{
+		this.closeLoad = closeLoad;
 	}
 }

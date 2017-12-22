@@ -45,11 +45,9 @@ public class LoginController
 			Node.getInstance().setName(name);
 			Node.getInstance().getFileManager().setRootDirectory(directory);
 
-			//manageController.toLoadWindow();
+			manageController.toLoadWindow();
 
 			Node.getInstance().start();
-
-
 
 		}
 	}
@@ -76,4 +74,5 @@ public class LoginController
 			this.rootDir.setText(args[1]);
 		}
 	}
+
 }
