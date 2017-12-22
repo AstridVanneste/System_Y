@@ -113,6 +113,7 @@ public class MainController
 			{
 				if(!s.equals(obsList.get(i).getFileName()))
 				{
+					System.out.println("not identical");
 					identical = false;
 				}
 				i++;
@@ -121,11 +122,13 @@ public class MainController
 			if(!identical)
 			{
 				obsList.clear();
+				System.out.println("cleared");
 				for(String s: filesList)
 				{
 					obsList.add(new TableFile(s));
 				}
 				tableView.setItems(obsList);
+				identical = true;
 			}
 		}
 		else
@@ -134,6 +137,7 @@ public class MainController
 			for(String s: filesList)
 			{
 				obsList.add(new TableFile(s));
+				System.out.println(s);
 			}
 			tableView.setItems(obsList);
 		}

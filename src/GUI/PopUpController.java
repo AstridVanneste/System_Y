@@ -252,7 +252,4 @@ public class PopUpController
 			deleteLocalButton.setVisible(false);
 		}
 	}
-
-
-
 }
