@@ -76,8 +76,6 @@ public class ConnectionHandler implements Runnable
 			{
 				int numRead = this.inStream.read(buffer);
 
-				System.out.println("numRead: " + numRead);
-
 				if (numRead > 0)
 				{
 					byte[] trimmedBuffer = new byte [numRead];
@@ -99,8 +97,6 @@ public class ConnectionHandler implements Runnable
 
 	public void stop ()
 	{
-		System.out.println("Attemting to stop connection handler");
-
 		this.running = false;
 
 		try
@@ -108,11 +104,7 @@ public class ConnectionHandler implements Runnable
 			this.socket.close();
 			this.inStream.close();
 
-			System.out.println("Closed socket and stream");
-
 			this.thread.join();
-
-			System.out.println("Joined Thread");
 		}
 		catch (IOException | InterruptedException e)
 		{
