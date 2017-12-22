@@ -5,9 +5,16 @@ import IO.Network.Datagrams.Datagram;
 import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.UDP.Multicast.Subscriber;
 import IO.Network.UDP.Unicast.Client;
+import Node.Node;
+import Node.NodeInteractionInterface;
+import Util.General;
 import Util.Serializer;
 
 import java.net.DatagramPacket;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 /**
  * The discovery agent just runs in the background listening for discovery requests
@@ -141,6 +148,28 @@ public class DiscoveryAgent implements Runnable
 						Util.General.printLineSep();
 						System.out.println("Discovery: " + nodeName + " ID: " + nodeId);
 						Util.General.printLineSep();
+
+						if(numNodes == 1)
+						{
+							NameServer.getInstance().setRingMonitorId(nodeId);
+							try
+							{
+								Registry reg = LocateRegistry.getRegistry(NameServer.getInstance().getResolver().getIP(nodeId));
+								NodeInteractionInterface node = (NodeInteractionInterface) reg.lookup(Node.NODE_INTERACTION_NAME);
+								node.runRingMonitor();
+								Util.General.printLineSep();
+								System.out.println("Ring monitor set to: " + nodeId);
+								Util.General.printLineSep();
+							}
+							catch (RemoteException re)
+							{
+								re.printStackTrace();
+							}
+							catch (NotBoundException nbe)
+							{
+								nbe.printStackTrace();
+							}
+						}
 					}
 					else
 					{

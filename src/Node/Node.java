@@ -275,6 +275,12 @@ public class Node implements NodeInteractionInterface
 		this.neighbourSetSemaphore.release(1);
 	}
 
+	@Override
+	public void runRingMonitor() throws RemoteException
+	{
+		RingMonitor.getInstance().start();
+	}
+
 	public AgentHandler getAgentHandler ()
 	{
 		return this.agentHandler;
