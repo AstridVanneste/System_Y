@@ -2,6 +2,7 @@ package GUI;
 
 import Node.Node;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+
+import javax.swing.text.TableView;
 
 public class MainController
 {
@@ -104,43 +107,35 @@ public class MainController
 
 	public void updateFiles(LinkedList<String> filesList)
 	{
+		boolean obsListChanged = false;
 		ObservableList<TableFile> obsList = tableView.getItems();
-		int i = 0;
-		boolean identical = true;
-		if(filesList.size() == obsList.size())
+		for (String file : filesList)
 		{
-			for(String s : filesList)
+			if (!obsList.contains(file))
 			{
-				if(!s.equals(obsList.get(i).getFileName()))
-				{
-					System.out.println("not identical");
-					identical = false;
-				}
-				i++;
-			}
-			
-			if(!identical)
-			{
-				obsList.clear();
-				System.out.println("cleared");
-				for(String s: filesList)
-				{
-					obsList.add(new TableFile(s));
-				}
-				tableView.setItems(obsList);
-				identical = true;
+				obsList.add(new TableFile(file));
+				obsListChanged = true;
 			}
 		}
-		else
+
+		Iterator<TableFile> allIt = obsList.iterator();
+
+		while (allIt.hasNext())
 		{
-			obsList.clear();
-			for(String s: filesList)
+			final String file  = allIt.next().getFileName();
+
+			if (!filesList.contains(file))
 			{
-				obsList.add(new TableFile(s));
-				System.out.println(s);
+				obsList.remove(file);
+				obsListChanged = true;
 			}
+		}
+
+		if(obsListChanged)
+		{
 			tableView.setItems(obsList);
 		}
+
 	}
 
 	public void updateNeighbours ()
