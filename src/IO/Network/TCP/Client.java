@@ -1,243 +1,114 @@
 package IO.Network.TCP;
 
-import IO.*;
-import IO.File;
-import IO.Network.Constants;
-import IO.Network.Datagrams.Datagram;
-import IO.Network.Datagrams.ProtocolHeader;
-
-import java.net.*;
-import java.io.*;
-import java.util.LinkedList;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
-import java.util.Random;
 
-public class Client //implements Runnable
+public class Client
 {
-	private static long TIMEOUT = 50000; //TIMEOUT IN MS (50 seconds)
+	//private static final long TIMEOUT_MS = 50000;
 
-	private boolean stop;
 	private int portNum;
-	private String IP;
-	private Socket clientSocket;
-	private DataInputStream in;
-	private DataOutputStream out;
-	private LinkedList<byte[]> buffer;
+	private String ip;
+	private Socket socket;
+	private DataOutputStream outStream;
 
-	public Client (String IP, int port)
+	public Client (String ip, int portNum)
 	{
-		this.stop = false;
-		this.portNum = port;
-		this.IP = IP;
-		this.buffer = new LinkedList<byte[]>();
+		this.ip = ip;
+		this.portNum = portNum;
+		this.socket = null;
+		this.outStream = null;
+		System.out.println("Constructed TCP Client");
 	}
 
-	/**
-	 * Returns the port that the client is running on
-	 * @return
-	 */
-	public void start()
+	public void start ()
 	{
 		try
 		{
-			this.clientSocket = new Socket(this.IP, this.portNum);
-			this.in = new DataInputStream(clientSocket.getInputStream());
-			this.out = new DataOutputStream(clientSocket.getOutputStream());
-			//Thread ownThread = new Thread(this);
-			//ownThread.start();
+			this.socket = new Socket(this.ip, this.portNum);
+			this.outStream = new DataOutputStream(this.socket.getOutputStream());
+			System.out.println("Started TCP Client");
 		}
-		catch(IOException e)
+		catch (IOException ioe)
 		{
-			System.err.println("IO exception when starting client TCP socket");
+			ioe.printStackTrace();
+		}
+	}
+
+	public void stop ()
+	{
+		try
+		{
+			this.socket.close();
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * Sends all bytes in the data array
-	 * @param data
-	 */
+	public void sendFile (String filename)
+	{
+		long totalRead = 0;
+
+		try
+		{
+			FileInputStream stream = new FileInputStream(filename);
+
+			while (stream.available() > 0)
+			{
+				byte[] fileBuffer = new byte[1460];
+				int bytesRead = stream.read(fileBuffer);
+
+				byte[] trimmedBuffer = new byte [bytesRead];
+				System.arraycopy(fileBuffer, 0, trimmedBuffer, 0, bytesRead);
+
+				this.outStream.write(trimmedBuffer, 0, trimmedBuffer.length);
+
+				totalRead += bytesRead;
+				System.out.println("Read " + bytesRead + "B, sent " + fileBuffer.length + "B");
+			}
+
+			stream.close();
+			this.outStream.flush();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("Read a total of " + Long.toString(totalRead) + "B");
+	}
+
 	public void send(byte[] data)
 	{
 		try
 		{
-			this.out.write(data);
+			this.outStream.write(data);
 		}
-		catch(IOException e)
+		catch (IOException ioe)
 		{
-			System.err.println("Error when writing data to outputstream");
-			e.printStackTrace();
+			ioe.printStackTrace();
 		}
 	}
 
-	/**
-	 * Sends all bytes in the data list.
-	 * @param data
-	 */
 	public void send(List<Byte> data)
 	{
-		byte[] arrayData = new byte[data.size()];
-
-		for (int i = 0; i < data.size(); i++)
-		{
-			arrayData[i] = data.get(i);
-		}
-
-		try
-		{
-			out.write(arrayData);
-		}
-		catch(IOException e)
-		{
-			System.err.println("Error when writing data to outputstream");
-			e.printStackTrace();
-		}
+		// Does nothing, exists to ensure compatibility
+		System.err.println("[IO.Network.TCP.Client.send(List<Byte> data)]\tWARNING: Called dummy method on client socket: " + ip + ":" + Integer.toString(this.portNum) + "\n[IO.Network.TCP.Client.send(List<Byte> data)]\tParameters: data: " + data.toString());
 	}
 
-	/**
-	 * reads all bytes from the interal receive buffer
-	 * @return
-	 */
-	public synchronized byte[] receive()
+	public boolean hasData ()
 	{
-		byte[] data = this.buffer.getFirst();
-		this.buffer.removeFirst();
-
-		return data;
+		System.err.println("[IO.Network.TCP.Client.hasData()]\tWARNING: Called dummy method on client socket: " + ip + ":" + Integer.toString(this.portNum));
+		return true;
 	}
 
-	/**
-	 * Stops the client
-	 */
-	public void stop()
+	public int getLocalPort ()
 	{
-		try
-		{
-			this.stop = true;
-			clientSocket.close();
-		}
-		catch(IOException e)
-		{
-			System.err.println("Error when closing client socket");
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Send complete file
-	 * @param filename
-	 */
-	public void sendFile(String filename)
-	{
-		Random random = new Random();
-		ProtocolHeader header = new ProtocolHeader(ProtocolHeader.CURRENT_VERSION,0,random.nextInt(),ProtocolHeader.REQUEST_FILE,ProtocolHeader.REPLY_FILE);
-		FileInputStream file = null;
-		try
-		{
-			file = new FileInputStream(filename);
-		} catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		try
-		{
-			int length = 0;
-			long bytes = 0;
-
-			if(file.available() == 0)
-			{
-				header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
-				Datagram data = new Datagram(header,new byte[0]);
-				this.send(data.serialize());
-			}
-
-			while(file.available() > 0)
-			{
-				if(file.available() > Constants.MAX_TCP_FILE_SEGMENT_SIZE)
-				{
-					byte[] buffer = new byte[Constants.MAX_TCP_FILE_SEGMENT_SIZE];
-					file.read(buffer);
-					Datagram data = new Datagram(header, buffer);
-					this.send(data.serialize());
-					length++;
-					//bytes += data.getData().length;
-				}
-				else
-				{
-					header.setReplyCode(ProtocolHeader.REPLY_FILE_END);
-					byte[] buffer = new byte[file.available()];
-					file.read(buffer);
-					Datagram data = new Datagram(header,buffer);
-
-					this.send(data.serialize());
-					length++;
-					//bytes += data.getData().length;
-
-					//System.out.println("last packet sent Packets: " + length +  "Total: " + bytes);
-				}
-			}
-
-			file.close();
-		}
-		catch(IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-	}
-
-	/**
-	 * Returns true if there is data in the buffer.
-	 * @return
-	 */
-	public boolean hasData()
-	{
-		try
-		{
-			return this.in.available() > 0;
-		}
-		catch(IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-		finally
-		{
-			return false;
-		}
-	}
-
-
-	/*
-	public void run()
-	{
-		while (!this.stop)
-		{
-			try
-			{
-				if (this.hasData())
-				{
-					System.out.println("CLIENT " + this.in.available() + " Bytes available to TCP");
-					byte[] data = new byte [this.in.available()];
-					int numBytes = this.in.read(data);
-
-					this.buffer.add(data);
-
-					System.out.println("CLIENT Added " + data.length + " Bytes to internal buffer.");
-				}
-			}
-			catch (IOException ioe)
-			{
-				System.err.println("TCPClient: An exception occurred while trying to read data.");
-			}
-		}
-	}
-	*/
-
-	/**
-	 * Returns the local port from where the client will send data
-	 * @return
-	 */
-	public int getLocalPort()
-	{
-		return this.clientSocket.getLocalPort();
+		return this.portNum;
 	}
 }

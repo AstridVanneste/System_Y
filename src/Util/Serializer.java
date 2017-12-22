@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 
 public class Serializer
 {
-	public static short[] ipStringToBytes (String ip)
+	public static int[] ipStringToBytes (String ip)
 	{
 		String[] sepBytes = ip.split("\\.");
 
@@ -14,21 +14,21 @@ public class Serializer
 			throw new RuntimeException("IP address '" + ip + "' wasn't formatted properly, expected IPv4 Address: 'www.xxx.yyy.zzz'");
 		}
 
-		short[] data = new short [4];
+		int[] data = new int [4];
 		for (int i = 0; i < 4; i++)
 		{
-			data[i] = Short.parseShort(sepBytes[i]);
+			data[i] = Integer.parseInt(sepBytes[i]);
 		}
 		return data;
 	}
 
-	public static String bytesToIPString (short[] ipBytes)
+	public static String bytesToIPString (int[] ipBytes)
 	{
 		if (ipBytes.length != 4)
 		{
 			throw new RuntimeException("Only IPv4 Addresses are supported, the given address had a length of " + Integer.toString(ipBytes.length) + " instead of 4.");
 		}
-		return Short.toString(ipBytes[0]) + "." + Short.toString(ipBytes[1]) + "." + Short.toString(ipBytes[2]) + "." + Short.toString(ipBytes[3]);
+		return Integer.toString(ipBytes[0]) + "." + Integer.toString(ipBytes[1]) + "." + Integer.toString(ipBytes[2]) + "." + Integer.toString(ipBytes[3]);
 	}
 
 	public static byte[] intToBytes (int value)

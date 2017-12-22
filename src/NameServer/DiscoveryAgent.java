@@ -56,7 +56,6 @@ public class DiscoveryAgent implements Runnable
 					{
 						//System.out.println("DiscoveryAgent.run()");
 
-
 						byte[] data = request.getData();
 						byte[] nameLenBytes = new byte[4];
 						System.arraycopy(data, 0, nameLenBytes, 0, 4);
@@ -87,12 +86,12 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
-						short[] unicastIPBytes = new short[4];
+						int[] unicastIPBytes = new int[4];
 						//System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
 
 						for (int i = 4 + nameLen; i < 8 + nameLen; i++)
 						{
-							unicastIPBytes[i - (4 + nameLen)] = data[i];
+							unicastIPBytes[i - (4 + nameLen)] = data[i] & 0x000000FF;
 						}
 
 						String unicastIp = Serializer.bytesToIPString(unicastIPBytes);
