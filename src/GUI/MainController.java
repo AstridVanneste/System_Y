@@ -26,6 +26,8 @@ public class MainController
 	private List<String> allFiles;
 	private Boolean popUpOpen;
 
+	private PopUpController controller;
+
 	@FXML
 	private javafx.scene.image.ImageView shutdownButton;
 	@FXML
@@ -165,7 +167,7 @@ public class MainController
 
 			FXMLLoader fxmlLoader = new FXMLLoader();
 			Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-			PopUpController controller = fxmlLoader.getController();
+			controller = fxmlLoader.getController();
 			controller.init(this);
 
 			Stage secondaryStage = new Stage();
