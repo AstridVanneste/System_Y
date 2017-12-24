@@ -98,8 +98,8 @@ public class Client
 		return true;
 	}
 
-	public String getLocalHost()
+	public int getLocalPort()
 	{
-		return this.socket.getLocalSocketAddress().toString();
+		return this.socket.getLocalPort();
 	}
 }

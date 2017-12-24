@@ -601,9 +601,7 @@ public class FileManager implements FileManagerInterface
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 
-
 			remoteFileManager.lockSlot();
-
 
 			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 			client.start();
@@ -631,8 +629,9 @@ public class FileManager implements FileManagerInterface
 			client.sendFile(this.getFullPath(filename, srcType));
 		}
 
-		/*
-		int localPort = client.getLocalHost();
+		client.stop();
+
+		int localPort = client.getLocalPort();
 		String remoteHost = "";
 
 		try
@@ -645,15 +644,15 @@ public class FileManager implements FileManagerInterface
 		{
 			uhe.printStackTrace();
 		}
-		*/
-		String remoteHost = client.getLocalHost();
+
+		//String remoteHost = client.getLocalPort();
 
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
-			File file = new File(this.getFullPath(filename, srcType));
+			//File file = new File(this.getFullPath(filename, srcType));
 			remoteFileManager.pushFile(filename, dstType, remoteHost);
 
 			if (dstType == FileType.OWNED_FILE)
@@ -791,8 +790,7 @@ public class FileManager implements FileManagerInterface
 		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 		client.start();
 
-		/*
-		int localPort = client.getLocalHost();
+		int localPort = client.getLocalPort();
 		String remoteHost = "";
 
 		try
@@ -805,9 +803,8 @@ public class FileManager implements FileManagerInterface
 		{
 			uhe.printStackTrace();
 		}
-		*/
 
-		String remoteHost = client.getLocalHost();
+		//String remoteHost = client.getLocalPort();
 
 		try
 		{

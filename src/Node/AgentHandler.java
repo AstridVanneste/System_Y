@@ -72,11 +72,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					{
 						while (Node.getInstance().getFailureAgent().getActiveFailures().contains(nextId))
 						{
-							//System.out.println(nextId + " was in the failure-list.");
 							nextId = Node.getInstance().getResolverStub().getNext(nextId);
 						}
-
-						//System.out.println("Sending agent to " + nextId);
 					}
 					catch(RemoteException re)
 					{
@@ -84,24 +81,9 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					}
 					try
 					{
-						/*
-						if (agent instanceof FileAgent)
-						{
-							System.out.println("FileAgent");
-						}
-						else
-						{
-							System.out.println("RecoveryAgent");
-						}
-						*/
-
-						//System.out.println("1");
 						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
-						//System.out.println("2");
 						AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
-						//System.out.println("3");
 						remoteAgentHandler.runAgent(agent);
-						//System.out.println("4");
 					}
 					catch (RemoteException | NotBoundException e)
 					{
@@ -126,11 +108,6 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 	@Override
 	public void runAgent(Agent agent)
 	{
-		if(agent instanceof FileAgent)
-		{
-			RingMonitor.getInstance().fileAgentPassed();
-			ManageController.getInstance().getMainController().updateFiles(allFiles);
-		}
 		try
 		{
 			if (agent instanceof FileAgent)
@@ -193,31 +170,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 	public synchronized void setAllFiles (Set<String> files)
 	{
-
 		this.allFiles.clear();
 		this.allFiles.addAll(files);
-
-/*
-		for (String file : files)
-		{
-			if (!this.allFiles.contains(file))
-			{
-				this.allFiles.add(file);
-			}
-		}
-
-		Iterator<String> allIt = this.allFiles.iterator();
-
-		while (allIt.hasNext())
-		{
-			final String file  = allIt.next();
-
-			if (!files.contains(file))
-			{
-				this.allFiles.remove(file);
-			}
-		}
-*/
 	}
 
 	// Method is synchronized because FileAgent uses it to re-add unfinished tasks
