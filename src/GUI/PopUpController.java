@@ -47,11 +47,15 @@ public class PopUpController
 		System.out.println("Open file " + this.selectedFile + " ...");
 		if(Node.getInstance().getFileManager().hasFile(this.selectedFile, FileType.LOCAL_FILE))
 		{
-			if (Desktop.isDesktopSupported()) {
-				try {
+			if (Desktop.isDesktopSupported())
+			{
+				try
+				{
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.LOCAL_FILE) + PREFIX + this.selectedFile);
 					Desktop.getDesktop().open(myFile);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex)
+				{
 					ex.printStackTrace();
 				}
 			}
@@ -59,11 +63,15 @@ public class PopUpController
 		}
 		else if(Node.getInstance().getFileManager().hasFile(this.selectedFile, FileType.REPLICATED_FILE))
 		{
-			if (Desktop.isDesktopSupported()) {
-				try {
+			if (Desktop.isDesktopSupported())
+			{
+				try
+				{
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.REPLICATED_FILE) + PREFIX + this.selectedFile);
 					Desktop.getDesktop().open(myFile);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex)
+				{
 					ex.printStackTrace();
 				}
 			}
@@ -71,11 +79,15 @@ public class PopUpController
 		}
 		else if(Node.getInstance().getFileManager().hasFile(this.selectedFile, FileType.DOWNLOADED_FILE))
 		{
-			if (Desktop.isDesktopSupported()) {
-				try {
+			if (Desktop.isDesktopSupported())
+			{
+				try
+				{
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE) + PREFIX + this.selectedFile);
 					Desktop.getDesktop().open(myFile);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex)
+				{
 					ex.printStackTrace();
 				}
 			}
@@ -83,11 +95,15 @@ public class PopUpController
 		}
 		else if(Node.getInstance().getFileManager().hasFile(this.selectedFile, FileType.OWNED_FILE))
 		{
-			if (Desktop.isDesktopSupported()) {
-				try {
+			if (Desktop.isDesktopSupported())
+			{
+				try
+				{
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.OWNED_FILE) + PREFIX + this.selectedFile);
 					Desktop.getDesktop().open(myFile);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex)
+				{
 					ex.printStackTrace();
 				}
 			}
@@ -96,11 +112,14 @@ public class PopUpController
 		else
 		{
 			Node.getInstance().getAgentHandler().downloadFile(this.selectedFile);
-			if (Desktop.isDesktopSupported()) {
-				try {
+			if (Desktop.isDesktopSupported())
+			{
+				try
+				{
 					File myFile = new File(Node.getInstance().getFileManager().getFolder(FileType.DOWNLOADED_FILE) + PREFIX + this.selectedFile);
 					Desktop.getDesktop().open(myFile);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -118,7 +137,8 @@ public class PopUpController
 			try
 			{
 				Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.LOCAL_FILE);
-			} catch (IOException e)
+			}
+			catch (IOException e)
 			{
 				e.printStackTrace();
 			}

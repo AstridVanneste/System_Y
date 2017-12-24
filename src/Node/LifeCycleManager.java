@@ -348,7 +348,6 @@ public class LifeCycleManager implements Runnable
 			//Node.getInstance().getFileManager().transferReplicaded();
 		}
 
-		ManageController.getInstance().getMainController().updateNeighbours();
 	}
 
 	public boolean isRunning ()

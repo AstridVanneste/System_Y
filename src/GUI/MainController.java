@@ -38,14 +38,6 @@ public class MainController
 	private TableColumn<TableFile, String> fileNameColumn;
 	//@FXML
 	//private TableColumn<TableFile, String> sizeColumn;
-	@FXML
-	private Label previousLabel;
-	@FXML
-	private Label nextLabel;
-	@FXML
-	private Label nodeNameLabel;
-	@FXML
-	private Label nodeIDLabel;
 
 	public MainController()
 	{
@@ -99,10 +91,6 @@ public class MainController
 		});
 		stage.setScene(view);
 		stage.show();
-
-		System.out.println(Node.getInstance().getName());
-		this.nodeNameLabel.setText(Node.getInstance().getName());
-		System.out.println(String.valueOf(Node.getInstance().getId()));
 	}
 
 	public void updateFiles(LinkedList<String> filesList)
@@ -147,12 +135,6 @@ public class MainController
 		}
 	}
 
-	public void updateNeighbours ()
-	{
-		this.nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
-		this.previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
-	}
-
 	/**
 	 * When clicked on a fileEntry, a PopUpWindow will open to do something with the file
 	 * @throws IOException
@@ -162,22 +144,35 @@ public class MainController
 		if (!popUpOpen)
 		{
 			popUpOpen = true;
-			String file = tableView.getSelectionModel().getSelectedItem().getFileName();
-			this.fileSelected = file;
 
-			FXMLLoader fxmlLoader = new FXMLLoader();
-			Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-			controller = fxmlLoader.getController();
-			controller.init(this);
+			TableFile file = tableView.getSelectionModel().getSelectedItem();
 
-			Stage secondaryStage = new Stage();
-			secondaryStage.initStyle(StageStyle.UTILITY);
-			secondaryStage.setMinWidth(160);
-			secondaryStage.setMinHeight(120);
-			secondaryStage.setScene(new Scene(root, 160, 120));
-			secondaryStage.show();
+			if (file != null)
+			{
+				String fileName = file.getFileName();
 
-			controller.setSelectedFile(this.fileSelected);
+				this.fileSelected = fileName;
+
+				FXMLLoader fxmlLoader = new FXMLLoader();
+				Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
+				controller = fxmlLoader.getController();
+				controller.init(this);
+
+				Stage secondaryStage = new Stage();
+//			secondaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+//				@Override
+//				public void handle(final WindowEvent arg0) {
+//					setPopUpOpen(false);
+//				}
+//			});
+				secondaryStage.initStyle(StageStyle.UTILITY);
+				secondaryStage.setMinWidth(160);
+				secondaryStage.setMinHeight(120);
+				secondaryStage.setScene(new Scene(root, 160, 120));
+				secondaryStage.show();
+
+				controller.setSelectedFile(this.fileSelected);
+			}
 		}
 	}
 

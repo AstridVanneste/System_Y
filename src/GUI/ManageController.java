@@ -87,6 +87,11 @@ public class ManageController
 		toMainWindow();
 	}
 
+	public void toPopUp ()
+	{
+
+	}
+
 	public MainController getMainController()
 	{
 		return mainController;

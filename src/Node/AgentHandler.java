@@ -136,7 +136,6 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			if (agent instanceof FileAgent)
 			{
 				RingMonitor.getInstance().fileAgentPassed();
-				ManageController.getInstance().getMainController().updateFiles(allFiles);
 			}
 
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
