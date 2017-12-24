@@ -1,8 +1,6 @@
 package Node;
 
-import GUI.TableFile;
 import IO.Network.Constants;
-import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
 
@@ -10,20 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-
-import static java.rmi.server.RemoteServer.getClientHost;
 
 /**
  * This class will handle everything concerning the files.
@@ -638,7 +631,8 @@ public class FileManager implements FileManagerInterface
 			client.sendFile(this.getFullPath(filename, srcType));
 		}
 
-		int localPort = client.getLocalPort();
+		/*
+		int localPort = client.getLocalHost();
 		String remoteHost = "";
 
 		try
@@ -651,6 +645,8 @@ public class FileManager implements FileManagerInterface
 		{
 			uhe.printStackTrace();
 		}
+		*/
+		String remoteHost = client.getLocalHost();
 
 		try
 		{
@@ -795,7 +791,8 @@ public class FileManager implements FileManagerInterface
 		Client client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 		client.start();
 
-		int localPort = client.getLocalPort();
+		/*
+		int localPort = client.getLocalHost();
 		String remoteHost = "";
 
 		try
@@ -808,6 +805,9 @@ public class FileManager implements FileManagerInterface
 		{
 			uhe.printStackTrace();
 		}
+		*/
+
+		String remoteHost = client.getLocalHost();
 
 		try
 		{
