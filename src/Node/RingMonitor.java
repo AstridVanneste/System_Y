@@ -69,17 +69,9 @@ public class RingMonitor implements Runnable
 			//synchronized (this.startTime)
 			//{
 
-			try
-			{
-				Thread.sleep(500);  // Sleep for 500ms to stop CPU-hogging
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-
 			if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
 			{
+				System.err.println("FileAgent Time-Out");
 				Node.getInstance().getAgentHandler().runAgent(new FileAgent());
 				this.startTime = System.nanoTime();
 				///System.out.printf("Started new file agent because of timeout");

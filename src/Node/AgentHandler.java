@@ -126,17 +126,19 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 	@Override
 	public void runAgent(Agent agent)
 	{
+		/*
 		if(agent instanceof FileAgent)
 		{
 			RingMonitor.getInstance().fileAgentPassed();
-			ManageController.getInstance().getMainController().updateFiles(allFiles);
+			//ManageController.getInstance().getMainController().updateFiles(allFiles);
 		}
+		*/
 		try
 		{
 			if (agent instanceof FileAgent)
 			{
 				RingMonitor.getInstance().fileAgentPassed();
-				ManageController.getInstance().getMainController().updateFiles(allFiles);
+				//ManageController.getInstance().getMainController().updateFiles(allFiles);
 			}
 
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
@@ -193,31 +195,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 	public synchronized void setAllFiles (Set<String> files)
 	{
-
 		this.allFiles.clear();
 		this.allFiles.addAll(files);
-
-/*
-		for (String file : files)
-		{
-			if (!this.allFiles.contains(file))
-			{
-				this.allFiles.add(file);
-			}
-		}
-
-		Iterator<String> allIt = this.allFiles.iterator();
-
-		while (allIt.hasNext())
-		{
-			final String file  = allIt.next();
-
-			if (!files.contains(file))
-			{
-				this.allFiles.remove(file);
-			}
-		}
-*/
 	}
 
 	// Method is synchronized because FileAgent uses it to re-add unfinished tasks
