@@ -91,6 +91,7 @@ public class ConnectionHandler implements Runnable
 			catch (IOException e)
 			{
 				e.printStackTrace();
+				this.stop();
 			}
 		}
 	}

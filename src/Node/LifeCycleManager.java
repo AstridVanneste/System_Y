@@ -121,6 +121,7 @@ public class LifeCycleManager implements Runnable
 
 								try
 								{
+									System.out.println("Running initial FileAgent remotely");
 									//Get the remote node's AgentHandler
 									Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newNodeID));
 									//Node.getInstance().getAgentHandler().runAgent(new FileAgent());

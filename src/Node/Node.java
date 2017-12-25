@@ -282,7 +282,7 @@ public class Node implements NodeInteractionInterface
 	{
 		RingMonitor.getInstance();
 		RingMonitor.getInstance().start();
-		System.out.println("RingMonitor started");
+		//System.out.println("RingMonitor started");
 	}
 
 	public AgentHandler getAgentHandler ()

@@ -1,8 +1,6 @@
 package Node;
 
-import GUI.TableFile;
 import IO.Network.Constants;
-import IO.Network.Datagrams.ProtocolHeader;
 import IO.Network.TCP.Client;
 import IO.Network.TCP.Server;
 
@@ -10,20 +8,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.ServerNotActiveException;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-
-import static java.rmi.server.RemoteServer.getClientHost;
 
 /**
  * This class will handle everything concerning the files.
@@ -608,9 +601,7 @@ public class FileManager implements FileManagerInterface
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 
-
 			remoteFileManager.lockSlot();
-
 
 			client = new Client(dstIP, Constants.FILE_RECEIVE_PORT);
 			client.start();
@@ -638,6 +629,8 @@ public class FileManager implements FileManagerInterface
 			client.sendFile(this.getFullPath(filename, srcType));
 		}
 
+		client.stop();
+
 		int localPort = client.getLocalPort();
 		String remoteHost = "";
 
@@ -652,12 +645,14 @@ public class FileManager implements FileManagerInterface
 			uhe.printStackTrace();
 		}
 
+		//String remoteHost = client.getLocalPort();
+
 		try
 		{
 			Registry reg = LocateRegistry.getRegistry(dstIP);
 			//remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
 			//IO.File file = new IO.File(this.getFullPath(filename,type));
-			File file = new File(this.getFullPath(filename, srcType));
+			//File file = new File(this.getFullPath(filename, srcType));
 			remoteFileManager.pushFile(filename, dstType, remoteHost);
 
 			if (dstType == FileType.OWNED_FILE)
@@ -808,6 +803,8 @@ public class FileManager implements FileManagerInterface
 		{
 			uhe.printStackTrace();
 		}
+
+		//String remoteHost = client.getLocalPort();
 
 		try
 		{
