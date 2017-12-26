@@ -81,6 +81,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 					}
 					try
 					{
+						//System.out.println("Running Agent remotely");
 						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(nextId));
 						AgentHandlerInterface remoteAgentHandler = (AgentHandlerInterface) reg.lookup(Node.AGENT_HANDLER_NAME);
 						remoteAgentHandler.runAgent(agent);
@@ -108,6 +109,7 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 	@Override
 	public void runAgent(Agent agent)
 	{
+		//System.out.println("Running agent locally");
 		try
 		{
 			if (agent instanceof FileAgent)

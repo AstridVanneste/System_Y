@@ -61,7 +61,8 @@ public class ManageController
 			try
 			{
 				ManageController.instance = new ManageController();
-			} catch (IOException e)
+			}
+			catch (IOException e)
 			{
 				e.printStackTrace();
 			}

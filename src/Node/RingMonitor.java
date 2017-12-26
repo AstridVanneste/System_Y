@@ -66,17 +66,16 @@ public class RingMonitor implements Runnable
 		//System.out.println("Started RingMonitor");
 		while(this.running)
 		{
-			//synchronized (this.startTime)
-			//{
-
-			if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
+			synchronized (this.startTime)
 			{
-				System.err.println("FileAgent Time-Out");
-				Node.getInstance().getAgentHandler().runAgent(new FileAgent());
-				this.startTime = System.nanoTime();
-				///System.out.printf("Started new file agent because of timeout");
+				if (((System.nanoTime() - this.startTime) / 1000000) > TIMEOUT)
+				{
+					System.err.println("FileAgent Time-Out");
+					Node.getInstance().getAgentHandler().runAgent(new FileAgent());
+					this.startTime = System.nanoTime();
+					///System.out.println("Started new file agent because of timeout");
+				}
 			}
-			//}
 		}
 		//System.out.println("Fell through");
 	}
@@ -93,8 +92,9 @@ public class RingMonitor implements Runnable
 	/**
 	 * Called when a file agent passes on the node. The timeout procedure will be started again from scratch.
 	 */
-	public void fileAgentPassed()
+	public synchronized void fileAgentPassed()
 	{
+		//System.out.println("Resetting RingMonitor");
 		synchronized (this.startTime)
 		{
 			this.startTime = System.nanoTime();

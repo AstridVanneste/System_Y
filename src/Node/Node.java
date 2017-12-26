@@ -124,7 +124,7 @@ public class Node implements NodeInteractionInterface
 			this.fileManager.start();
 			this.updateAgent.start();
 			this.agentHandler.start();
-			ManageController.getInstance().setCloseLoad(true);
+			//ManageController.getInstance().setCloseLoad(true);
 		}
 		else
 		{
