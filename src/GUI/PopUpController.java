@@ -1,8 +1,13 @@
 package GUI;
 
 import Node.*;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 import java.awt.*;
 import java.io.File;
@@ -15,8 +20,10 @@ import static Node.FileType.REPLICATED_FILE;
 
 public class PopUpController
 {
+
+	private Scene view;
 	private Stage currentWindow;
-	private MainController mainController;
+	private ManageController manageController;
 
 	private String selectedFile;
 
@@ -33,14 +40,37 @@ public class PopUpController
 	{
 	}
 
-	public void init(MainController mainController)
+	public void init(ManageController manageController)
 	{
-		this.mainController = mainController;
+		this.manageController = manageController;
 	}
 
-	/**
-	 *
-	 */
+	public void view (Parent root, String fileName)
+	{
+		if(view == null)
+			view = new Scene(root,160,120);
+
+		Stage stage = new Stage();
+		stage.setResizable(false);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(final WindowEvent arg0) {
+				ManageController.getInstance().getMainController().setPopUpOpen(false);
+				Stage stage = (Stage) openButton.getScene().getWindow();
+				stage.close();
+			}
+		});
+
+		stage.initStyle((StageStyle.UTILITY));
+		stage.setScene(view);
+		stage.show();
+
+		setSelectedFile(fileName);
+		this.currentWindow = (Stage) openButton.getScene().getWindow();
+	}
+
+
+
 	public void openFile()
 	{
 
@@ -125,8 +155,8 @@ public class PopUpController
 			}
 			//return true;
 		}
-		//currentWindow.close();
-		mainController.setPopUpOpen(false);
+		ManageController.getInstance().getMainController().setPopUpOpen(false);
+		currentWindow.close();
 	}
 
 	public void deleteLocal()
@@ -143,14 +173,16 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
-		//currentWindow.close();
-		mainController.setPopUpOpen(false);
+		ManageController.getInstance().getMainController().setPopUpOpen(false);
+		currentWindow.close();
+
 	}
 
 	public void deleteNetwork()
 	{
 		Node.getInstance().getAgentHandler().deleteFile(selectedFile);
-		mainController.setPopUpOpen(false);
+		ManageController.getInstance().getMainController().setPopUpOpen(false);
+		currentWindow.close();
 	}
 
 	public void setSelectedFile(String selectedFile)

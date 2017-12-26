@@ -46,7 +46,7 @@ public class LoadController implements Runnable
 	public void close ()
 	{
 		stage.close();
-		manageController.toMainWindow();
+		ManageController.getInstance().toMainWindow();
 	}
 
 	@Override

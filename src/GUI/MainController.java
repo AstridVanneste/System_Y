@@ -152,26 +152,7 @@ public class MainController
 				String fileName = file.getFileName();
 
 				this.fileSelected = fileName;
-
-				FXMLLoader fxmlLoader = new FXMLLoader();
-				Parent root = fxmlLoader.load(getClass().getResource("PopUpWindow.fxml").openStream());
-				controller = fxmlLoader.getController();
-				controller.init(this);
-
-				Stage secondaryStage = new Stage();
-//			secondaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-//				@Override
-//				public void handle(final WindowEvent arg0) {
-//					setPopUpOpen(false);
-//				}
-//			});
-				secondaryStage.initStyle(StageStyle.UTILITY);
-				secondaryStage.setMinWidth(160);
-				secondaryStage.setMinHeight(120);
-				secondaryStage.setScene(new Scene(root, 160, 120));
-				secondaryStage.show();
-
-				controller.setSelectedFile(this.fileSelected);
+				ManageController.getInstance().toPopUp(fileName);
 			}
 		}
 	}
