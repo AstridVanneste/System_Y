@@ -14,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -38,6 +39,8 @@ public class MainController
 	private TableColumn<TableFile, String> fileNameColumn;
 	//@FXML
 	//private TableColumn<TableFile, String> sizeColumn;
+	@FXML
+	private TextField pathField;
 
 	public MainController()
 	{
@@ -162,6 +165,15 @@ public class MainController
 		//shutdownButton.setImage(new Image("@exit_image.jpg"));
 		Node.getInstance().stop();
 		System.exit(0);
+	}
+
+	public void addFile()
+	{
+		String filePath = pathField.getText();
+		if (!filePath.equals(""))
+		{
+
+		}
 	}
 
 	public void setPopUpOpen (Boolean value)
