@@ -23,7 +23,7 @@
          </BorderPane.margin>
          <children>
             <TextField fx:id="pathField" prefWidth="300.0" promptText="Path to file" />
-            <Button fx:id="pathButton" mnemonicParsing="false" text="Add file" />
+            <Button fx:id="pathButton" mnemonicParsing="false" onAction="#addFile" text="Add file" />
             <Region visible="false" HBox.hgrow="ALWAYS" />
             <ImageView fx:id="shutdownButton" fitHeight="30.0" fitWidth="30.0" onMouseClicked="#shutdown" pickOnBounds="true" HBox.hgrow="ALWAYS">
                <image>
