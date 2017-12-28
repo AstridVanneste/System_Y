@@ -25,6 +25,8 @@ public class Node implements NodeInteractionInterface
 	private Short previousNeighbour;
 	private Short nextNeighbour;
 
+	private Boolean GUIActive;
+
 	private LifeCycleManager lifeCycleManager;
 	private FailureAgent failureAgent;
 	private FileManager fileManager;
@@ -43,6 +45,7 @@ public class Node implements NodeInteractionInterface
 		this.id = DEFAULT_ID;
 		this.previousNeighbour = DEFAULT_ID;
 		this.nextNeighbour = DEFAULT_ID;
+		this.GUIActive = false;
 		this.lifeCycleManager = new LifeCycleManager();
 		this.failureAgent = new FailureAgent();
 		this.fileManager = new FileManager();
@@ -124,7 +127,9 @@ public class Node implements NodeInteractionInterface
 			this.fileManager.start();
 			this.updateAgent.start();
 			this.agentHandler.start();
-			ManageController.getInstance().setCloseLoad(true);
+			if (GUIActive)
+				ManageController.getInstance().setCloseLoad(true);
+
 		}
 		else
 		{
@@ -202,6 +207,16 @@ public class Node implements NodeInteractionInterface
 	void setId(short id)
 	{
 		this.id = id;
+	}
+
+	public Boolean getGUIActive()
+	{
+		return GUIActive;
+	}
+
+	public void setGUIActive(Boolean GUIActive)
+	{
+		this.GUIActive = GUIActive;
 	}
 
 	public short getPreviousNeighbour()

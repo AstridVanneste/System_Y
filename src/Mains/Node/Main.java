@@ -26,15 +26,15 @@ public class Main
 	    else
 	    {
 		    String serverPolicyPath = "/Policies/Server.policy";
-		    URL serverPolicyURL = Mains.NameServer.Main.class.getResource(serverPolicyPath);
+			URL serverPolicyURL = Mains.NameServer.Main.class.getResource(serverPolicyPath);
 
-		    if (serverPolicyURL == null)
-		    {
-			    System.err.println("getResource returned NULL");
-		    }
+			if (serverPolicyURL == null)
+			{
+				System.err.println("getResource returned NULL");
+			}
 
-		    System.setProperty("java.security.policy",serverPolicyURL.toString());
-		    Policy.getPolicy().refresh();
+			System.setProperty("java.security.policy",serverPolicyURL.toString());
+			Policy.getPolicy().refresh();
 
 		    Scanner scanner = new Scanner(System.in);
 		    printLineSep();
