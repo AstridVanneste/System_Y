@@ -53,14 +53,14 @@ public class LoadController implements Runnable
 	public void run()
 	{
 		System.out.println("thread started");
-		boolean isClosed = true;
-		while (isClosed)
+		boolean isClosed = false;
+		while (!isClosed)
 		{
 			if (ManageController.getInstance().getCloseLoad())
 			{
 				javafx.application.Platform.runLater(() -> close());
 
-				isClosed = false;
+				isClosed = true;
 			}
 
 		}

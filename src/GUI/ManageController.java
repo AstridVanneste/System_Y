@@ -88,18 +88,10 @@ public class ManageController
 		loadController.view(rootLoad);
 	}
 
-	// Close loadingwindow. Called by the model when a second node has joined the network
-	public void closeLoadWindow()
-	{
-		loadController.close();
-		toMainWindow();
-	}
-
 	public void toPopUp (String file)
 	{
 		popUpController.view(rootPopUp, file );
 	}
-
 
 	public MainController getMainController()
 	{

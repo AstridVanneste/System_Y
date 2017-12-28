@@ -44,6 +44,7 @@ public class LoginController
 			System.out.println("name " + name);
 			Node.getInstance().setName(name);
 			Node.getInstance().getFileManager().setRootDirectory(directory);
+			Node.getInstance().setGUIActive(true);
 
 			ManageController.getInstance().toLoadWindow();
 
