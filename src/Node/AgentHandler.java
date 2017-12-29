@@ -65,6 +65,11 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 
 				Agent agent = this.finishedAgents.removeFirst();
 
+				if (agent instanceof FileAgent)
+				{
+					RingMonitor.getInstance().fileAgentPassed();
+				}
+
 				if (!agent.isFinished())
 				{
 					short nextId = Node.getInstance().getNextNeighbour();

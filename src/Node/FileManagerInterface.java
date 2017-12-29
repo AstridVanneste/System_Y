@@ -64,16 +64,6 @@ public interface FileManagerInterface extends Remote
 	 */
 	public void deleteFileLedgerRemote(String fileName) throws RemoteException;
 
-
-	/**
-	 * orders a node to remove a file through a remote call
-	 * @param id of the receiving node
-	 * @param filename of the to be deleted file
-	 * @param filetype of the to be deletd file
-	 * @throws RemoteException
-	 */
-	public void deleteFileRemote(short id, String filename, FileType filetype)  throws RemoteException;
-
 	/**
 	 * get a file ledger froma specific file through a remote call
 	 * @param id of the node
@@ -82,6 +72,13 @@ public interface FileManagerInterface extends Remote
 	 * @throws RemoteException
 	 */
 	public FileLedger getFileLedgerRemote(short id, String fileName)  throws RemoteException;
+
+	/**
+	 * ALWAYS CALL THIS ON THE OWNER
+	 * @param filename
+	 * @throws RemoteException
+	 */
+	public void deleteFileInNetwork(String filename) throws RemoteException;
 
 	/**
 	 * Copies a file from a node to another. This method does not take into account any responsibility of ledgers.
