@@ -110,8 +110,6 @@ public class Node implements NodeInteractionInterface
 
 			this.lifeCycleManager.start();
 
-			boolean exit = false;
-
 			try
 			{
 				this.neighbourSetSemaphore.acquire(2);  // Blocks until (a) permit(s) become available
@@ -125,11 +123,13 @@ public class Node implements NodeInteractionInterface
 			DownloadManager.getInstance().start();
 
 			this.fileManager.start();
-			this.updateAgent.start();
-			this.agentHandler.start();
-			if (GUIActive)
-				ManageController.getInstance().setCloseLoad(true);
 
+			this.updateAgent.start();
+
+			this.agentHandler.start();
+
+			if (this.GUIActive)
+				ManageController.getInstance().setCloseLoad(true);
 		}
 		else
 		{

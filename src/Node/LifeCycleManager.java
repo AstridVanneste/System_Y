@@ -52,18 +52,6 @@ public class LifeCycleManager implements Runnable
 
 		this.bootstrapTransactionID = (new Random()).nextInt() & 0x7FFFFFFF;
 		this.sendAccessRequest();
-
-
-		/*while (Node.getInstance().getPreviousNeighbour() == -1 || Node.getInstance().getNextNeighbour() == -1)
-		{
-
-			//wait until discovery is finished...
-
-		}*/
-
-
-
-
 	}
 
 	/**
@@ -97,7 +85,6 @@ public class LifeCycleManager implements Runnable
 						// We're not a new node, check and if needed update neighbours
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
-
 							this.updateNeighbours(newNodeID);
 
 							// You were alone, now there's 2 of you
@@ -111,7 +98,6 @@ public class LifeCycleManager implements Runnable
 									try
 									{
 										Node.getInstance().releaseStartupSlot();
-
 									}
 									catch (RemoteException re)
 									{
@@ -121,7 +107,6 @@ public class LifeCycleManager implements Runnable
 
 								try
 								{
-									System.out.println("Running initial FileAgent remotely");
 									//Get the remote node's AgentHandler
 									Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(newNodeID));
 									//Node.getInstance().getAgentHandler().runAgent(new FileAgent());
@@ -158,7 +143,6 @@ public class LifeCycleManager implements Runnable
 						//check if successfully added to NS
 						if (request.getHeader().getReplyCode() == ProtocolHeader.REPLY_SUCCESSFULLY_ADDED)
 						{
-
 							Node.getInstance().setId(newNodeID);
 
 							String nsIp = packet.getAddress().getHostAddress();
@@ -166,8 +150,6 @@ public class LifeCycleManager implements Runnable
 							// Set up connection(s) to NameServer
 
 							this.bindNameserverStubs(nsIp);
-
-
 
 							//nameserver sends the amount of nodes in the tree
 
@@ -346,9 +328,7 @@ public class LifeCycleManager implements Runnable
 		if(previous)
 		{
 			Node.getInstance().getFileManager().checkFiles(FileType.OWNED_FILE);
-			//Node.getInstance().getFileManager().transferReplicaded();
 		}
-
 	}
 
 	public boolean isRunning ()

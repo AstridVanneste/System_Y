@@ -903,21 +903,6 @@ public class FileManager implements FileManagerInterface
 	}
 
 	@Override
-	public void deleteFileRemote(short id, String filename, FileType filetype)  throws RemoteException
-	{
-		try
-		{
-			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
-			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-			remoteFileManager.deleteFile(filename, filetype);
-		}
-		catch (NotBoundException | IOException re)
-		{
-			re.printStackTrace();
-		}
-	}
-
-	@Override
 	public FileLedger getFileLedgerRemote(short id, String fileName)  throws RemoteException
 	{
 		FileLedger fileLedger = null;
@@ -934,6 +919,92 @@ public class FileManager implements FileManagerInterface
 		return fileLedger;
 	}
 
+	@Override
+	public void deleteFileInNetwork(String filename) throws RemoteException
+	{
+		if (this.fileLedgers.containsKey(filename))
+		{
+			short localId = this.fileLedgers.get(filename).getLocalID();
+			short replicatedId = this.fileLedgers.get(filename).getReplicatedId();
+			Set<Short> downloads = this.fileLedgers.get(filename).getDownloads();
+
+			if (localId == Node.getInstance().getId())
+			{
+				try
+				{
+					this.deleteFile(filename, FileType.LOCAL_FILE);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				try
+				{
+					this.deleteFile(filename, FileType.OWNED_FILE);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			if (localId != Node.DEFAULT_ID)
+			{
+				try
+				{
+					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(localId));
+					FileManagerInterface replicatedFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+					replicatedFM.deleteFile(filename, FileType.REPLICATED_FILE);
+				}
+				catch (NotBoundException | IOException nbe)
+				{
+					System.err.println("[ERROR]\tError while trying to delete replication.");
+					nbe.printStackTrace();
+				}
+			}
+
+			if (replicatedId != Node.DEFAULT_ID)
+			{
+				try
+				{
+					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(replicatedId));
+					FileManagerInterface replicatedFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+					replicatedFM.deleteFile(filename, FileType.REPLICATED_FILE);
+				}
+				catch (NotBoundException | IOException nbe)
+				{
+					System.err.println("[ERROR]\tError while trying to delete replication.");
+					nbe.printStackTrace();
+				}
+			}
+
+			for (short downloadId : downloads)
+			{
+				if (downloadId != Node.DEFAULT_ID)
+				{
+					try
+					{
+						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(downloadId));
+						FileManagerInterface replicatedFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+						replicatedFM.deleteFile(filename, FileType.REPLICATED_FILE);
+					}
+					catch (NotBoundException | IOException nbe)
+					{
+						System.err.println("[ERROR]\tError while trying to delete replication.");
+						nbe.printStackTrace();
+					}
+				}
+			}
+		}
+		else
+		{
+			System.err.println("[ERROR]\tCalled deleteFileInNetwork() on a non-owner.");
+		}
+	}
+
 	/**
 	 * replaces the current ledger for a file with a new one
 	 *
@@ -945,8 +1016,6 @@ public class FileManager implements FileManagerInterface
 		this.fileLedgers.put(ledger.getFileName(), ledger);
 		//System.out.println("replacing fileledger of file " + ledger.getFileName() + " thread " + Thread.currentThread().getName());
 	}
-
-
 
 	/**
 	 *
