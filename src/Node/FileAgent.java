@@ -3,7 +3,12 @@ package Node;
 import GUI.MainController;
 
 import java.io.Serializable;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.TreeMap;
 
 public class FileAgent extends Agent implements Serializable
@@ -53,6 +58,17 @@ public class FileAgent extends Agent implements Serializable
 				if (this.fileMap.containsKey(filename))
 				{
 					this.fileMap.remove(filename);
+					try
+					{
+						short ownerId = Node.getInstance().getResolverStub().getOwnerID(filename);
+						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(ownerId));
+						FileManagerInterface ownerFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+						ownerFM.deleteFileInNetwork(filename);
+					}
+					catch (RemoteException | NotBoundException e)
+					{
+						e.printStackTrace();
+					}
 				}
 				else
 				{

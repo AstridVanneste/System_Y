@@ -334,6 +334,7 @@ public class FileManager implements FileManagerInterface
 	public void deleteFile(String filename, FileType type) throws IOException
 	{
 		File file = new File(this.getFullPath(filename, type));
+
 		if (file.exists())
 		{
 			file.delete();
@@ -928,7 +929,7 @@ public class FileManager implements FileManagerInterface
 			short replicatedId = this.fileLedgers.get(filename).getReplicatedId();
 			Set<Short> downloads = this.fileLedgers.get(filename).getDownloads();
 
-			if (localId == Node.getInstance().getId())
+			if (localId == Node.getInstance().getId())  // Local and owner are same node, delete locally
 			{
 				try
 				{
@@ -939,7 +940,7 @@ public class FileManager implements FileManagerInterface
 					e.printStackTrace();
 				}
 			}
-			else
+			else    // Delete file, we are the owner
 			{
 				try
 				{
@@ -957,7 +958,7 @@ public class FileManager implements FileManagerInterface
 				{
 					Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(localId));
 					FileManagerInterface replicatedFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-					replicatedFM.deleteFile(filename, FileType.REPLICATED_FILE);
+					replicatedFM.deleteFile(filename, FileType.LOCAL_FILE);
 				}
 				catch (NotBoundException | IOException nbe)
 				{
@@ -989,7 +990,7 @@ public class FileManager implements FileManagerInterface
 					{
 						Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(downloadId));
 						FileManagerInterface replicatedFM = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
-						replicatedFM.deleteFile(filename, FileType.REPLICATED_FILE);
+						replicatedFM.deleteFile(filename, FileType.DOWNLOADED_FILE);
 					}
 					catch (NotBoundException | IOException nbe)
 					{

@@ -59,7 +59,7 @@ public class Main
 
 		    while (!quit)
 		    {
-			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | Manually [D]ownload File | Do[w]nload file through FileAgent");
+			    System.out.println("[Q]uit | Show [N]eighbours | Shu[T]down | St[A]rt | Fail[u]re | Print [I]D | List Files [o]n this Node | List All [F]iles | Manually [D]ownload File | Do[w]nload file through FileAgent | D[e]lete file in network");
 			    System.out.print(">");
 			    String next = scanner.nextLine();
 
@@ -126,6 +126,14 @@ public class Main
 					    	System.out.println("File: " + file);
 					    }
 					    break;
+				    case "E":
+				    case "e":
+				    	{
+				    		System.out.println("Pleas enter the name of the file you wish to delete");
+				    		String filename = scanner.nextLine();
+					        Node.getInstance().getAgentHandler().deleteFile(filename);
+				        }
+				    	break;
 				    default:
 					    System.err.println("[ERROR]\tInvalid input: '" + next + "'");
 					    continue;
