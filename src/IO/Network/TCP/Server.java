@@ -166,7 +166,7 @@ public class Server implements Runnable
 			{
 				Socket clientSocket = this.socket.accept();
 				String remoteHost = clientSocket.getRemoteSocketAddress().toString();
-				//System.out.println("Got incoming connection on " + remoteHost);
+				System.out.println("Got incoming connection on " + remoteHost);
 				this.connectionHandlers.put(remoteHost, new ConnectionHandler(clientSocket));
 				this.connectionHandlers.get(remoteHost).start();
 			}

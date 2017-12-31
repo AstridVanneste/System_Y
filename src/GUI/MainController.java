@@ -1,7 +1,10 @@
 package GUI;
 
-import Node.Node;
+import Node.*;
+
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -170,9 +173,22 @@ public class MainController
 	public void addFile()
 	{
 		String filePath = pathField.getText();
+		File file = new File(filePath);
 		if (!filePath.equals(""))
 		{
+			return;
+		}
+		if(file.exists())
+		{
+			String rootDir = Node.getInstance().getFileManager().getRootDirectory().concat("/" + FileType.LOCAL_FILE);
 
+			try
+			{
+				Files.copy(file.toPath(),new File(rootDir).toPath());
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
