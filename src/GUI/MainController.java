@@ -63,27 +63,6 @@ public class MainController
 		popUpOpen = false;
 	}
 
-	/*public void start()
-	{
-		Thread t = new Thread(this);
-		t.start();
-	}
-
-	public void run()
-	{
-		while(isRunnig)
-		{
-			if(String.valueOf(Node.getInstance().getNextNeighbour()) != nextLabel.getText())
-			{
-				nextLabel.setText(String.valueOf(Node.getInstance().getNextNeighbour()));
-			}
-			if(String.valueOf(Node.getInstance().getPreviousNeighbour()) != previousLabel.getText())
-			{
-				previousLabel.setText(String.valueOf(Node.getInstance().getPreviousNeighbour()));
-			}
-		}
-	}*/
-
 	public void view(Parent root){
 		if(view == null)
 			view = new Scene(root,600,400);
@@ -92,7 +71,7 @@ public class MainController
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(final WindowEvent arg0) {
-				System.exit(-1);
+				shutdown();
 			}
 		});
 		stage.setScene(view);
@@ -149,8 +128,6 @@ public class MainController
 	{
 		if (!popUpOpen)
 		{
-			popUpOpen = true;
-
 			TableFile file = tableView.getSelectionModel().getSelectedItem();
 
 			if (file != null)
@@ -159,8 +136,13 @@ public class MainController
 
 				this.fileSelected = fileName;
 				ManageController.getInstance().toPopUp(fileName);
+
+				popUpOpen = true;
+
 			}
 		}
+
+		tableView.getSelectionModel().clearSelection();
 	}
 
 	public void shutdown()

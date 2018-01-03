@@ -120,7 +120,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			if (agent instanceof FileAgent)
 			{
 				RingMonitor.getInstance().fileAgentPassed();
-				ManageController.getInstance().getMainController().updateFiles(this.allFiles);
+				if (Node.getInstance().getGUIActive())
+					ManageController.getInstance().getMainController().updateFiles(this.allFiles);
 			}
 
 			if (Node.getInstance().getFileManager().isRunning() || (this.removeQueue.size() > 0))
@@ -139,8 +140,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			ie.printStackTrace();
 		}
 
-		if (Node.getInstance().getGUIActive())
-			ManageController.getInstance().getMainController().updateFiles(this.allFiles);
+		//if (Node.getInstance().getGUIActive())
+		//	ManageController.getInstance().getMainController().updateFiles(this.allFiles);
 	}
 
 	public synchronized LinkedList<String> getDownloadQueue()
