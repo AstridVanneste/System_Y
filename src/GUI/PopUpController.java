@@ -173,6 +173,18 @@ public class PopUpController
 				e.printStackTrace();
 			}
 		}
+
+		if(Node.getInstance().getFileManager().hasFile(this.selectedFile, FileType.REPLICATED_FILE))
+		{
+			try
+			{
+				Node.getInstance().getFileManager().deleteFile(this.selectedFile,FileType.REPLICATED_FILE);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 		ManageController.getInstance().getMainController().setPopUpOpen(false);
 		currentWindow.close();
 
@@ -188,9 +200,31 @@ public class PopUpController
 	public void setSelectedFile(String selectedFile)
 	{
 		this.selectedFile = selectedFile;
-		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE))
+
+		try
 		{
-			deleteLocalButton.setVisible(false);
+
+			short ownerId = Node.getInstance().getResolverStub().getOwnerID(this.selectedFile);
+
+			if (ownerId != Node.getInstance().getId())
+			{
+				FileLedger fileLedger = Node.getInstance().getFileManager().getFileLedgerRemote(ownerId, this.selectedFile);
+
+				//System.out.println("lokale : " + fileLedger.getLocalID());
+				//System.out.println("replicated: " + fileLedger.getReplicatedId());
+
+				if (!(fileLedger.getLocalID() == Node.getInstance().getId()) || !(fileLedger.getReplicatedId() == Node.getInstance().getId()))
+				{
+					deleteLocalButton.setVisible(false);
+				}
+			}
+			else
+				deleteLocalButton.setVisible(false);
+
+		}
+		catch (RemoteException e)
+		{
+			e.printStackTrace();
 		}
 	}
 }

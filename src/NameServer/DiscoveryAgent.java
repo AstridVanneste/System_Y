@@ -33,8 +33,6 @@ public class DiscoveryAgent implements Runnable
 
 	public void init ()
 	{
-
-
 		multicastSub.start();
 		Thread t = new Thread (this);
 		t.start();
@@ -56,7 +54,12 @@ public class DiscoveryAgent implements Runnable
 					{
 						//System.out.println("DiscoveryAgent.run()");
 
+						// Get data
+						// DiscoveryPackage consists of NameLength, Node Name, and Node IP
+
 						byte[] data = request.getData();
+
+						// Get Name Length out of data
 						byte[] nameLenBytes = new byte[4];
 						System.arraycopy(data, 0, nameLenBytes, 0, 4);
 						int nameLen = Util.Serializer.bytesToInt(nameLenBytes);
@@ -67,6 +70,7 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
+						// Get Node Name out of data
 						byte[] nameBytes = new byte[nameLen];
 						System.arraycopy(data, 4, nameBytes, 0, nameLen);
 						String nodeName = new String(nameBytes, Constants.ENCODING);
@@ -86,6 +90,7 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
+						// Get Node IP out of data
 						int[] unicastIPBytes = new int[4];
 						//System.arraycopy(data, 4 + nameLen, unicastIPBytes, 0, 4);
 
@@ -111,11 +116,10 @@ public class DiscoveryAgent implements Runnable
 							continue;
 						}
 
-
 						// Return succes
+						// Return package consists of NodeID and number of nodes already in network
 
 						short nodeId = NameServer.getHash(nodeName);
-
 
 						//System.out.println("Name: " + nodeName + ", IP: " + unicastIp + ", ID: " + Short.toString(nodeId));
 
