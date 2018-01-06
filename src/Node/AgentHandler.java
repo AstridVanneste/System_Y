@@ -140,8 +140,8 @@ public class AgentHandler implements AgentHandlerInterface, Runnable
 			ie.printStackTrace();
 		}
 
-		//if (Node.getInstance().getGUIActive())
-		//	ManageController.getInstance().getMainController().updateFiles(this.allFiles);
+//		if (Node.getInstance().getGUIActive())
+//			ManageController.getInstance().getMainController().updateFiles(this.allFiles);
 	}
 
 	public synchronized LinkedList<String> getDownloadQueue()

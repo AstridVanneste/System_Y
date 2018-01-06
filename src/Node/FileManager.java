@@ -920,6 +920,22 @@ public class FileManager implements FileManagerInterface
 		return fileLedger;
 	}
 
+	public void replaceFileLedgerRemote(short id, FileLedger fileLedger)
+	{
+		try
+		{
+			Registry reg = LocateRegistry.getRegistry(Node.getInstance().getResolverStub().getIP(id));
+			FileManagerInterface remoteFileManager = (FileManagerInterface) reg.lookup(Node.FILE_MANAGER_NAME);
+			remoteFileManager.deleteFileLedgerRemote(fileLedger.getFileName());
+			remoteFileManager.addFileLedger(fileLedger);
+		}
+		catch (NotBoundException | IOException re)
+		{
+			re.printStackTrace();
+		}
+	}
+
+
 	@Override
 	public void deleteFileInNetwork(String filename) throws RemoteException
 	{
