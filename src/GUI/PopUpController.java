@@ -224,9 +224,6 @@ public class PopUpController
 			{
 				FileLedger fileLedger = Node.getInstance().getFileManager().getFileLedgerRemote(ownerId, this.selectedFile);
 
-				System.out.println("lokale : " + fileLedger.getLocalID());
-				System.out.println("replicated: " + fileLedger.getReplicatedId());
-
 				if (fileLedger.getLocalID() != Node.getInstance().getId() && fileLedger.getReplicatedId() != Node.getInstance().getId())
 				{
 					deleteLocalButton.setVisible(false);
@@ -241,12 +238,5 @@ public class PopUpController
 			e.printStackTrace();
 		}
 
-
-
-//		this.selectedFile = selectedFile;
-//		if(!Node.getInstance().getFileManager().hasFile(selectedFile,FileType.LOCAL_FILE) && !Node.getInstance().getFileManager().hasFile(selectedFile,FileType.REPLICATED_FILE))
-//		{
-//			deleteLocalButton.setVisible(false);
-//		}
 	}
 }

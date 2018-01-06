@@ -5,6 +5,7 @@ import Node.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -156,17 +157,17 @@ public class MainController
 	{
 		String filePath = pathField.getText();
 		File file = new File(filePath);
-		if (!filePath.equals(""))
+		if (filePath.equals(""))
 		{
 			return;
 		}
 		if(file.exists())
 		{
-			String rootDir = Node.getInstance().getFileManager().getRootDirectory().concat("/" + FileType.LOCAL_FILE);
+			String rootDir = Node.getInstance().getFileManager().getRootDirectory().concat("\\Local\\");
 
 			try
 			{
-				Files.copy(file.toPath(),new File(rootDir).toPath());
+				Files.copy(file.toPath(),new File(rootDir + file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e)
 			{
 				e.printStackTrace();
